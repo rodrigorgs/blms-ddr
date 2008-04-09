@@ -1,0 +1,66 @@
+##################################################################
+# PLEASE REPORT ANY ERRORS IN THE TESTS TO jacques@dsc.ufcg.edu.br
+##################################################################
+# [History] Player history
+# For a given player, show full player history for any season (all matches, handicap changes, manual handicap modifications, sequence of high runs, ...).
+# This page can also provide the handicap this player has in other leagues.
+#
+# Observation: tests use a method called getMatchAsString that can call getMatchAsObject.toString()
+# where getMatchAsObject is a facade method returning a match object from the point of view of a player
+# The method getMatchAsObject will be useful to set up the History user interface page
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+# date format is country-dependent
+dateFormat format=dd/mm/yyyy
+
+##################################################################
+# simple case - everything nice and rosy
+##################################################################
+# setup
+userId1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+userId2=createUser firstName=fn1 lastName=ln1 homePhone=111-1111 workPhone= cellPhone= email=fl1@a.com picture=
+userId3=createUser firstName=fn2 lastName=ln2 homePhone=222-2222 workPhone= cellPhone= email=fl2@a.com picture=
+leagueId1=createLeague name=LSCG operator=${userId1}
+joinLeague id=${userId2} leagueId=${leagueId1} initialHandicap=200
+joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
+
+# "score" is the number of balls made by losing player
+addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId3} length=150 score=90 longestRunForWinner=22 longestRunForLoser=3
+addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId3} loser=${userId1} length=120 score=45 longestRunForWinner=12 longestRunForLoser=15
+expect "date=01/12/2007,opponent=fn1 ln1,myScore=150,opponentScore=87,myRun=23,opponentRun=30,myHandicap=0,winStatus=true" getMatchAsString userId=${userId1} leagueId=${leagueId1} index=1
+expect "date=01/12/2007,opponent=fn2 ln2,myScore=150,opponentScore=90,myRun=22,opponentRun=3,myHandicap=0,winStatus=true" getMatchAsString userId=${userId1} leagueId=${leagueId1} index=2
+expect "date=02/12/2007,opponent=fn2 ln2,myScore=45,opponentScore=120,myRun=15,opponentRun=12,myHandicap=0,winStatus=false" getMatchAsString userId=${userId1} leagueId=${leagueId1} index=3
+expect "date=01/12/2007,opponent=Jacques Sauve,myScore=87,opponentScore=150,myRun=30,opponentRun=23,myHandicap=200,winStatus=false" getMatchAsString userId=${userId2} leagueId=${leagueId1} index=1
+expect "date=01/12/2007,opponent=Jacques Sauve,myScore=90,opponentScore=150,myRun=3,opponentRun=22,myHandicap=200,winStatus=false" getMatchAsString userId=${userId3} leagueId=${leagueId1} index=1
+expect "date=02/12/2007,opponent=Jacques Sauve,myScore=120,opponentScore=45,myRun=12,opponentRun=15,myHandicap=200,winStatus=true" getMatchAsString userId=${userId3} leagueId=${leagueId1} index=2
+
+##################################################################
+# Testing error conditions
+##################################################################
+# --------------------------------------------
+# command: getMatchAsString (player)
+# syntax: getMatchAsString userId leagueId index
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" getMatchAsString userId=xxx leagueId=${leagueId1} index=1
+expectError "Unknown user" getMatchAsString userId="" leagueId=${leagueId1} index=1
+expectError "Unknown user" getMatchAsString userId= leagueId=${leagueId1} index=1
+expectError "Unknown league" getMatchAsString userId=${userId1} leagueId=xxx index=1
+expectError "Unknown league" getMatchAsString userId=${userId1} leagueId="" index=1
+expectError "Unknown league" getMatchAsString userId=${userId1} leagueId= index=1
+expectError "Invalid index" getMatchAsString userId=${userId1} leagueId=${leagueId1} index=0
+expectError "Invalid index" getMatchAsString userId=${userId1} leagueId=${leagueId1} index=4
