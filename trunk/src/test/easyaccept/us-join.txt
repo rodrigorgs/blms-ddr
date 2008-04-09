@@ -1,0 +1,121 @@
+##################################################################
+# PLEASE REPORT ANY ERRORS IN THE TESTS TO jacques@dsc.ufcg.edu.br
+##################################################################
+# [Join] User joins a league as a player
+# A user may join one or more leagues. 
+# An initial handicap must be provided for that player. 
+# A list of all league players may be displayed on a web page, together with their attributes.
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+##################################################################
+# simple case - everything nice and rosy
+##################################################################
+# setup
+idUser1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+idUser2=createUser firstName=Mark lastName=Twain homePhone=123-222-3333 \
+	workPhone=123-444-5555 cellPhone=123-666-7777 email=mt@a.com picture=mark-twain.jpg
+idUser3=createUser firstName=fn1 lastName=ln1 homePhone=3333-3333 workPhone= cellPhone= email=fl1@a.com picture=
+idUser4=createUser firstName=fn2 lastName=ln2 homePhone=3333-3334 workPhone= cellPhone= email=fl2@a.com picture=
+idLeague1=createLeague name=LSCG operator=${idUser1}
+idLeague2=createLeague name=LSPB operator=${idUser2}
+today=todaysDate
+
+# operator is part of league
+expect true isLeagueMember userId=${idUser1} leagueId=${idLeague1}
+expect false isLeagueMember userId=${idUser1} leagueId=${idLeague2}
+
+# player starts out of leagues
+expect "" getPlayerLeagues userId=${idUser3}
+expect "Sauve" getLeagueMembers leagueId=${idLeague1}
+expect false isLeagueMember userId=${idUser3} leagueId=${idLeague1}
+# player joins league
+joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=200
+expect "LSCG" getPlayerLeagues userId=${idUser3}
+expect "Sauve, ln1" getLeagueMembers leagueId=${idLeague1}
+expect true isLeagueMember id=${idUser3} leagueId=${idLeague1}
+expect ${today} getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=joinDate
+expect 200 getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=currentHandicap
+# player leaves league
+leaveLeague id=${idUser3} leagueId=${idLeague1}
+expect "" getPlayerLeagues userId=${idUser3}
+expect "Sauve" getLeagueMembers leagueId=${idLeague1}
+expect false isLeagueMember id=${idUser3} leagueId=${idLeague1}
+
+##################################################################
+# another user joins same league
+##################################################################
+joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=200
+joinLeague id=${idUser4} leagueId=${idLeague1} initialHandicap=250
+expect "Sauve, ln1, ln2" getLeagueMembers leagueId=${idLeague1}
+
+##################################################################
+# first user joins another league
+##################################################################
+joinLeague id=${idUser3} leagueId=${idLeague2} initialHandicap=220
+expect "LSCG, LSPB" getPlayerLeagues userId=${idUser3}
+expect "Sauve, ln1, ln2" getLeagueMembers leagueId=${idLeague1}
+expect "Twain, ln1" getLeagueMembers leagueId=${idLeague2}
+expect 200 getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=currentHandicap
+expect 220 getUserLeagueAttribute userId=${idUser3} id=${idLeague2} attribute=currentHandicap
+
+##################################################################
+# test error conditions
+##################################################################
+# command: isLeagueMember
+#  bad user id
+expectError "Unknown user" isLeagueMember userId=xxx leagueId=${idLeague1}
+#  bad leagueid
+expectError "Unknown league" isLeagueMember userId=${idUser1} leagueId=xxx
+
+# command: getPlayerLeagues
+#  bad user id
+expectError "Unknown user" getPlayerLeagues userId=xxx
+
+# command: getLeagueMembers
+#  bad league id
+expectError "Unknown league" getLeagueMembers leagueId=xxx
+
+# command: joinLeague
+#  bad user id
+expectError "Unknown user" joinLeague id=xxx leagueId=${idLeague1} initialHandicap=200
+#  bad league id
+expectError "Unknown league" joinLeague id=${idUser3} leagueId=xxx initialHandicap=200
+#  already a member
+expectError "User is already a league member" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=200
+#  handicap can be null or empty
+expectError "Must provide initial player handicap" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=
+expectError "Must provide initial player handicap" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=""
+#  handicap cant be negative
+expectError "Handicap cant be negative" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=-200
+
+# command: getUserLeagueAttribute
+#  bad user id
+expectError "Unknown user" getUserLeagueAttribute userId=xxx id=${idLeague1} attribute=joinDate
+#  bad league id
+expectError "Unknown league" getUserLeagueAttribute userId=${idUser3} id=xxx attribute=joinDate
+#  bad attribute
+expectError "Unknown user attribute" getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=xxx
+#  user not member of league
+expectError "User is not a league member" getUserLeagueAttribute userId=${idUser4} id=${idLeague2} attribute=joinDate
+
+# command: leaveLeague
+#  bad user id
+expectError "Unknown user" leaveLeague id=xxx leagueId=${idLeague1}
+#  bad league id
+expectError "Unknown league" leaveLeague id=${idUser3} leagueId=xxx
+#  user not member of league
+expectError "User is not a league member" leaveLeague id=${idUser4} leagueId=${idLeague2}
+#  operator cant leave league
+expectError "Operator cannot leave league" leaveLeague id=${idUser1} leagueId=${idLeague1}
