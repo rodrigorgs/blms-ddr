@@ -51,19 +51,19 @@ idLeague3=createLeague name=LSMS operator=${idUser2}
 ##################################################################
 expect LSCG getLeagueAttribute id=${idLeague1} attribute=name
 idTemp=getLeagueAttribute id=${idLeague1} attribute=operator
-expectEqual ${idUser1} ${idTemp}
+expect ${idUser1} echo ${idTemp}
 today=todaysDate
 expect ${today} getLeagueAttribute id=${idLeague1} attribute=creationDate
 
 expect LSPB getLeagueAttribute id=${idLeague2} attribute=name
 idTemp=getLeagueAttribute id=${idLeague2} attribute=operator
-expectEqual ${idUser1} $idTemp
+expect ${idUser1} echo ${idTemp}
 today=todaysDate
 expect ${today} getLeagueAttribute id=${idLeague2} attribute=creationDate
 
 expect LSMS getLeagueAttribute id=${idLeague3} attribute=name
 idTemp=getLeagueAttribute id=${idLeague3} attribute=operator
-expectEqual ${idUser2} $idTemp
+expect ${idUser2} echo ${idTemp}
 today=todaysDate
 expect ${today} getLeagueAttribute id=${idLeague3} attribute=creationDate
 
@@ -95,7 +95,7 @@ changeLeagueAttribute id=${idLeague1} attribute=operator value=${idUser2}
 
 expect "LSCG A" getLeagueAttribute id=${idLeague1} attribute=name
 idTemp=getLeagueAttribute id=${idLeague1} attribute=operator
-expectEqual $idTemp ${idUser2}
+expect ${idTemp} echo ${idUser2}
 
 # Check some rules again ...
 # Rule: name and operator are required
@@ -116,17 +116,17 @@ expectError "Cannot remove league operator" deleteUser id=${idUser1}
 ##################################################################
 # can find league
 ##################################################################
-expect "LSCG A, LSPB"  findLeague name=LS[CP].*
-expect "LSCG A, LSPB"  findLeague name=Ls[cp].*
+expect "[LSCG A, LSPB]"  findLeague name=LS[CP].*
+expect "[LSCG A, LSPB]"  findLeague name=Ls[cp].*
 expectError "Could not find league z.*" findLeague name=z.*
 
 ##################################################################
 # League deletion
 ##################################################################
 # list is ordered by league name
-expect "LSCG A, LSMS, LSPB"  findLeague name=.*
+expect "[LSCG A, LSMS, LSPB]"  findLeague name=.*
 deleteLeague id=${idLeague1}
-expect "LSMS, LSPB"  findLeague name=.*
+expect "[LSMS, LSPB]"  findLeague name=.*
 expectError "Cannot remove league operator" deleteUser id=${idUser1}
 deleteLeague id=${idLeague2}
 deleteLeague id=${idLeague3}
