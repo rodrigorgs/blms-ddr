@@ -70,8 +70,9 @@ Dir.glob('../test/easyaccept/us-*.txt').each do |filename|
 		instr = instr[$~.end(0)..-1]
 
 		method = meths[name] || meths[name] = Meth.new(name)
-		method.lines[filename] ||= []
-		method.lines[filename] << line_number
+    basename = File.basename(filename)
+		method.lines[basename] ||= []
+		method.lines[basename] << line_number
 		if m.throws then method.throws = m.throws end
 		if m.ret != 'void' then method.ret = m.ret end
 
@@ -86,12 +87,14 @@ Dir.glob('../test/easyaccept/us-*.txt').each do |filename|
 	file.close
 end
 
-file = STDOUT #File.new('BlmsFacade.java', 'w')
-#file.puts 'public class BlmsFacade {'
+file = File.new('BlmsFacade.java', 'w')
+file.puts 'package blms.facade;'
+file.puts
+file.puts 'public class BlmsFacade {'
 meths.keys.sort.each do |key|
 	method = meths[key]
 	file.puts method
 end
 file.puts '}'
 file.puts
-#file.close
+file.close
