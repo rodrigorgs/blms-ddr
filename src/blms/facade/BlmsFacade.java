@@ -1,6 +1,41 @@
 package blms.facade;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import blms.Registry;
+import blms.User;
+
 public class BlmsFacade {
+	public Registry registry;
+
+	private void changeAttribute(String id, String attribute, String value)
+			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException {
+		Object target = registry.getObject(id);
+		Class clas = target.getClass();
+		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
+		Method met = clas.getMethod("set" + s, new Class[] {String.class});
+		met.invoke(target, new Object[] {value});
+	}
+	
+	private String getAttribute(/*Class clas, */String id, String attribute) 
+			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException {
+		Object target = registry.getObject(id);
+		Class clas = target.getClass();
+		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
+		Method met = clas.getMethod("get" + s, new Class[] {});
+		return met.invoke(target, new Object[] {}).toString();
+	}
+	
+	public BlmsFacade() {
+		registry = new Registry();
+	}
+	
 	// from us-standings.txt:340,343,346,373,374,375 us-history.txt:453,454,455,471 us-win-loss.txt:535,538,541,582,610,620,621,622,640,644,673,674,675,676,677,678,679,680,681,682,683,684,685,691,692,693,694,695,696,697,698,699,700,701,702,704,705,706,708,709,710,712,713,714,715,717,718,719,720,749,761,776,793,814,824,834,844,854,864,874,911 
 	public String addMatchResult(String leagueId, String date, String winner, String loser) throws Exception {
 		return "";
@@ -12,8 +47,17 @@ public class BlmsFacade {
 	}
 
 	// from us-users.txt:231,232,233,236,237,238,239,240,241,242,254,255,256,257,258,259,262,263,264,267,268,269,272,273 
-	public void changeUserAttribute(String id, String value) throws Exception {
-		
+	public void changeUserAttribute(String id, String attribute, String value) throws Exception {
+		if (attribute == null || attribute.length() == 0)
+			throw new Exception("Must provide an attribute to be changed");
+		try {
+			changeAttribute(id, attribute, value);
+		} catch (NoSuchMethodException e) {
+			throw new Exception("Unknown user attribute");
+		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	// from us-leagues.txt:45,46,47,74,75,76,77,78,81,82 us-standings.txt:330 us-history.txt:448 us-join.txt:952,953 us-win-loss.txt:525 
@@ -32,8 +76,9 @@ public class BlmsFacade {
 	 * @param picture Name of the user picture.
 	 * @return User id number.
 	 */ 
-	public int createUser(String firstName, String lastName, String homePhone, String workPhone, String cellPhone, String email, String picture) throws Exception {
-		return 0;
+	public String createUser(String firstName, String lastName, String homePhone, String workPhone, String cellPhone, String email, String picture) throws Exception {
+		User user = registry.createUser(firstName, lastName, homePhone, workPhone, cellPhone, email, picture);
+		return registry.getId(user);
 	}
 
 	// from us-standings.txt:320 us-history.txt:438 us-win-loss.txt:515,642,646,919,920,921 
@@ -77,7 +122,11 @@ public class BlmsFacade {
 	 * @throws UnknownLastNameException If no user exists with given last name. 
 	 */ 
 	public String findUserByLastName(String lastName) throws Exception {
-		throw new UnknownLastNameException("Could not find user " + lastName);
+		Collection<User> users = registry.findUserByLastName(lastName);
+		if (users.isEmpty()) 
+			throw new UnknownLastNameException("Could not find user " + lastName);
+		else
+			return Arrays.toString(users.toArray());
 	}
 
 	// from us-leagues.txt:52,53,56,58,59,62,64,65,68,96,97 
@@ -171,8 +220,8 @@ public class BlmsFacade {
 	 * @param attribute Name of the attribute.
 	 * @return The value of intended attribute for this user.
 	 */ 
-	public String getUserAttribute(String id, String attribute) {
-		return "Jacques";
+	public String getUserAttribute(String id, String attribute) throws Exception {
+		return getAttribute(id, attribute);
 	}
 
 	// from us-join.txt:969,970,991,992,1026,1028,1030,1032 
