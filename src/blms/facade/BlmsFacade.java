@@ -21,9 +21,19 @@ public class BlmsFacade {
 		return "";
 	}
 
-	// from us-leagues.txt:41,43 us-standings.txt:327,328,329 us-users.txt:177,179,202,204,206,208,210,212,215,216,217,218,222,224 us-history.txt:445,446,447 us-join.txt:947,949,950,951 us-win-loss.txt:522,523,524 
-	public String createUser(String firstName, String lastName, String homePhone, String workPhone, String cellPhone, String email, String picture) throws Exception {
-		return "";
+	/**
+	 * Creates a new user
+	 * @param firstName The first name of the user.
+	 * @param lastName The last name of the user.
+	 * @param homePhone The home phone number of the user.
+	 * @param workPhone The work phone number of the user
+	 * @param cellPhone The cell phone number of the user.
+	 * @param email The email of the user.
+	 * @param picture Name of the user picture.
+	 * @return User id number.
+	 */ 
+	public int createUser(String firstName, String lastName, String homePhone, String workPhone, String cellPhone, String email, String picture) throws Exception {
+		return 0;
 	}
 
 	// from us-standings.txt:320 us-history.txt:438 us-win-loss.txt:515,642,646,919,920,921 
@@ -61,9 +71,13 @@ public class BlmsFacade {
 		return "";
 	}
 
-	// from us-users.txt:172,173,278,280,282,288,289,291,293,294 
+	/**
+	 * Finds a user by his/her last name.
+	 * @param lastName The last name of the user.
+	 * @throws UnknownLastNameException If no user exists with given last name. 
+	 */ 
 	public String findUserByLastName(String lastName) throws Exception {
-		return "";
+		throw new UnknownLastNameException("Could not find user " + lastName);
 	}
 
 	// from us-leagues.txt:52,53,56,58,59,62,64,65,68,96,97 
@@ -151,9 +165,14 @@ public class BlmsFacade {
 		return "";
 	}
 
-	// from us-users.txt:180,181,182,183,184,185,186,188,189,190,191,192,193,194,244,245,246,247,248,249,250 
+	/**
+	 * Returns some attribute from some user.
+	 * @param id The user id.
+	 * @param attribute Name of the attribute.
+	 * @return The value of intended attribute for this user.
+	 */ 
 	public String getUserAttribute(String id, String attribute) {
-		return "";
+		return "Jacques";
 	}
 
 	// from us-join.txt:969,970,991,992,1026,1028,1030,1032 
@@ -176,17 +195,24 @@ public class BlmsFacade {
 		
 	}
 
-	// from us-leagues.txt:29 us-standings.txt:316 us-users.txt:165 us-history.txt:434 us-join.txt:939 us-win-loss.txt:511 
+	/**
+	 * Removes all existing leagues.
+	 */ 
 	public void removeAllLeagues() {
 		
 	}
 
-	// from us-leagues.txt:28 us-standings.txt:315,411 us-users.txt:164 us-history.txt:433,470 us-join.txt:938 us-win-loss.txt:510,580,608,619,748,760,775,792,813,823,833,843,853,863,873,910 
+	/**
+	 * Removes all existing matches.
+	 */
+ 
 	public void removeAllMatches() {
 		
 	}
 
-	// from us-leagues.txt:30 us-standings.txt:317 us-users.txt:166 us-history.txt:435 us-join.txt:940 us-win-loss.txt:512 
+	/**
+	 * Removes all existing users.
+	 */ 
 	public void removeAllUsers() {
 		
 	}
@@ -201,7 +227,10 @@ public class BlmsFacade {
 		
 	}
 
-	// from us-leagues.txt:25 us-standings.txt:312 us-users.txt:161 us-history.txt:430 us-join.txt:935 us-win-loss.txt:507 
+	/**
+	 * Selects the dataBase used.
+	 * @param databaseName The name of database instance.
+	 */ 
 	public void useDatabase(String databaseName) {
 		
 	}
