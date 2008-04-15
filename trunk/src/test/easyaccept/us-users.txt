@@ -110,22 +110,22 @@ expect jumping-frog.jpg getUserAttribute id=${idUser2} attribute=picture
 
 # Check some rules again ...
 # Rule: firstName, lastName are required
-#expectError "Required data: first name" changeUserAttribute id=${idUser2} attribute=firstName value=
-#expectError "Required data: first name" changeUserAttribute id=${idUser2} attribute=firstName value=""
-#expectError "Required data: last name" changeUserAttribute id=${idUser2} attribute=lastName value=
-#expectError "Required data: last name" changeUserAttribute id=${idUser2} attribute=lastName value=""
-#expectError "Required data: email" changeUserAttribute id=${idUser2} attribute=email value=""
-#expectError "Required data: email" changeUserAttribute id=${idUser2} attribute=email value=""
+expectError "Required data: first name" changeUserAttribute id=${idUser2} attribute=firstName value=
+expectError "Required data: first name" changeUserAttribute id=${idUser2} attribute=firstName value=""
+expectError "Required data: last name" changeUserAttribute id=${idUser2} attribute=lastName value=
+expectError "Required data: last name" changeUserAttribute id=${idUser2} attribute=lastName value=""
+expectError "Required data: email" changeUserAttribute id=${idUser2} attribute=email value=""
+expectError "Required data: email" changeUserAttribute id=${idUser2} attribute=email value=""
 
 # Rule: picture not required
-#changeUserAttribute id=${idUser2} attribute=picture value=
-#changeUserAttribute id=${idUser2} attribute=picture value=""
-#changeUserAttribute id=${idUser2} attribute=picture value=jumping-frog.jpg
+changeUserAttribute id=${idUser2} attribute=picture value=
+changeUserAttribute id=${idUser2} attribute=picture value=""
+changeUserAttribute id=${idUser2} attribute=picture value=jumping-frog.jpg
 
 # Rule: must have at least one way to contact user by phone
-#changeUserAttribute id=${idUser2} attribute=homePhone value=
-#changeUserAttribute id=${idUser2} attribute=workPhone value=
-#expectError "Need at least one phone" changeUserAttribute id=${idUser2} attribute=cellPhone value=
+changeUserAttribute id=${idUser2} attribute=homePhone value=
+changeUserAttribute id=${idUser2} attribute=workPhone value=
+expectError "Need at least one phone" changeUserAttribute id=${idUser2} attribute=cellPhone value=
 
 # Rule: No user data is unique except email
 #expectError "User with this email exists" changeUserAttribute id=${idUser2} attribute=email value=js@a.com

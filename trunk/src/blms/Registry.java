@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import blms.exceptions.BlmsException;
+
 public class Registry {
 	Collection<User> users;
 	Map<String, Object> idToObj;
@@ -45,7 +47,7 @@ public class Registry {
 	}
 
 	public User createUser(String firstName, String lastName, String homePhone,
-			String workPhone, String cellPhone, String email, String picture) throws Exception {
+			String workPhone, String cellPhone, String email, String picture) throws BlmsException {
 		User user = new User(firstName, lastName, homePhone, workPhone, cellPhone, email, picture);
 		users.add(user);
 		generateId(user);
