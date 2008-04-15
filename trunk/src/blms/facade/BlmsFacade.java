@@ -2,17 +2,26 @@ package blms.facade;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
+import blms.League;
 import blms.Registry;
 import blms.User;
 import blms.exceptions.BlmsException;
 
 public class BlmsFacade {
-	public Registry registry;
+	Registry registry;
+	SimpleDateFormat dateFormat;
 
+	public BlmsFacade() {
+		registry = new Registry();
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	}
+	
 	private void changeAttribute(String id, String attribute, String value)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException, BlmsException {
@@ -21,15 +30,11 @@ public class BlmsFacade {
 		registry.changeAttribute(target, attribute, value);
 	}
 	
-	private String getAttribute(String id, String attribute) 
+	private Object getAttribute(String id, String attribute) 
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		Object target = registry.getObject(id);
 		return registry.getAttribute(target, id, attribute);
-	}
-	
-	public BlmsFacade() {
-		registry = new Registry();
 	}
 	
 	// from us-standings.txt:340,343,346,373,374,375 us-history.txt:453,454,455,471 us-win-loss.txt:535,538,541,582,610,620,621,622,640,644,673,674,675,676,677,678,679,680,681,682,683,684,685,691,692,693,694,695,696,697,698,699,700,701,702,704,705,706,708,709,710,712,713,714,715,717,718,719,720,749,761,776,793,814,824,834,844,854,864,874,911 
@@ -57,7 +62,8 @@ public class BlmsFacade {
 
 	// from us-leagues.txt:45,46,47,74,75,76,77,78,81,82 us-standings.txt:330 us-history.txt:448 us-join.txt:952,953 us-win-loss.txt:525 
 	public String createLeague(String name, String operator) throws Exception {
-		return "";
+		League league = registry.createLeague(name, (User)registry.getObject(operator));
+		return registry.getId(league);
 	}
 
 	/**
@@ -108,7 +114,7 @@ public class BlmsFacade {
 
 	// from us-leagues.txt:36,37,119,120,121,127,129,133 
 	public String findLeague(String name) throws Exception {
-		return "";
+		throw new BlmsException("Could not find league " + name);
 	}
 
 	/**
@@ -125,8 +131,13 @@ public class BlmsFacade {
 	}
 
 	// from us-leagues.txt:52,53,56,58,59,62,64,65,68,96,97 
-	public String getLeagueAttribute(String id, String attribute) {
-		return "";
+	public String getLeagueAttribute(String id, String attribute) throws Exception {
+		if (attribute.equals("operator"))
+			return registry.getId(getAttribute(id, attribute));
+		else if (attribute.equals("creationDate"))
+			return dateFormat.format(getAttribute(id, attribute));
+		else
+			return (String)getAttribute(id, attribute);
 	}
 
 	// from us-join.txt:962,967,974,982,989,990,1009 
@@ -216,7 +227,7 @@ public class BlmsFacade {
 	 * @return The value of intended attribute for this user.
 	 */ 
 	public String getUserAttribute(String id, String attribute) throws Exception {
-		return getAttribute(id, attribute);
+		return (String)getAttribute(id, attribute);
 	}
 
 	// from us-join.txt:969,970,991,992,1026,1028,1030,1032 
@@ -243,7 +254,7 @@ public class BlmsFacade {
 	 * Removes all existing leagues.
 	 */ 
 	public void removeAllLeagues() {
-		
+		registry.removeAllLeagues();
 	}
 
 	/**
@@ -258,12 +269,12 @@ public class BlmsFacade {
 	 * Removes all existing users.
 	 */ 
 	public void removeAllUsers() {
-		
+		registry.removeAllUsers();
 	}
 
 	// from us-leagues.txt:55,61,67 us-join.txt:954 
 	public String todaysDate() {
-		return "";
+		return dateFormat.format(new Date());
 	}
 
 	// from us-standings.txt:353 us-win-loss.txt:595,875,876,877,878,879,880,881,882,883,884,885,886,888,889,890,892,893,894,896,897,898,899,901,902,903,904 

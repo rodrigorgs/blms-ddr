@@ -8,6 +8,8 @@ import blms.exceptions.BlmsException;
 
 import util.StringUtil;
 
+// Invariant: the user has a firstName, a lastName and a email (not null and not empty).
+// Invariant: the user has at least one phone number.
 public class User {
 	String firstName, lastName, homePhone, workPhone, cellPhone, email;
 	String picture;

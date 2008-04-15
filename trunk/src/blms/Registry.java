@@ -4,26 +4,35 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import blms.exceptions.BlmsException;
 
+// Invariant: there aren't two users with the same email address. 
 public class Registry {
 	Collection<User> users;
+	Collection<League> leagues;
+	
 	Map<String, Object> idToObj;
 	Map<Object, String> objToId;
-	long lastId = 0;
+	long nextId = 0;
+
+	public Registry() {
+		users = new LinkedList<User>();
+		leagues = new LinkedList<League>();
+		
+		idToObj = new HashMap<String, Object>();
+		objToId = new HashMap<Object, String>();
+	}
 	
-	private String generateId(Object obj) {
-		String s = "" + lastId;
+	private String insertIntoTables(Object obj) {
+		String s = "" + nextId;
 		idToObj.put(s, obj);
 		objToId.put(obj, s);
-		lastId++;
+		nextId++;
 		return s;
 	}
 	
@@ -38,13 +47,6 @@ public class Registry {
 	
 	public String getId(Object o) {
 		return objToId.get(o);
-	}
-	
-	
-	public Registry() {
-		users = new LinkedList<User>();
-		idToObj = new HashMap<String, Object>();
-		objToId = new HashMap<Object, String>();
 	}
 	
 	public User[] findUserByLastName(String lastName) {
@@ -64,7 +66,7 @@ public class Registry {
 		if (users.contains(user))
 			throw new BlmsException("User with this email exists");
 		users.add(user);
-		generateId(user);
+		insertIntoTables(user);
 		return user;
 	}
 
@@ -72,6 +74,19 @@ public class Registry {
 		users.remove(user);
 		removeFromTables(user);
 	}
+	
+	// --------------------------------------
+	
+	public League createLeague(String name, User operator) throws BlmsException {
+		League league = new League(name, operator);
+		if (leagues.contains(league))
+			throw new BlmsException("This league already exists");
+		leagues.add(league);
+		insertIntoTables(league);
+		return league;
+	}
+	
+	// --------------------------------------
 	
 	public void changeAttribute(Object target, String attribute, String value)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
@@ -89,12 +104,26 @@ public class Registry {
 		met.invoke(target, new Object[] {value});
 	}
 	
-	public String getAttribute(Object target, String id, String attribute) 
+	public Object getAttribute(Object target, String id, String attribute) 
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		Class clas = target.getClass();
 		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
 		Method met = clas.getMethod("get" + s, new Class[] {});
-		return met.invoke(target, new Object[] {}).toString();
+		return met.invoke(target, new Object[] {});
+	}
+
+	public void removeAllUsers() {
+		for (User u : users)
+			removeFromTables(u);
+		users.clear();
+	}
+
+	// TODO: remove seasons, win/loss...
+	public void removeAllLeagues() {
+		for (League l : leagues)
+			removeFromTables(l);
+		leagues.clear();
+		
 	}
 }
