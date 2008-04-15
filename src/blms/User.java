@@ -77,6 +77,11 @@ public class User {
 		this.lastName = lastName;
 	}
 
+	/**
+	 * Must not be used directly. Please use {@link Registry#changeAttribute(Object, String, String)}.
+	 * @param email
+	 * @throws Exception
+	 */
 	public void setEmail(String email) throws Exception {
 		Validator.validateNameAndEmail(this.firstName, this.lastName, email);
 		this.email = email;

@@ -16,21 +16,16 @@ public class BlmsFacade {
 	private void changeAttribute(String id, String attribute, String value)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException, BlmsException {
+
 		Object target = registry.getObject(id);
-		Class clas = target.getClass();
-		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-		Method met = clas.getMethod("set" + s, new Class[] {String.class});
-		met.invoke(target, new Object[] {value});
+		registry.changeAttribute(target, attribute, value);
 	}
 	
 	private String getAttribute(String id, String attribute) 
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		Object target = registry.getObject(id);
-		Class clas = target.getClass();
-		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-		Method met = clas.getMethod("get" + s, new Class[] {});
-		return met.invoke(target, new Object[] {}).toString();
+		return registry.getAttribute(target, id, attribute);
 	}
 	
 	public BlmsFacade() {

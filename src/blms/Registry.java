@@ -1,5 +1,7 @@
 package blms;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,5 +71,30 @@ public class Registry {
 	public void deleteUser(User user) {
 		users.remove(user);
 		removeFromTables(user);
+	}
+	
+	public void changeAttribute(Object target, String attribute, String value)
+			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException, BlmsException {
+		Class clas = target.getClass();
+		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
+		Method met = clas.getMethod("set" + s, new Class[] {String.class});
+		
+		if (clas == User.class && attribute.equals("email")) {
+			for (User u : users)
+				if (u.email.equals(value) && !u.equals(target))
+					throw new BlmsException("User with this email exists");
+		}
+		
+		met.invoke(target, new Object[] {value});
+	}
+	
+	public String getAttribute(Object target, String id, String attribute) 
+			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException {
+		Class clas = target.getClass();
+		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
+		Method met = clas.getMethod("get" + s, new Class[] {});
+		return met.invoke(target, new Object[] {}).toString();
 	}
 }
