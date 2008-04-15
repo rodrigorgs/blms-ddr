@@ -66,7 +66,7 @@ idTemp=getLeagueAttribute id=${idLeague3} attribute=operator
 expect ${idUser2} echo ${idTemp}
 today=todaysDate
 expect ${today} getLeagueAttribute id=${idLeague3} attribute=creationDate
-quit
+
 ##################################################################
 # rules concerning league attributes
 ##################################################################
@@ -80,7 +80,7 @@ expectError "Unknown user" createLeague name=abc operator=xxx
 # Rule: league name must be unique
 expectError "This league already exists" createLeague name=LSCG operator=${idUser1}
 expectError "This league already exists" createLeague name=LSCG operator=${idUser2}
-
+quit
 ##################################################################
 # Changing league attributes
 ##################################################################
