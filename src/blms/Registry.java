@@ -45,7 +45,7 @@ public class Registry {
 	}
 
 	public User createUser(String firstName, String lastName, String homePhone,
-			String workPhone, String cellPhone, String email, String picture) {
+			String workPhone, String cellPhone, String email, String picture) throws Exception {
 		User user = new User(firstName, lastName, homePhone, workPhone, cellPhone, email, picture);
 		users.add(user);
 		generateId(user);

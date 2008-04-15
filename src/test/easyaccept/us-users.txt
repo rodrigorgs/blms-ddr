@@ -57,24 +57,24 @@ expect mark-twain.jpg getUserAttribute id=${idUser2} attribute=picture
 ##################################################################
 # Rule: firstName, lastName are required
 # Rule: picture not required
-#expectError "Required data: first name" createUser firstName= lastName=ln homePhone=111-222-3333 \
+expectError "Required data: first name" createUser firstName= lastName=ln homePhone=111-222-3333 \
 	workPhone= cellPhone= email=x picture=
-#expectError "Required data: first name" createUser firstName="" lastName=ln homePhone=111-222-3333 \
+expectError "Required data: first name" createUser firstName="" lastName=ln homePhone=111-222-3333 \
 	workPhone= cellPhone= email=x picture=
-#expectError "Required data: last name" createUser firstName=fn lastName= homePhone=111-222-3333 \
+expectError "Required data: last name" createUser firstName=fn lastName= homePhone=111-222-3333 \
 	workPhone= cellPhone= email=x picture=
-#expectError "Required data: last name" createUser firstName=fn lastName="" homePhone=111-222-3333 \
+expectError "Required data: last name" createUser firstName=fn lastName="" homePhone=111-222-3333 \
 	workPhone= cellPhone= email=x picture=
-#expectError "Required data: first name, last name" createUser firstName= lastName= homePhone=111-222-3333 \
+expectError "Required data: first name, last name" createUser firstName= lastName= homePhone=111-222-3333 \
 	workPhone= cellPhone= email=x picture=
-#expectError "Required data: first name, last name, email" createUser firstName= lastName= homePhone=111-222-3333 \
+expectError "Required data: first name, last name, email" createUser firstName= lastName= homePhone=111-222-3333 \
 	workPhone= cellPhone= email= picture=
 
 # Rule: must have at least one way to contact user (by phone or email)
-#expectError "Need at least one phone" createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone= email=fl1@a.com picture=
-#idUser3=createUser firstName=fn lastName=ln homePhone=111-222-3333 workPhone= cellPhone= email=fl2@a.com picture=
-#idUser4=createUser firstName=fn lastName=ln homePhone= workPhone=111-222-3333 cellPhone= email=fl3@a.com picture=
-#idUser5=createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone=111-222-3333 email=f4@a.com picture=
+expectError "Need at least one phone" createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone= email=fl1@a.com picture=
+idUser3=createUser firstName=fn lastName=ln homePhone=111-222-3333 workPhone= cellPhone= email=fl2@a.com picture=
+idUser4=createUser firstName=fn lastName=ln homePhone= workPhone=111-222-3333 cellPhone= email=fl3@a.com picture=
+idUser5=createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone=111-222-3333 email=f4@a.com picture=
 
 # Rule: No user data is unique except email
 #expectError "User with this email exists" createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
