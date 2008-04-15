@@ -109,10 +109,6 @@ public class User {
 	}
 	
 	static class Validator {
-		private static boolean isNullOrEmpty(String s) {
-			return (s == null || s.trim().length() == 0);
-		}
-		
 		private static void validateAttributes(String firstName, String lastName, 
 				String email, String homePhone, String workPhone, 
 				String cellPhone) throws BlmsException {
@@ -129,20 +125,20 @@ public class User {
 		
 		private static void validatePhones(String homePhone, String workPhone, 
 				String cellPhone) throws BlmsException {
-			if (isNullOrEmpty(homePhone)
-					&& isNullOrEmpty(workPhone)
-					&& isNullOrEmpty(cellPhone))
+			if (Util.isNullOrEmpty(homePhone)
+					&& Util.isNullOrEmpty(workPhone)
+					&& Util.isNullOrEmpty(cellPhone))
 				throw new BlmsException("Need at least one phone");
 		}
 		
 		private static String[] missingAttributes(String firstName, String lastName, 
 				String email) {
 			Collection<String> list = new LinkedList<String>();
-			if (isNullOrEmpty(firstName))
+			if (Util.isNullOrEmpty(firstName))
 				list.add("first name");
-			if (isNullOrEmpty(lastName))
+			if (Util.isNullOrEmpty(lastName))
 				list.add("last name");
-			if (isNullOrEmpty(email))
+			if (Util.isNullOrEmpty(email))
 				list.add("email");
 			return list.toArray(new String[] {});
 		}	

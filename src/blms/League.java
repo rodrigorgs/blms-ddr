@@ -10,7 +10,10 @@ public class League {
 	Date creationDate;
 	
 	public League(String name, User operator) throws BlmsException {
-		
+		if (Util.isNullOrEmpty(name))
+			throw new BlmsException("Required data: league name");
+		if (operator == null)
+			throw new BlmsException("Required data: league operator");
 		this.name = name;
 		this.operator = operator;
 		this.creationDate = new Date();
@@ -19,7 +22,7 @@ public class League {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof League && ((League)obj).getName() == this.name);
+		return (obj instanceof League && ((League)obj).getName().equals(this.name));
 	}
 
 	public String getName() {

@@ -1,16 +1,14 @@
 package blms.facade;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 import blms.League;
 import blms.Registry;
 import blms.User;
+import blms.Util;
 import blms.exceptions.BlmsException;
 
 public class BlmsFacade {
@@ -62,7 +60,12 @@ public class BlmsFacade {
 
 	// from us-leagues.txt:45,46,47,74,75,76,77,78,81,82 us-standings.txt:330 us-history.txt:448 us-join.txt:952,953 us-win-loss.txt:525 
 	public String createLeague(String name, String operator) throws Exception {
-		League league = registry.createLeague(name, (User)registry.getObject(operator));
+		if (Util.isNullOrEmpty(operator))
+			throw new BlmsException("Required data: league operator");
+		User user = (User)registry.getObject(operator);
+		if (user == null)
+			throw new BlmsException("Unknown user");
+		League league = registry.createLeague(name, user);
 		return registry.getId(league);
 	}
 
