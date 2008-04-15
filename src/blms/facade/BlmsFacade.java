@@ -8,13 +8,14 @@ import java.util.Map;
 
 import blms.Registry;
 import blms.User;
+import blms.exceptions.BlmsException;
 
 public class BlmsFacade {
 	public Registry registry;
 
 	private void changeAttribute(String id, String attribute, String value)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException {
+			IllegalAccessException, InvocationTargetException, BlmsException {
 		Object target = registry.getObject(id);
 		Class clas = target.getClass();
 		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
@@ -22,7 +23,7 @@ public class BlmsFacade {
 		met.invoke(target, new Object[] {value});
 	}
 	
-	private String getAttribute(/*Class clas, */String id, String attribute) 
+	private String getAttribute(String id, String attribute) 
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		Object target = registry.getObject(id);
@@ -47,17 +48,16 @@ public class BlmsFacade {
 	}
 
 	// from us-users.txt:231,232,233,236,237,238,239,240,241,242,254,255,256,257,258,259,262,263,264,267,268,269,272,273 
-	public void changeUserAttribute(String id, String attribute, String value) throws Exception {
+	public void changeUserAttribute(String id, String attribute, String value) throws Throwable {
 		if (attribute == null || attribute.length() == 0)
 			throw new Exception("Must provide an attribute to be changed");
 		try {
 			changeAttribute(id, attribute, value);
 		} catch (NoSuchMethodException e) {
 			throw new Exception("Unknown user attribute");
+		} catch (InvocationTargetException e) {
+			throw e.getCause();
 		}
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	// from us-leagues.txt:45,46,47,74,75,76,77,78,81,82 us-standings.txt:330 us-history.txt:448 us-join.txt:952,953 us-win-loss.txt:525 

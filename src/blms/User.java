@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import blms.exceptions.BlmsException;
+
 import util.StringUtil;
 
 public class User {
@@ -12,7 +14,9 @@ public class User {
 	
 	public User(String firstName, String lastName, String homePhone,
 			String workPhone, String cellPhone, String email, 
-			String picture) throws Exception {
+			String picture) throws BlmsException {
+		Validator.validateAttributes(firstName, lastName, email, homePhone, workPhone, cellPhone);
+		
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.homePhone = homePhone;
@@ -20,35 +24,8 @@ public class User {
 		this.cellPhone = cellPhone;
 		this.email = email;
 		this.picture = picture;
-		
-		validateAttributes();
 	}
 	
-	private boolean isNullOrEmpty(String s) {
-		return (s == null || s.trim().length() == 0);
-	}
-	
-	private void validateAttributes() throws Exception {
-		String[] missing = missingAttributes();
-		if (missing.length > 0)
-			throw new Exception("Required data: " + Util.join(missing, ", "));
-		if (isNullOrEmpty(homePhone)
-				&& isNullOrEmpty(workPhone)
-				&& isNullOrEmpty(cellPhone))
-			throw new Exception("Need at least one phone");
-	}
-	
-	private String[] missingAttributes() {
-		Collection<String> list = new LinkedList<String>();
-		if (isNullOrEmpty(firstName))
-			list.add("first name");
-		if (isNullOrEmpty(lastName))
-			list.add("last name");
-		if (isNullOrEmpty(email))
-			list.add("email");
-		return list.toArray(new String[] {});
-	}
-
 	public String toString() {
 		return lastName;
 	}
@@ -85,31 +62,77 @@ public class User {
 		return cellPhone;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(String firstName) throws Exception {
+		Validator.validateNameAndEmail(firstName, this.lastName, this.email);
 		this.firstName = firstName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(String lastName) throws Exception {
+		Validator.validateNameAndEmail(this.firstName, lastName, this.email);
 		this.lastName = lastName;
 	}
 
-	public void setHomePhone(String homePhone) {
+	public void setEmail(String email) throws Exception {
+		Validator.validateNameAndEmail(this.firstName, this.lastName, email);
+		this.email = email;
+	}
+	
+	public void setHomePhone(String homePhone) throws Exception {
+		Validator.validatePhones(homePhone, this.workPhone, this.cellPhone);
 		this.homePhone = homePhone;
 	}
 
-	public void setWorkPhone(String workPhone) {
+	public void setWorkPhone(String workPhone) throws Exception {
+		Validator.validatePhones(this.homePhone, workPhone, this.cellPhone);
 		this.workPhone = workPhone;
 	}
 
-	public void setCellPhone(String cellPhone) {
+	public void setCellPhone(String cellPhone) throws Exception {
+		Validator.validatePhones(this.homePhone, this.workPhone, cellPhone);
 		this.cellPhone = cellPhone;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public void setPicture(String picture) {
 		this.picture = picture;
+	}
+	
+	static class Validator {
+		private static boolean isNullOrEmpty(String s) {
+			return (s == null || s.trim().length() == 0);
+		}
+		
+		private static void validateAttributes(String firstName, String lastName, 
+				String email, String homePhone, String workPhone, 
+				String cellPhone) throws BlmsException {
+			validateNameAndEmail(firstName, lastName, email);
+			validatePhones(homePhone, workPhone, cellPhone);
+		}
+		
+		private static void validateNameAndEmail(String firstName, String lastName, 
+				String email) throws BlmsException {
+			String[] missing = missingAttributes(firstName, lastName, email);
+			if (missing.length > 0)
+				throw new BlmsException("Required data: " + Util.join(missing, ", "));		
+		}
+		
+		private static void validatePhones(String homePhone, String workPhone, 
+				String cellPhone) throws BlmsException {
+			if (isNullOrEmpty(homePhone)
+					&& isNullOrEmpty(workPhone)
+					&& isNullOrEmpty(cellPhone))
+				throw new BlmsException("Need at least one phone");
+		}
+		
+		private static String[] missingAttributes(String firstName, String lastName, 
+				String email) {
+			Collection<String> list = new LinkedList<String>();
+			if (isNullOrEmpty(firstName))
+				list.add("first name");
+			if (isNullOrEmpty(lastName))
+				list.add("last name");
+			if (isNullOrEmpty(email))
+				list.add("email");
+			return list.toArray(new String[] {});
+		}	
 	}
 }
