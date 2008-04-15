@@ -103,7 +103,7 @@ public class BlmsFacade {
 
 	// from us-leagues.txt:114,130,135,136 us-users.txt:279,281 
 	public void deleteUser(String id) throws Exception {
-		
+		registry.deleteUser((User)registry.getObject(id));
 	}
 
 	// from us-leagues.txt:54,60,66,98 
@@ -122,11 +122,11 @@ public class BlmsFacade {
 	 * @throws UnknownLastNameException If no user exists with given last name. 
 	 */ 
 	public String findUserByLastName(String lastName) throws Exception {
-		Collection<User> users = registry.findUserByLastName(lastName);
-		if (users.isEmpty()) 
+		User[] users = registry.findUserByLastName(lastName);
+		if (users.length == 0) 
 			throw new UnknownLastNameException("Could not find user " + lastName);
 		else
-			return Arrays.toString(users.toArray());
+			return Arrays.toString(users);
 	}
 
 	// from us-leagues.txt:52,53,56,58,59,62,64,65,68,96,97 

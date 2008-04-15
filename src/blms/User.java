@@ -26,12 +26,17 @@ public class User {
 		this.picture = picture;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof User))
+			return false;
+		User other = (User)o;
+		return email.equals(other.getEmail());
+	}
+
+	@Override
 	public String toString() {
 		return lastName;
-	}
-	
-	public int hashCode() {
-		return 0;
 	}
 	
 	public String getFirstName() {
