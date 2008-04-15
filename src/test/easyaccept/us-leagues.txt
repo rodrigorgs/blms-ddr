@@ -41,6 +41,7 @@ idUser1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
 	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
 idUser2=createUser firstName=Mark lastName=Twain homePhone=123-222-3333 \
 	workPhone=123-444-5555 cellPhone=123-666-7777 email=mt@a.com picture=mark-twain.jpg
+
 # a league operator can operate more than one league
 idLeague1=createLeague name=LSCG operator=${idUser1}
 idLeague2=createLeague name=LSPB operator=${idUser1}
@@ -51,10 +52,9 @@ idLeague3=createLeague name=LSMS operator=${idUser2}
 ##################################################################
 expect LSCG getLeagueAttribute id=${idLeague1} attribute=name
 idTemp=getLeagueAttribute id=${idLeague1} attribute=operator
-expect ${idUser1} echo ${idTemp}
+#expect ${idUser1} echo ${idTemp}
 today=todaysDate
 expect ${today} getLeagueAttribute id=${idLeague1} attribute=creationDate
-
 expect LSPB getLeagueAttribute id=${idLeague2} attribute=name
 idTemp=getLeagueAttribute id=${idLeague2} attribute=operator
 expect ${idUser1} echo ${idTemp}
@@ -66,7 +66,7 @@ idTemp=getLeagueAttribute id=${idLeague3} attribute=operator
 expect ${idUser2} echo ${idTemp}
 today=todaysDate
 expect ${today} getLeagueAttribute id=${idLeague3} attribute=creationDate
-
+quit
 ##################################################################
 # rules concerning league attributes
 ##################################################################
