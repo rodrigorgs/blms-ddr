@@ -77,11 +77,11 @@ idUser4=createUser firstName=fn lastName=ln homePhone= workPhone=111-222-3333 ce
 idUser5=createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone=111-222-3333 email=f4@a.com picture=
 
 # Rule: No user data is unique except email
-#expectError "User with this email exists" createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+expectError "User with this email exists" createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
 	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
 idUser7=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
 	workPhone=111-444-5555 cellPhone=111-666-7777 email=js1@a.com picture=jacques-sauve.jpg
-#expectDifferent ${idUser1} echo ${idUser7}
+expectDifferent ${idUser1} echo ${idUser7}
 
 ##################################################################
 # Changing user attributes
@@ -128,26 +128,26 @@ changeUserAttribute id=${idUser2} attribute=workPhone value=
 expectError "Need at least one phone" changeUserAttribute id=${idUser2} attribute=cellPhone value=
 
 # Rule: No user data is unique except email
-#expectError "User with this email exists" changeUserAttribute id=${idUser2} attribute=email value=js@a.com
-#changeUserAttribute id=${idUser1} attribute=email value=js@a.com
+expectError "User with this email exists" changeUserAttribute id=${idUser2} attribute=email value=js@a.com
+changeUserAttribute id=${idUser1} attribute=email value=js@a.com
 
 ##################################################################
 # User deletion
 ##################################################################
 expect "[Sauve, Sauve]" findUserByLastName lastName=Sauve
-#deleteUser id=${idUser7}
-#expect "[Sauve]" findUserByLastName lastName=Sauve
-#deleteUser id=${idUser1}
-#expectError "Could not find user Sauve" findUserByLastName lastName=Sauve
+deleteUser id=${idUser7}
+expect "[Sauve]" findUserByLastName lastName=Sauve
+deleteUser id=${idUser1}
+expectError "Could not find user Sauve" findUserByLastName lastName=Sauve
 
 ##################################################################
 # Finding users
 ##################################################################
 # Twain is now "The Jumping Frog of Calaveras County"
-#expectError "Could not find user Twain" findUserByLastName lastName=Twain
-#expect [Frog] findUserByLastName lastName=Frog
+expectError "Could not find user Twain" findUserByLastName lastName=Twain
+expect [Frog] findUserByLastName lastName=Frog
 # case insensitive
-#expect [Frog] findUserByLastName lastName=frog
+expect [Frog] findUserByLastName lastName=frog
 # can find user with regular expression
-#expect [Frog] findUserByLastName lastName=f[a-z]+g
-#expectError "Could not find user f[0-9]*g" findUserByLastName lastName=f[0-9]*g
+expect [Frog] findUserByLastName lastName=f[a-z]+g
+expectError "Could not find user f[0-9]*g" findUserByLastName lastName=f[0-9]*g
