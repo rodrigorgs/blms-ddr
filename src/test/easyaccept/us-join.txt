@@ -40,6 +40,7 @@ expect false isLeagueMember userId=${idUser1} leagueId=${idLeague2}
 expect "" getPlayerLeagues userId=${idUser3}
 expect "Sauve" getLeagueMembers leagueId=${idLeague1}
 expect false isLeagueMember userId=${idUser3} leagueId=${idLeague1}
+quit
 # player joins league
 joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=200
 expect "LSCG" getPlayerLeagues userId=${idUser3}
