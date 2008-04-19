@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -87,6 +88,45 @@ public class Registry {
 	}
 	
 	// --------------------------------------
+	
+	public String getUserLeagues(String userId) throws Exception{
+		String stringLeagues = "";
+		User user = (User) this.getObject(userId);
+		if (user == null)
+			throw new BlmsException("Required data: league user");
+		for (Iterator it = leagues.iterator(); it.hasNext(); ){
+			League league = (League)it.next();
+			if ((league.operator).equals(user)){
+				stringLeagues += "" + league.name;
+			}
+		}		
+		return stringLeagues;
+	}
+	
+	public String getLeagueUsers(String leagueId) throws Exception{
+		
+		String stringMembers = "";
+		League league = (League) this.getObject(leagueId);
+		for (Iterator it = users.iterator(); it.hasNext(); ){
+			User user = (User) it.next();
+			String userId = this.getId(user);
+			if (this.isUserLeague(userId, leagueId)){
+				stringMembers += "" + user.lastName;
+			}
+		}		
+		return stringMembers;
+	}
+	
+	public boolean isUserLeague(String userId, String leagueId) throws BlmsException {
+		if (Util.isNullOrEmpty(leagueId))
+			throw new BlmsException("Required: league");
+		if (userId == null)
+			throw new BlmsException("Required data: league operator");
+		User user = (User) this.getObject(userId);
+		League league = (League) this.getObject(leagueId);
+		
+		return ((league.operator).equals(user));
+	}
 	
 	public void changeAttribute(Object target, String attribute, String value)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
