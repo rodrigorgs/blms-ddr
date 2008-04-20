@@ -3,12 +3,15 @@ package blms;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import sun.util.calendar.BaseCalendar.Date;
 
 import blms.exceptions.BlmsException;
 
@@ -19,6 +22,9 @@ public class Registry {
 	
 	Map<String, Object> idToObj;
 	Map<Object, String> objToId;
+	Map<String, Date> datesMap;
+	Map<String, Integer> handicaps;
+	Map<League, LinkedList<User>> leaguesMap;
 	long nextId = 0;
 
 	public Registry() {
@@ -27,6 +33,9 @@ public class Registry {
 		
 		idToObj = new HashMap<String, Object>();
 		objToId = new HashMap<Object, String>();
+		datesMap = new HashMap<String, Date>();
+		handicaps = new HashMap<String, Integer>();
+		leaguesMap = new HashMap<League, LinkedList<User>>();
 	}
 	
 	private String insertIntoTables(Object obj) {
@@ -83,6 +92,9 @@ public class Registry {
 		if (leagues.contains(league))
 			throw new BlmsException("This league already exists");
 		leagues.add(league);
+		LinkedList<User> usersList = new LinkedList<User>();
+		usersList.add(operator);
+		leaguesMap.put(league, usersList);
 		insertIntoTables(league);
 		return league;
 	}
@@ -96,25 +108,46 @@ public class Registry {
 			throw new BlmsException("Required data: league user");
 		for (Iterator it = leagues.iterator(); it.hasNext(); ){
 			League league = (League)it.next();
-			if ((league.operator).equals(user)){
-				stringLeagues += "" + league.name;
+			LinkedList<User> usersList = leaguesMap.get(league);
+			if (usersList.contains(user)){
+				if (stringLeagues.length() > 0){
+					stringLeagues += ", " + league.name;
+				} else stringLeagues += league.name;
 			}
 		}		
 		return stringLeagues;
 	}
 	
 	public String getLeagueUsers(String leagueId) throws Exception{
-		
+		if (Util.isNullOrEmpty(leagueId))
+			throw new BlmsException("Required data: league id");
 		String stringMembers = "";
 		League league = (League) this.getObject(leagueId);
-		for (Iterator it = users.iterator(); it.hasNext(); ){
+		LinkedList<User> usersList = leaguesMap.get(league);
+		for (Iterator it = usersList.iterator(); it.hasNext(); ){
 			User user = (User) it.next();
 			String userId = this.getId(user);
-			if (this.isUserLeague(userId, leagueId)){
-				stringMembers += "" + user.lastName;
-			}
+			if (stringMembers.length() > 0){
+				stringMembers += ", " + user.lastName;
+			} else stringMembers += user.lastName;				
+			
 		}		
 		return stringMembers;
+	}
+	
+	public void userJoinLeague(String idUser, String leagueId, int initialHandicap) throws Exception{
+		User user = (User) this.getObject(idUser);
+		League league = (League) this.getObject(leagueId);
+		LinkedList<User> usersList = new LinkedList<User>();
+		//Date joinDate = new
+		if (!leaguesMap.containsKey(league)){
+			throw new BlmsException("This league was not created!");
+		}
+		usersList = leaguesMap.get(league);
+		usersList.add(user);
+		
+		leaguesMap.put(league, usersList);
+		handicaps.put(league.name+user.email, initialHandicap);
 	}
 	
 	public boolean isUserLeague(String userId, String leagueId) throws BlmsException {
@@ -125,7 +158,7 @@ public class Registry {
 		User user = (User) this.getObject(userId);
 		League league = (League) this.getObject(leagueId);
 		
-		return ((league.operator).equals(user));
+		return (leaguesMap.get(league)).contains(user);
 	}
 	
 	public void changeAttribute(Object target, String attribute, String value)
