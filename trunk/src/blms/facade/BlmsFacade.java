@@ -20,12 +20,18 @@ public class BlmsFacade {
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	}
 	
-	private void changeAttribute(String id, String attribute, String value)
-			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException, BlmsException {
-
-		Object target = registry.getObject(id);
-		registry.changeAttribute(target, attribute, value);
+	private void changeAttribute(String id, String attribute, Object value, 
+			String type, Class valueType) throws Throwable {
+		if (Util.isNullOrEmpty(attribute))
+			throw new Exception("Must provide an attribute to be changed");
+		try {
+			Object target = registry.getObject(id);
+			registry.changeAttribute(target, attribute, value, valueType);
+		} catch (NoSuchMethodException e) {
+			throw new Exception("Unknown " + type + " attribute");
+		} catch (InvocationTargetException e) {
+			throw e.getCause();
+		}
 	}
 	
 	private Object getAttribute(String id, String attribute) 
@@ -41,21 +47,31 @@ public class BlmsFacade {
 	}
 
 	// from us-leagues.txt:88,89,90,93,94,102,103,104,105,106,109 
-	public void changeLeagueAttribute(String id, String value) throws Exception {
+	public void changeLeagueAttribute(String id, String attribute, String value) throws Throwable {
+		Object objValue = value;
+		Class<? extends Object> klass = String.class;
 		
+		if (attribute != null) {
+			// TODO: this kind of logic must be in League!!
+			if (Util.isNullOrEmpty(value) && 
+					(attribute.equals("operator") || attribute.equals("name"))) {
+				throw new Exception("Required data: league " + attribute);
+			}
+		
+			if (attribute.equals("operator")) {
+				klass = User.class;
+				objValue = registry.getObject(value);
+				if (objValue == null)
+					throw new Exception("Unknown user");
+			}
+		}
+
+		changeAttribute(id, attribute, objValue, "league", klass);
 	}
 
 	// from us-users.txt:231,232,233,236,237,238,239,240,241,242,254,255,256,257,258,259,262,263,264,267,268,269,272,273 
 	public void changeUserAttribute(String id, String attribute, String value) throws Throwable {
-		if (attribute == null || attribute.length() == 0)
-			throw new Exception("Must provide an attribute to be changed");
-		try {
-			changeAttribute(id, attribute, value);
-		} catch (NoSuchMethodException e) {
-			throw new Exception("Unknown user attribute");
-		} catch (InvocationTargetException e) {
-			throw e.getCause();
-		}
+		changeAttribute(id, attribute, value, "user", String.class);
 	}
 
 	// from us-leagues.txt:45,46,47,74,75,76,77,78,81,82 us-standings.txt:330 us-history.txt:448 us-join.txt:952,953 us-win-loss.txt:525 
@@ -97,7 +113,7 @@ public class BlmsFacade {
 
 	// from us-leagues.txt:128,131,132 
 	public void deleteLeague(String id) {
-		
+		registry.deleteLeague((League)registry.getObject(id));
 	}
 
 	// from us-standings.txt:360,363,366 us-win-loss.txt:612,912,913,914 
@@ -110,14 +126,13 @@ public class BlmsFacade {
 		registry.deleteUser((User)registry.getObject(id));
 	}
 
-	// from us-leagues.txt:54,60,66,98 
-	public String echo() {
-		return "";
-	}
-
 	// from us-leagues.txt:36,37,119,120,121,127,129,133 
 	public String findLeague(String name) throws Exception {
-		throw new BlmsException("Could not find league " + name);
+		League[] leagues = registry.findLeague(name);
+		if (leagues.length == 0)
+			throw new BlmsException("Could not find league " + name);
+		else
+			return Arrays.toString(leagues);
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +70,17 @@ public class Registry {
 		}
 		return ret.toArray(new User[] {});
 	}
+	
+	public League[] findLeague(String name) {
+		Pattern pat = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
+		TreeSet<League> ret = new TreeSet<League>();
+		for (League league : leagues) {
+			Matcher m = pat.matcher(league.getName());
+			if (m.matches())
+				ret.add(league);
+		}
+		return ret.toArray(new League[] {});
+	}
 
 	public User createUser(String firstName, String lastName, String homePhone,
 			String workPhone, String cellPhone, String email, String picture) throws BlmsException {
@@ -80,9 +92,17 @@ public class Registry {
 		return user;
 	}
 
-	public void deleteUser(User user) {
+	public void deleteUser(User user) throws BlmsException {
+		for (League l : leagues)
+			if (l.getOperator() == user)
+				throw new BlmsException("Cannot remove league operator");
 		users.remove(user);
 		removeFromTables(user);
+	}
+	
+	public void deleteLeague(League league) {
+		leagues.remove(league);
+		removeFromTables(league);
 	}
 	
 	// --------------------------------------
@@ -161,17 +181,40 @@ public class Registry {
 		return (leaguesMap.get(league)).contains(user);
 	}
 	
-	public void changeAttribute(Object target, String attribute, String value)
+	/**
+	 * Changes an attribute by calling on the target object a setter method
+	 * which takes one parameter of the type valueType 
+	 * @param target
+	 * @param attribute
+	 * @param value
+	 * @param valueType
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws BlmsException
+	 */
+	public void changeAttribute(Object target, String attribute, Object value, Class valueType)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException, BlmsException {
+		//Class parameterClass = (value == null) ? String.class : value.getClass();
 		Class clas = target.getClass();
 		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-		Method met = clas.getMethod("set" + s, new Class[] {String.class});
+		Method met = clas.getMethod("set" + s, new Class[] {valueType});
 		
+		/* TODO: generalize. Each class must define an unique attribute which
+		   is to be checked */
 		if (clas == User.class && attribute.equals("email")) {
 			for (User u : users)
-				if (u.email.equals(value) && !u.equals(target))
+				if (u.getEmail().equals(value) && !u.equals(target))
 					throw new BlmsException("User with this email exists");
+		}
+		
+		if (clas == League.class && attribute.equals("name")) {
+			for (League l : leagues)
+				if (l.getName().equals(value) && !l.equals(target))
+					throw new BlmsException("This league already exists");
 		}
 		
 		met.invoke(target, new Object[] {value});
@@ -199,4 +242,7 @@ public class Registry {
 		leagues.clear();
 		
 	}
+
+
+
 }
