@@ -1,10 +1,12 @@
 package blms;
 
+import java.text.Collator;
 import java.util.Date;
 
 import blms.exceptions.BlmsException;
 
-public class League {
+// invariant: name and operator are non-empty
+public class League implements Comparable<League> {
 	String name;
 	User operator;
 	Date creationDate;
@@ -46,5 +48,14 @@ public class League {
 		return creationDate;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return name;
+	}
+
+
+	@Override
+	public int compareTo(League other) {
+		return Collator.getInstance().compare(name, other.getName());
+	}
 }
