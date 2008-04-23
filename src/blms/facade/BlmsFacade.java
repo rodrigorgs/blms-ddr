@@ -103,7 +103,7 @@ public class BlmsFacade {
 
 	// from us-standings.txt:320 us-history.txt:438 us-win-loss.txt:515,642,646,919,920,921 
 	public void dateFormat(String format) throws Exception {
-		
+		dateFormat = new SimpleDateFormat(format.replaceAll("m", "M"));
 	}
 
 	// from us-standings.txt:335,378,381,384,395,396,397,398,399,412 
