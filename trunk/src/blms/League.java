@@ -1,6 +1,7 @@
 package blms;
 
 import java.text.Collator;
+import java.util.Collection;
 import java.util.Date;
 
 import blms.exceptions.BlmsException;
@@ -10,6 +11,7 @@ public class League implements Comparable<League> {
 	String name;
 	User operator;
 	Date creationDate;
+	Collection<Match> matches;
 	
 	public League(String name, User operator) throws BlmsException {
 		if (Util.isNullOrEmpty(name))
@@ -46,6 +48,10 @@ public class League implements Comparable<League> {
 
 	public Date getCreationDate() {
 		return creationDate;
+	}
+	
+	public Match[] getMatches() {
+		return matches.toArray(new Match[] {});
 	}
 	
 	@Override

@@ -13,6 +13,7 @@ import util.StringUtil;
 public class User {
 	String firstName, lastName, homePhone, workPhone, cellPhone, email;
 	String picture;
+	Collection<Match> matches;
 	
 	public User(String firstName, String lastName, String homePhone,
 			String workPhone, String cellPhone, String email, 
@@ -106,6 +107,14 @@ public class User {
 
 	public void setPicture(String picture) {
 		this.picture = picture;
+	}
+	
+	public Match[] getMatches(League l) {
+		Collection<Match> ret = new LinkedList<Match>();
+		for (Match m : matches)
+			if (m.getLeague() == l)
+				ret.add(m);
+		return ret.toArray(new Match[] {});
 	}
 	
 	static class Validator {
