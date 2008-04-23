@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,14 +13,13 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sun.util.calendar.BaseCalendar.Date;
-
 import blms.exceptions.BlmsException;
 
 // Invariant: there aren't two users with the same email address. 
 public class Registry {
 	Collection<User> users;
 	Collection<League> leagues;
+	Collection<Match> matches;
 	
 	Map<String, Object> idToObj;
 	Map<Object, String> objToId;
@@ -31,6 +31,7 @@ public class Registry {
 	public Registry() {
 		users = new LinkedList<User>();
 		leagues = new LinkedList<League>();
+		matches = new LinkedList<Match>();
 		
 		idToObj = new HashMap<String, Object>();
 		objToId = new HashMap<Object, String>();
@@ -241,6 +242,19 @@ public class Registry {
 			removeFromTables(l);
 		leagues.clear();
 		
+	}
+
+	public Match addMatchResult(League league, Date date,
+			User winner, User loser) {
+		Match m = new Match(league, date, winner, loser);
+		league.addMatch(m);
+		winner.addMatch(m);
+		loser.addMatch(m);
+		
+		matches.add(m);
+		insertIntoTables(m);
+		
+		return m;
 	}
 
 
