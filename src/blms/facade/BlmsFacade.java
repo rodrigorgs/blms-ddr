@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import blms.League;
+import blms.Match;
 import blms.Registry;
 import blms.User;
 import blms.Util;
@@ -43,7 +44,18 @@ public class BlmsFacade {
 	
 	// from us-standings.txt:340,343,346,373,374,375 us-history.txt:453,454,455,471 us-win-loss.txt:535,538,541,582,610,620,621,622,640,644,673,674,675,676,677,678,679,680,681,682,683,684,685,691,692,693,694,695,696,697,698,699,700,701,702,704,705,706,708,709,710,712,713,714,715,717,718,719,720,749,761,776,793,814,824,834,844,854,864,874,911 
 	public String addMatchResult(String leagueId, String date, String winner, String loser) throws Exception {
-		return "";
+		// addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
+		League league = (League)registry.getObject(leagueId);
+		Date parsedDate = dateFormat.parse(date);
+		User userWinner = (User)registry.getObject(winner);
+		User userLoser = (User)registry.getObject(loser);
+		assert league != null;
+		assert parsedDate != null;
+		assert userWinner != null;
+		assert userLoser != null;
+		
+		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser);
+		return registry.getId(m);
 	}
 
 	// from us-leagues.txt:88,89,90,93,94,102,103,104,105,106,109 
@@ -103,7 +115,7 @@ public class BlmsFacade {
 
 	// from us-standings.txt:320 us-history.txt:438 us-win-loss.txt:515,642,646,919,920,921 
 	public void dateFormat(String format) throws Exception {
-		dateFormat = new SimpleDateFormat(format.replaceAll("m", "M"));
+		dateFormat.applyPattern(format.replaceAll("m", "M"));
 	}
 
 	// from us-standings.txt:335,378,381,384,395,396,397,398,399,412 
@@ -215,17 +227,28 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:547,548,737,738,739,740,741,742 
 	public String getNumberOfLosses(String id, String leagueId) throws Exception {
-		return "";
+		User user = (User)registry.getObject(id);
+		League league = (League)registry.getObject(leagueId);
+		return "" + user.getNumberOfWinsOrLosses(league, Match.Role.LOSER);
 	}
 
 	// from us-win-loss.txt:530,531,532,536,537,539,540,542,543,609,611,613,656,662,663,664,665,666,667 
 	public String getNumberOfMatches(String leagueId) throws Exception {
-		return "";
+		League league = (League)registry.getObject(leagueId);
+		return "" + league.getMatches().length;
+	}
+	
+	public String getNumberOfMatches(String id, String leagueId) throws Exception {
+		User user = (User)registry.getObject(id);
+		League league = (League)registry.getObject(leagueId);
+		return "" + user.getMatches(league).length;
 	}
 
 	// from us-win-loss.txt:545,546,726,727,728,729,730,731 
 	public String getNumberOfWins(String id, String leagueId) throws Exception {
-		return "";
+		User user = (User)registry.getObject(id);
+		League league = (League)registry.getObject(leagueId);
+		return "" + user.getNumberOfWinsOrLosses(league, Match.Role.WINNER);
 	}
 
 	// from us-join.txt:961,966,973,988,1005 

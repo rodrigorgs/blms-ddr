@@ -46,7 +46,7 @@ userId3=createUser firstName=fn2 lastName=ln2 homePhone=222-2222 workPhone= cell
 leagueId1=createLeague name=LSCG operator=${userId1}
 joinLeague id=${userId2} leagueId=${leagueId1} initialHandicap=200
 joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
-quit
+
 # after joining league, player starts with no match results
 expect 0 getNumberOfMatches leagueId=${leagueId1}
 expect 0 getNumberOfMatches id=${userId1} leagueId=${leagueId1}
@@ -67,6 +67,7 @@ expect 2 getNumberOfWins id=${userId1} leagueId=${leagueId1}
 expect 1 getNumberOfWins id=${userId2} leagueId=${leagueId1}
 expect 1 getNumberOfLosses id=${userId1} leagueId=${leagueId1}
 expect 2 getNumberOfLosses id=${userId2} leagueId=${leagueId1}
+quit
 
 # index starts at 1
 matchId=getMatch leagueId=${leagueId1} index=1

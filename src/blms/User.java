@@ -19,7 +19,7 @@ public class User {
 			String workPhone, String cellPhone, String email, 
 			String picture) throws BlmsException {
 		Validator.validateAttributes(firstName, lastName, email, homePhone, workPhone, cellPhone);
-		
+		matches = new LinkedList<Match>();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.homePhone = homePhone;
@@ -117,6 +117,14 @@ public class User {
 		return ret.toArray(new Match[] {});
 	}
 	
+	public int getNumberOfWinsOrLosses(League league, Match.Role role) {
+		int count = 0;
+		for (Match m : matches)
+			if (m.getUserRole(this) == role)
+				count++;
+		return count;
+	}
+	
 	static class Validator {
 		private static void validateAttributes(String firstName, String lastName, 
 				String email, String homePhone, String workPhone, 
@@ -151,5 +159,9 @@ public class User {
 				list.add("email");
 			return list.toArray(new String[] {});
 		}	
+	}
+
+	public void addMatch(Match m) {
+		matches.add(m);
 	}
 }
