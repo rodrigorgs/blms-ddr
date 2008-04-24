@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
+import blms.Join;
 import blms.League;
 import blms.Match;
 import blms.Registry;
@@ -172,7 +173,8 @@ public class BlmsFacade {
 
 	// from us-join.txt:962,967,974,982,989,990,1009 
 	public String getLeagueMembers(String leagueId) throws Exception {
-		return registry.getLeagueUsers(leagueId);
+		League league = (League) registry.getObject(leagueId);
+		return registry.getLeagueUsers(league);
 	}
 
 	// from us-win-loss.txt:551,559,567,594,623,624,625,626,628,629,750,751,752,753,754,762,763,764,765,766,767,768,769 
@@ -258,7 +260,8 @@ public class BlmsFacade {
 
 	// from us-join.txt:961,966,973,988,1005 
 	public String getPlayerLeagues(String userId) throws Exception {
-		return registry.getUserLeagues(userId);
+		User user = (User) registry.getObject(userId);
+		return registry.getUserLeagues(user);
 	}
 
 	// from us-standings.txt:338,339,341,342,344,345,347,348,354,355,361,362,364,365,367,368,376,377,379,380,382,383,385,386,405,406,407,408,409,410,413 
@@ -280,7 +283,10 @@ public class BlmsFacade {
 	public String getUserLeagueAttribute(String userId, String id, String attribute) throws Exception {
 		User user = (User) registry.getObject(userId);
 		League league = (League) registry.getObject(id);
-		return (String) registry.getAttribute(user, id, attribute);
+		Join join = new Join(user, league, 0);
+		String joinId = registry.getId(join);
+		
+		return dateFormat.format(getAttribute(id, attribute));
 	}
 
 	// from us-join.txt:957,958,963,968,975,999,1001 
@@ -288,6 +294,7 @@ public class BlmsFacade {
 		User user = (User) registry.getObject(userId);
 		League league = (League) registry.getObject(leagueId);
 		return registry.isUserLeague(user, league);
+
 	}
 
 	// from us-standings.txt:331,332 us-history.txt:449,450 us-join.txt:965,980,981,987,1013,1015,1017,1019,1020,1022 us-win-loss.txt:526,527 

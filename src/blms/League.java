@@ -32,6 +32,7 @@ public class League implements Comparable<League> {
 		return (obj instanceof League && ((League)obj).getName().equals(this.name));
 	}
 
+	
 	public String getName() {
 		return name;
 	}
