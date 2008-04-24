@@ -20,11 +20,11 @@ public class Registry {
 	Collection<User> users;
 	Collection<League> leagues;
 	Collection<Match> matches;
+	Collection<Join> joins;
 	
 	Map<String, Object> idToObj;
 	Map<Object, String> objToId;
-	Map<String, Date> datesMap;
-	Map<String, Integer> handicaps;
+	
 	Map<League, LinkedList<User>> leaguesMap;
 	long nextId = 0;
 
@@ -32,11 +32,12 @@ public class Registry {
 		users = new LinkedList<User>();
 		leagues = new LinkedList<League>();
 		matches = new LinkedList<Match>();
+		joins = new LinkedList<Join>(); 
 		
 		idToObj = new HashMap<String, Object>();
 		objToId = new HashMap<Object, String>();
-		datesMap = new HashMap<String, Date>();
-		handicaps = new HashMap<String, Integer>();
+		
+		
 		leaguesMap = new HashMap<League, LinkedList<User>>();
 	}
 	
@@ -156,30 +157,37 @@ public class Registry {
 		return stringMembers;
 	}
 	
-	public void userJoinLeague(String idUser, String leagueId, int initialHandicap) throws Exception{
-		User user = (User) this.getObject(idUser);
-		League league = (League) this.getObject(leagueId);
-		LinkedList<User> usersList = new LinkedList<User>();
-		//Date joinDate = new
-		if (!leaguesMap.containsKey(league)){
-			throw new BlmsException("This league was not created!");
-		}
-		usersList = leaguesMap.get(league);
-		usersList.add(user);
+	public void userJoinLeague(User user, League league, int initialHandicap) throws Exception{
+		Join join = new Join(user, league, initialHandicap);
+		joins.add(join);
 		
-		leaguesMap.put(league, usersList);
-		handicaps.put(league.name+user.email, initialHandicap);
+		//		User user = (User) this.getObject(idUser);
+//		League league = (League) this.getObject(leagueId);
+//		LinkedList<User> usersList = new LinkedList<User>();
+//		//Date joinDate = new
+//		if (!leaguesMap.containsKey(league)){
+//			throw new BlmsException("This league was not created!");
+//		}
+//		usersList = leaguesMap.get(league);
+//		usersList.add(user);
+//
+//		leaguesMap.put(league, usersList);
+//		handicaps.put(league.name+user.email, initialHandicap);
 	}
 	
-	public boolean isUserLeague(String userId, String leagueId) throws BlmsException {
-		if (Util.isNullOrEmpty(leagueId))
+	public boolean isUserLeague(User user, League league) throws BlmsException {
+		if (Util.isNullOrEmpty(league.name))
 			throw new BlmsException("Required: league");
-		if (userId == null)
+		if (user.equals(null))
 			throw new BlmsException("Required data: league operator");
-		User user = (User) this.getObject(userId);
-		League league = (League) this.getObject(leagueId);
-		
-		return (leaguesMap.get(league)).contains(user);
+		Join join = new Join(user, league, 200);
+		for (Iterator it = joins.iterator(); it.hasNext(); ){
+			Join auxJoin = (Join) it.next();
+			if (join.equals(auxJoin)){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

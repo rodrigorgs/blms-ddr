@@ -279,17 +279,22 @@ public class BlmsFacade {
 	// from us-join.txt:969,970,991,992,1026,1028,1030,1032 
 	public String getUserLeagueAttribute(String userId, String id, String attribute) throws Exception {
 		User user = (User) registry.getObject(userId);
-		return registry.getAttribute(user, id, attribute).toString();
+		League league = (League) registry.getObject(id);
+		return (String) registry.getAttribute(user, id, attribute);
 	}
 
 	// from us-join.txt:957,958,963,968,975,999,1001 
 	public boolean isLeagueMember(String userId, String leagueId) throws Exception {
-		return registry.isUserLeague(userId, leagueId);
+		User user = (User) registry.getObject(userId);
+		League league = (League) registry.getObject(leagueId);
+		return registry.isUserLeague(user, league);
 	}
 
 	// from us-standings.txt:331,332 us-history.txt:449,450 us-join.txt:965,980,981,987,1013,1015,1017,1019,1020,1022 us-win-loss.txt:526,527 
-	public void joinLeague(String idUser, String leagueId, int initialHandicap) throws Exception {
-		registry.userJoinLeague(idUser, leagueId, initialHandicap);
+	public void joinLeague(String idUser, String idLeague, int initialHandicap) throws Exception {
+		User user = (User) registry.getObject(idUser);
+		League league = (League) registry.getObject(idLeague);
+		registry.userJoinLeague(user, league, initialHandicap);
 	}
 
 	// from us-join.txt:972,1036,1038,1040,1042 
