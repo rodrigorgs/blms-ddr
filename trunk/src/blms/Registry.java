@@ -2,6 +2,7 @@ package blms;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import java.util.Date;
@@ -25,7 +26,6 @@ public class Registry {
 	Map<String, Object> idToObj;
 	Map<Object, String> objToId;
 	
-	Map<League, LinkedList<User>> leaguesMap;
 	long nextId = 0;
 
 	public Registry() {
@@ -36,9 +36,6 @@ public class Registry {
 		
 		idToObj = new HashMap<String, Object>();
 		objToId = new HashMap<Object, String>();
-		
-		
-		leaguesMap = new HashMap<League, LinkedList<User>>();
 	}
 	
 	private String insertIntoTables(Object obj) {
@@ -111,48 +108,49 @@ public class Registry {
 	
 	public League createLeague(String name, User operator) throws BlmsException {
 		League league = new League(name, operator);
+		
 		if (leagues.contains(league))
 			throw new BlmsException("This league already exists");
+		Join join = new Join(operator, league, 0);
 		leagues.add(league);
-		LinkedList<User> usersList = new LinkedList<User>();
-		usersList.add(operator);
-		leaguesMap.put(league, usersList);
+		joins.add(join);
 		insertIntoTables(league);
+		insertIntoTables(join);
 		return league;
 	}
 	
 	// --------------------------------------
 	
-	public String getUserLeagues(String userId) throws Exception{
+	public String getUserLeagues(User user) throws Exception{
 		String stringLeagues = "";
-		User user = (User) this.getObject(userId);
-		if (user == null)
+		
+		if (user.equals(null))
 			throw new BlmsException("Required data: league user");
-		for (Iterator it = leagues.iterator(); it.hasNext(); ){
-			League league = (League)it.next();
-			LinkedList<User> usersList = leaguesMap.get(league);
-			if (usersList.contains(user)){
+		for (Iterator it = joins.iterator(); it.hasNext(); ){
+			Join join = (Join)it.next();
+			User userJoin = join.user;
+			if (user.equals(userJoin)){
 				if (stringLeagues.length() > 0){
-					stringLeagues += ", " + league.name;
-				} else stringLeagues += league.name;
+					stringLeagues += ", " + (join.league).name;
+				} else stringLeagues += (join.league).name;
 			}
 		}		
 		return stringLeagues;
 	}
 	
-	public String getLeagueUsers(String leagueId) throws Exception{
-		if (Util.isNullOrEmpty(leagueId))
+	public String getLeagueUsers(League league) throws Exception{
+		if (Util.isNullOrEmpty(league.name))
 			throw new BlmsException("Required data: league id");
 		String stringMembers = "";
-		League league = (League) this.getObject(leagueId);
-		LinkedList<User> usersList = leaguesMap.get(league);
-		for (Iterator it = usersList.iterator(); it.hasNext(); ){
-			User user = (User) it.next();
-			String userId = this.getId(user);
-			if (stringMembers.length() > 0){
-				stringMembers += ", " + user.lastName;
-			} else stringMembers += user.lastName;				
-			
+		
+		for (Iterator it = joins.iterator(); it.hasNext(); ){
+			Join join = (Join) it.next();
+			League leagueJoin = join.league;
+			if (league.equals(leagueJoin)){
+				if (stringMembers.length() > 0){
+					stringMembers += ", " + (join.user).lastName;
+				} else stringMembers += (join.user).lastName;				
+			}
 		}		
 		return stringMembers;
 	}
@@ -160,19 +158,7 @@ public class Registry {
 	public void userJoinLeague(User user, League league, int initialHandicap) throws Exception{
 		Join join = new Join(user, league, initialHandicap);
 		joins.add(join);
-		
-		//		User user = (User) this.getObject(idUser);
-//		League league = (League) this.getObject(leagueId);
-//		LinkedList<User> usersList = new LinkedList<User>();
-//		//Date joinDate = new
-//		if (!leaguesMap.containsKey(league)){
-//			throw new BlmsException("This league was not created!");
-//		}
-//		usersList = leaguesMap.get(league);
-//		usersList.add(user);
-//
-//		leaguesMap.put(league, usersList);
-//		handicaps.put(league.name+user.email, initialHandicap);
+		insertIntoTables(join);
 	}
 	
 	public boolean isUserLeague(User user, League league) throws BlmsException {
