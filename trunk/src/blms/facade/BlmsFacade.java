@@ -177,7 +177,9 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:551,559,567,594,623,624,625,626,628,629,750,751,752,753,754,762,763,764,765,766,767,768,769 
 	public String getMatch(String leagueId, String index) throws Exception {
-		return "";
+		League league = (League)registry.getObject(leagueId);
+		Match match = league.getMatch(Integer.parseInt(index));
+		return registry.getId(match);
 	}
 
 	// from us-history.txt:456,457,458,459,460,461,472,473,474,475,476,477,478,479 
@@ -192,7 +194,8 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:552,560,568,583,596,641,643,645,647 
 	public String getMatchDate(String matchId) {
-		return "";
+		Match m = (Match)registry.getObject(matchId);
+		return dateFormat.format(m.getDate());
 	}
 
 	// from us-win-loss.txt:555,563,571,586,599,835,836,837 
@@ -212,7 +215,8 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:554,562,570,585,598,825,826,827 
 	public String getMatchLoser(String matchId) throws Exception {
-		return "";
+		Match m = (Match)registry.getObject(matchId);
+		return registry.getId(m.getLoser());
 	}
 
 	// from us-win-loss.txt:556,564,572,587,600,845,846,847 
@@ -222,7 +226,8 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:553,561,569,584,597,815,816,817 
 	public String getMatchWinner(String matchId) throws Exception {
-		return "";
+		Match m = (Match)registry.getObject(matchId);
+		return registry.getId(m.getWinner());
 	}
 
 	// from us-win-loss.txt:547,548,737,738,739,740,741,742 

@@ -5,8 +5,8 @@ import java.util.Date;
 public class Match {
 	Date date;
 	League league;
-	User winningPlayer;
-	User losingPlayer;
+	User winner;
+	User loser;
 	int raceLength;
 	int finalScore;
 	int longestRun[];
@@ -15,8 +15,8 @@ public class Match {
 	public Match(League league, Date date, User winner, User loser) {
 		this.league = league;
 		this.date = date;
-		this.winningPlayer = winner;
-		this.losingPlayer = loser;
+		this.winner = winner;
+		this.loser = loser;
 	}
 
 	public League getLeague() {
@@ -24,6 +24,18 @@ public class Match {
 	}
 	
 	public Role getUserRole(User user) {
-		return (user == winningPlayer) ? Role.WINNER : Role.LOSER;
+		return (user == winner) ? Role.WINNER : Role.LOSER;
+	}
+
+	public User getWinner() {
+		return winner;
+	}
+
+	public User getLoser() {
+		return loser;
+	}
+
+	public Date getDate() {
+		return date;
 	}
 }
