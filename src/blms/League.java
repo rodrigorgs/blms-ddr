@@ -4,6 +4,7 @@ import java.text.Collator;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Vector;
 
 import blms.exceptions.BlmsException;
 
@@ -12,10 +13,10 @@ public class League implements Comparable<League> {
 	String name;
 	User operator;
 	Date creationDate;
-	Collection<Match> matches;
+	Vector<Match> matches;
 	
 	public League(String name, User operator) throws BlmsException {
-		matches = new LinkedList<Match>();
+		matches = new Vector<Match>();
 		if (Util.isNullOrEmpty(name))
 			throw new BlmsException("Required data: league name");
 		if (operator == null)
@@ -56,13 +57,15 @@ public class League implements Comparable<League> {
 		return matches.toArray(new Match[] {});
 	}
 	
+	public Match getMatch(int index) {
+		return matches.elementAt(index - 1);
+	}
+	
 	@Override
 	public String toString() {
 		return name;
 	}
 
-
-	@Override
 	public int compareTo(League other) {
 		return Collator.getInstance().compare(name, other.getName());
 	}

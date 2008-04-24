@@ -67,13 +67,13 @@ expect 2 getNumberOfWins id=${userId1} leagueId=${leagueId1}
 expect 1 getNumberOfWins id=${userId2} leagueId=${leagueId1}
 expect 1 getNumberOfLosses id=${userId1} leagueId=${leagueId1}
 expect 2 getNumberOfLosses id=${userId2} leagueId=${leagueId1}
-quit
 
 # index starts at 1
 matchId=getMatch leagueId=${leagueId1} index=1
 expect 01/12/2007 getMatchDate matchId=${matchId}
 expect ${userId1} getMatchWinner matchId=${matchId}
 expect ${userId2} getMatchLoser matchId=${matchId}
+quit
 expect "" getMatchLength matchId=${matchId}
 expect "" getMatchScore matchId=${matchId}
 expect "" getMatchLongestRunForWinner matchId=${matchId}
