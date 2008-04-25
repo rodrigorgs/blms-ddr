@@ -166,7 +166,6 @@ matchId=addMatchResult leagueId=${leagueId1} date=12/4/2007 winner=${userId1} lo
 expect 12/04/2007 getMatchDate matchId=${matchId}
 dateFormat format=dd/mm/yyyy
 expect 04/12/2007 getMatchDate matchId=${matchId}
-quit
 
 ##################################################################
 # Testing error conditions
@@ -205,6 +204,7 @@ expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 w
 expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=""
 expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=
 expectError "Users must be different" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId1}
+quit
 
 # --------------------------------------------
 # command: addMatchResult (optional info)
