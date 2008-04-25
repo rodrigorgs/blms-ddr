@@ -66,4 +66,36 @@ public class Match {
 	public int getLongestRunForLoser() {
 		return longestRunForLoser;
 	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public void setLeague(League league) {
+		this.league = league;
+	}
+
+	public void setWinner(User winner) {
+		this.winner = winner;
+	}
+
+	public void setLoser(User loser) {
+		this.loser = loser;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public void setLongestRunForWinner(int longestRunForWinner) {
+		this.longestRunForWinner = longestRunForWinner;
+	}
+
+	public void setLongestRunForLoser(int longestRunForLoser) {
+		this.longestRunForLoser = longestRunForLoser;
+	}
 }

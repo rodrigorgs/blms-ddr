@@ -108,7 +108,6 @@ expect 150 getMatchLength matchId=${matchId}
 expect 87 getMatchScore matchId=${matchId}
 expect 23 getMatchLongestRunForWinner matchId=${matchId}
 expect 30 getMatchLongestRunForLoser matchId=${matchId}
-quit
 
 ##################################################################
 # Updating match info
@@ -122,6 +121,7 @@ expect 120 getMatchLength matchId=${matchId}
 expect 86 getMatchScore matchId=${matchId}
 expect 22 getMatchLongestRunForWinner matchId=${matchId}
 expect 31 getMatchLongestRunForLoser matchId=${matchId}
+quit
 
 ##################################################################
 # Deleting matches
