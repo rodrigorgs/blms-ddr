@@ -225,7 +225,6 @@ expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 w
 expectError "Invalid match length" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=0 score=87 longestRunForWinner=23 longestRunForLoser=30
 expectError "Invalid match length" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=-1 score=87 longestRunForWinner=23 longestRunForLoser=30
 expectError "Invalid match length" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=xxx score=87 longestRunForWinner=23 longestRunForLoser=30
-quit
 # 0 <= score < length
 expectError "Invalid score" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=-1 longestRunForWinner=23 longestRunForLoser=30
 expectError "Invalid score" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=xxx longestRunForWinner=23 longestRunForLoser=30
@@ -262,6 +261,7 @@ expectError "Unknown league" getNumberOfLosses id=${userId1} leagueId=
 expectError "Unknown user" getNumberOfLosses id=xxx leagueId=${leagueId1}
 expectError "Unknown user" getNumberOfLosses id="" leagueId=${leagueId1}
 expectError "Unknown user" getNumberOfLosses id= leagueId=${leagueId1}
+quit
 
 # --------------------------------------------
 # command: getMatch (league)

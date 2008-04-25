@@ -52,6 +52,14 @@ public class BlmsFacade {
 	private int parseMatchLength(String number) throws Exception {
 		return parseInt(number, "Invalid match length");
 	}
+
+	private int parseScore(String number) throws Exception {
+		return parseInt(number, "Invalid score");
+	}
+	
+	private int parseRun(String number) throws Exception {
+		return parseInt(number, "Invalid run");
+	}
 	
 	private Date parseDate(String date) throws Exception {
 		try {
@@ -106,9 +114,9 @@ public class BlmsFacade {
 		User userWinner = getObject(winner, User.class);
 		User userLoser = getObject(loser, User.class);
 		int intLength = parseMatchLength(length);
-		int intScore = Integer.parseInt(score);
-		int intLongestRunForWinner = Integer.parseInt(longestRunForWinner);
-		int intLongestRunForLoser = Integer.parseInt(longestRunForLoser);
+		int intScore = parseScore(score);
+		int intLongestRunForWinner = parseRun(longestRunForWinner);
+		int intLongestRunForLoser = parseRun(longestRunForLoser);
 		
 		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser, 
 				intLength, intScore, intLongestRunForWinner, intLongestRunForLoser);
@@ -347,8 +355,8 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:547,548,737,738,739,740,741,742 
 	public String getNumberOfLosses(String id, String leagueId) throws Exception {
-		User user = (User)registry.getObject(id);
-		League league = (League)registry.getObject(leagueId);
+		User user = getObject(id, User.class);
+		League league = getObject(leagueId, League.class);
 		return "" + user.getNumberOfWinsOrLosses(league, Match.Role.LOSER);
 	}
 
@@ -366,8 +374,8 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:545,546,726,727,728,729,730,731 
 	public String getNumberOfWins(String id, String leagueId) throws Exception {
-		User user = (User)registry.getObject(id);
-		League league = (League)registry.getObject(leagueId);
+		User user = getObject(id, User.class);
+		League league = getObject(leagueId, League.class);
 		return "" + user.getNumberOfWinsOrLosses(league, Match.Role.WINNER);
 	}
 
@@ -458,9 +466,9 @@ public class BlmsFacade {
 		User userWinner = (User)registry.getObject(winner);
 		User userLoser = (User)registry.getObject(loser);
 		int intLength = parseMatchLength(length);
-		int intScore = Integer.parseInt(score);
-		int intLongestRunForWinner = Integer.parseInt(longestRunForWinner);
-		int intLongestRunForLoser = Integer.parseInt(longestRunForLoser);
+		int intScore = parseScore(score);
+		int intLongestRunForWinner = parseRun(longestRunForWinner);
+		int intLongestRunForLoser = parseRun(longestRunForLoser);
 		
 		m.setDate(parsedDate);
 		m.setWinner(userWinner);
