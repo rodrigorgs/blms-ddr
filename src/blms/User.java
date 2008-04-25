@@ -120,11 +120,13 @@ public class User {
 		return ret;
 	}
 	
-	public Match getMatch(League l, int index) {
+	public Match getMatch(League l, int index) throws BlmsException {
 		Match[] m = getMatches(l);
-//		System.out.printf("%d of %d\n", index - 1, m.length);
-//		System.out.println(Arrays.toString(m));
-		return m[index - 1];
+		try {
+			return m[index - 1];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new BlmsException("Invalid index");
+		}
 	}
 	
 	public int getNumberOfWinsOrLosses(League league, Match.Role role) {

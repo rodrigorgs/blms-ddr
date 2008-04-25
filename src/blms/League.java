@@ -61,8 +61,12 @@ public class League implements Comparable<League> {
 		return ret;
 	}
 	
-	public Match getMatch(int index) {
-		return matches.elementAt(index - 1);
+	public Match getMatch(int index) throws BlmsException {
+		try {
+			return matches.elementAt(index - 1);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new BlmsException("Invalid index");
+		}
 	}
 	
 	@Override
