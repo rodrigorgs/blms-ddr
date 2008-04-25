@@ -251,6 +251,22 @@ public class Registry {
 		return m;
 	}
 
+	public Match addMatchResult(League league, Date date,
+			User winner, User loser, int length, int score,
+			int longestRunForWinner, int longestRunForLoser) {
+		Match m = new Match(league, date, winner, loser, length,
+				score, longestRunForWinner, longestRunForLoser);
+		
+		league.addMatch(m);
+		winner.addMatch(m);
+		loser.addMatch(m);
+		
+		matches.add(m);
+		insertIntoTables(m);
+		
+		return m;
+	}
+
 
 
 }
