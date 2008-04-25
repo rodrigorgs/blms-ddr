@@ -310,7 +310,7 @@ public class Registry {
 		matches.remove(m);
 		m.getLeague().matches.remove(m);
 		m.getWinner().matches.remove(m);
-		m.getWinner().matches.remove(m);
+		m.getLoser().matches.remove(m);
 		removeFromTables(m);
 	}
 

@@ -59,7 +59,6 @@ expect 5 getPlayerStanding id=${userId3} leagueId=${leagueId1}
 updateMatchResult matchId=${matchId1} date=1/12/2007 winner=${userId3} loser=${userId2} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
 expect 5 getPlayerStanding id=${userId2} leagueId=${leagueId1}
 expect 7 getPlayerStanding id=${userId3} leagueId=${leagueId1}
-quit
 
 ##################################################################
 # Delete matches
@@ -91,6 +90,7 @@ expect -1 getPlayerStanding id=${userId3} leagueId=${leagueId1}
 defineStandingsExpression leagueId=${leagueId1} expression="4 * (seasonWins + 2) / seasonLosses"
 expect 16 getPlayerStanding id=${userId2} leagueId=${leagueId1}
 expect 6 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+quit
 
 ##################################################################
 # Testing error conditions
