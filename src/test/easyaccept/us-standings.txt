@@ -90,7 +90,6 @@ expect -1 getPlayerStanding id=${userId3} leagueId=${leagueId1}
 defineStandingsExpression leagueId=${leagueId1} expression="4 * (seasonWins + 2) / seasonLosses"
 expect 16 getPlayerStanding id=${userId2} leagueId=${leagueId1}
 expect 6 getPlayerStanding id=${userId3} leagueId=${leagueId1}
-quit
 
 ##################################################################
 # Testing error conditions

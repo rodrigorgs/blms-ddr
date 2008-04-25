@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import org.cheffo.jeplite.JEP;
+import org.cheffo.jeplite.ParseException;
+
 import blms.exceptions.BlmsException;
 
 // invariant: name and operator are non-empty
@@ -85,7 +88,17 @@ public class League implements Comparable<League> {
 	}
 
 
-	public void setStandingsExpression(String expression) {
+	public void setStandingsExpression(String expression) throws BlmsException {
+		JEP jep = new JEP();
+		jep.addVariable("seasonWins", 0.0);
+		jep.addVariable("seasonLosses", 0.0);
+		jep.parseExpression(expression);
+		try {
+			jep.getValue();
+		} catch (Throwable e) {
+			throw new BlmsException("Syntax error in standings expression");
+		}
+		
 		standingsExpression = expression;
 	}
 
