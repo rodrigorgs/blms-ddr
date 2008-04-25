@@ -181,6 +181,15 @@ public class Registry {
 	}
 	
 	public void userLeaveLeague(User user, League league) throws Exception{
+		if (user == null){
+			throw new BlmsException("Unknown user");
+		}
+		if (league == null){
+			throw new BlmsException("Unknown league");
+		}
+		if (!this.isUserLeague(user, league)){
+			throw new BlmsException("User is not a league member");
+		}
 		Join join = findJoin(user, league);
 		leagues.remove(league);
 		users.remove(user);
