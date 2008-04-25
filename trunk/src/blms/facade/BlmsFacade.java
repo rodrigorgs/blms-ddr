@@ -408,7 +408,9 @@ public class BlmsFacade {
 
 	// from us-standings.txt:338,339,341,342,344,345,347,348,354,355,361,362,364,365,367,368,376,377,379,380,382,383,385,386,405,406,407,408,409,410,413 
 	public String getPlayerStanding(String id, String leagueId) throws Exception {
-		return "";
+		User user = getObject(id, User.class);
+		League league = getObject(leagueId, League.class);
+		return "" + (int)user.getStanding(league);
 	}
 
 	/**
@@ -500,13 +502,6 @@ public class BlmsFacade {
 		int intLongestRunForLoser = parseRun(longestRunForLoser);
 		
 		registry.updateMatchResult(m, parsedDate, userWinner, userLoser, intLength, intScore, intLongestRunForWinner, intLongestRunForLoser);
-//		m.setDate(parsedDate);
-//		m.setWinner(userWinner);
-//		m.setLoser(userLoser);
-//		m.setLength(intLength);
-//		m.setScore(intScore);
-//		m.setLongestRunForWinner(intLongestRunForWinner);
-//		m.setLongestRunForLoser(intLongestRunForLoser);
 	}
 
 	/**

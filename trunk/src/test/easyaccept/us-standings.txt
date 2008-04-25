@@ -41,7 +41,6 @@ joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
 defineStandingsExpression leagueId=${leagueId1} expression="3 * seasonWins + seasonLosses"
 
 # enter a match result
-quit
 expect 0 getPlayerStanding id=${userId2} leagueId=${leagueId1}
 expect 0 getPlayerStanding id=${userId3} leagueId=${leagueId1}
 matchId1=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
@@ -60,6 +59,7 @@ expect 5 getPlayerStanding id=${userId3} leagueId=${leagueId1}
 updateMatchResult matchId=${matchId1} date=1/12/2007 winner=${userId3} loser=${userId2} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
 expect 5 getPlayerStanding id=${userId2} leagueId=${leagueId1}
 expect 7 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+quit
 
 ##################################################################
 # Delete matches
