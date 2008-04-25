@@ -15,6 +15,7 @@ public class League implements Comparable<League> {
 	User operator;
 	Date creationDate;
 	Vector<Match> matches;
+	String standingsExpression;
 	
 	public League(String name, User operator) throws BlmsException {
 		matches = new Vector<Match>();
@@ -81,5 +82,14 @@ public class League implements Comparable<League> {
 
 	public void addMatch(Match m) {
 		matches.add(m);
+	}
+
+
+	public void setStandingsExpression(String expression) {
+		standingsExpression = expression;
+	}
+
+	public String getStandingsExpression() {
+		return standingsExpression;
 	}
 }

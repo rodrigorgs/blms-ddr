@@ -199,7 +199,8 @@ public class BlmsFacade {
 
 	// from us-standings.txt:335,378,381,384,395,396,397,398,399,412 
 	public void defineStandingsExpression(String leagueId, String expression) throws Exception {
-		
+		League league = getObject(leagueId, League.class);
+		league.setStandingsExpression(expression);
 	}
 
 	// from us-leagues.txt:128,131,132 
@@ -425,13 +426,17 @@ public class BlmsFacade {
 		User user = (User) registry.getObject(userId);
 		League league = (League) registry.getObject(id);
 		Join join = registry.findJoin(user, league);
-		if (join.equals(null)){
+		if (join == null){
 			throw new BlmsException("The user " + userId + " didn't join in the league " + id);
 		}		
-		//Rodrigo, até aqui eu depurei e o objeto "join" não estava null... qnd passei dessa linha
-		//ele não depurou mais por causa do "easyaccept"... então nao sei exatamente a causa do null pointer...
-		//outra coisa é q, neste caso, nao vejo necessidade deste "id" no segundo parâmetro
-		return (String) registry.getAttribute(join, id, attribute);
+		//Rodrigo, atï¿½ aqui eu depurei e o objeto "join" nï¿½o estava null... qnd passei dessa linha
+		//ele nï¿½o depurou mais por causa do "easyaccept"... entï¿½o nao sei exatamente a causa do null pointer...
+		//outra coisa ï¿½ q, neste caso, nao vejo necessidade deste "id" no segundo parï¿½metro
+		Object value = registry.getAttribute(join, id, attribute);
+		if (value instanceof Date)
+			return dateFormat.format((Date)value);
+		else
+			return (String)value;
 	}
 
 	// from us-join.txt:957,958,963,968,975,999,1001 

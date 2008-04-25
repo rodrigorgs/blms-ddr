@@ -41,6 +41,7 @@ joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
 defineStandingsExpression leagueId=${leagueId1} expression="3 * seasonWins + seasonLosses"
 
 # enter a match result
+quit
 expect 0 getPlayerStanding id=${userId2} leagueId=${leagueId1}
 expect 0 getPlayerStanding id=${userId3} leagueId=${leagueId1}
 matchId1=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
