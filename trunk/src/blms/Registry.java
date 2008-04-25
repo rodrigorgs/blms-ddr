@@ -127,8 +127,8 @@ public class Registry {
 	public String getUserLeagues(User user) throws Exception{
 		String stringLeagues = "";
 		
-		if (user.equals(null))
-			throw new BlmsException("Required data: league user");
+		if (user == null)
+			throw new BlmsException("Unknown user");
 		for (Iterator it = joins.iterator(); it.hasNext(); ){
 			Join join = (Join)it.next();
 			User userJoin = join.user;
@@ -142,8 +142,8 @@ public class Registry {
 	}
 	
 	public String getLeagueUsers(League league) throws Exception{
-		if (Util.isNullOrEmpty(league.name))
-			throw new BlmsException("Required data: league id");
+		if (league == null)
+			throw new BlmsException("Unknown league");
 		String stringMembers = "";
 		
 		for (Iterator it = joins.iterator(); it.hasNext(); ){
@@ -158,10 +158,26 @@ public class Registry {
 		return stringMembers;
 	}
 	
-	public void userJoinLeague(User user, League league, int initialHandicap) throws Exception{
-		Join join = new Join(user, league, initialHandicap);
-		joins.add(join);
-		insertIntoTables(join);
+	public void userJoinLeague(User user, League league, String initialHandicap) throws Exception{
+		if (user == null){
+			throw new BlmsException("Unknown user");
+		}
+		if (league == null){
+			throw new BlmsException("Unknown league");
+		}
+		if (initialHandicap == null || initialHandicap.equals("")){
+			throw new BlmsException("Must provide initial player handicap");
+		}
+		int handicap = Integer.parseInt(initialHandicap);
+		if (handicap < 0){
+			throw new BlmsException("Handicap cant be negative");
+		}
+		Join existentJoin = findJoin(user, league);
+		if (existentJoin == null){
+			Join join = new Join(user, league, handicap);
+			joins.add(join);
+			insertIntoTables(join);
+		} else throw new BlmsException("User is already a league member");
 	}
 	
 	public void userLeaveLeague(User user, League league) throws Exception{
@@ -174,10 +190,10 @@ public class Registry {
 	}
 	
 	public boolean isUserLeague(User user, League league) throws BlmsException {
-		if (Util.isNullOrEmpty(league.name))
-			throw new BlmsException("Required: league");
-		if (user.equals(null))
-			throw new BlmsException("Required data: league operator");
+		if (league == null)
+			throw new BlmsException("Unknown league");
+		if (user == null)
+			throw new BlmsException("Unknown user");
 		Join join = new Join(user, league, 200);
 		for (Iterator it = joins.iterator(); it.hasNext(); ){
 			Join auxJoin = (Join) it.next();
