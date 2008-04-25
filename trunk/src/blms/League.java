@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.cheffo.jeplite.JEP;
 import org.cheffo.jeplite.ParseException;
@@ -89,6 +91,14 @@ public class League implements Comparable<League> {
 
 
 	public void setStandingsExpression(String expression) throws BlmsException {
+		Pattern regex = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)");
+		Matcher m = regex.matcher(expression);
+		while (m.find()) {
+			String s = m.group();
+			if (!s.equals("seasonWins") && !s.equals("seasonLosses"))
+				throw new BlmsException("Unknown variable in standings expression");
+		}
+		
 		JEP jep = new JEP();
 		jep.addVariable("seasonWins", 0.0);
 		jep.addVariable("seasonLosses", 0.0);
