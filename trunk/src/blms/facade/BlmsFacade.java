@@ -200,7 +200,11 @@ public class BlmsFacade {
 	// from us-standings.txt:335,378,381,384,395,396,397,398,399,412 
 	public void defineStandingsExpression(String leagueId, String expression) throws Exception {
 		League league = getObject(leagueId, League.class);
-		league.setStandingsExpression(expression);
+//		try {
+			league.setStandingsExpression(expression);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	// from us-leagues.txt:128,131,132 

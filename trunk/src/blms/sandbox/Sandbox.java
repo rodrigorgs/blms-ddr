@@ -38,8 +38,42 @@ public class Sandbox {
 		toArray();
 		date();
 		expression();
+		expressionWithUndefinedVariable();
+		expressionInvalid();
+		expressionDivideByZero();
 	}
 	
+	private static void expressionDivideByZero() {
+		JEP jep = new JEP();
+		jep.parseExpression("1/0");
+		try {
+			System.out.println(jep.getValue());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void expressionInvalid() {
+		JEP jep = new JEP();
+		jep.parseExpression("1+");
+		try {
+			System.out.println(jep.getValue());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void expressionWithUndefinedVariable() {
+		JEP jep = new JEP();
+		jep.addVariable("x", 2);
+		jep.parseExpression("x+y");
+		try {
+			System.out.println(jep.getValue());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static void expression() throws Exception {
 		JEP jep = new JEP();
 		jep.addVariable("x", 2);

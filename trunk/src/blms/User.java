@@ -196,11 +196,16 @@ public class User {
 		jep.addVariable("seasonWins", (double)wins);
 		jep.addVariable("seasonLosses", (double)losses);
 		jep.parseExpression(standingsExpression);
+		
+		double ret;
 		try {
-			return jep.getValue();
+			ret = jep.getValue();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return 3.1415; // :P TODO
 		}
+		if (Double.isInfinite(ret))
+			throw new BlmsException("Division by zero in standings expression");
+		return ret;
 	}
 }
