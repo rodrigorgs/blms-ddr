@@ -2,6 +2,8 @@ package blms;
 
 import java.util.Date;
 
+import blms.exceptions.BlmsException;
+
 public class Match implements Comparable<Match> {
 	Date date;
 	League league;
@@ -14,13 +16,16 @@ public class Match implements Comparable<Match> {
 	public enum Role {WINNER, LOSER};
 	public static final int UNDEFINED = -1;
 	
-	public Match(League league, Date date, User winner, User loser) {
+	public Match(League league, Date date, User winner, User loser) throws BlmsException {
 		this(league, date, winner, loser, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
 	}
 
 	public Match(League league, Date date, User winner, User loser,
 			int length, int score, int longestRunForWinner,
-			int longestRunForLoser) {
+			int longestRunForLoser) throws BlmsException {
+		if (winner == loser)
+			throw new BlmsException("Users must be different");
+		
 		this.league = league;
 		this.date = date;
 		this.winner = winner;

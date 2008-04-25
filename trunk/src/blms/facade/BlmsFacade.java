@@ -1,9 +1,11 @@
 package blms.facade;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 
 import blms.Join;
 import blms.League;
@@ -16,10 +18,37 @@ import blms.exceptions.BlmsException;
 public class BlmsFacade {
 	Registry registry;
 	SimpleDateFormat dateFormat;
-
+	HashMap<Class, String> classToString;
+	
 	public BlmsFacade() {
 		registry = new Registry();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		dateFormat.setLenient(false);
+		classToString = new HashMap<Class, String>();
+		classToString.put(User.class, "user");
+		classToString.put(League.class, "league");
+		classToString.put(Match.class, "match");
+	}
+
+	private <T> T getObject(String id, Class<T> klass) throws Exception {
+		String commonName = classToString.get(klass);
+		if (Util.isNullOrEmpty(id)) 
+			throw new Exception("Unknown " + commonName);
+//			throw new Exception("Required data: " + commonName); // TODO: allow multiple requires
+		T obj = (T)registry.getObject(id);
+		if (obj == null)
+			throw new Exception("Unknown " + commonName);
+		return obj;
+	}
+	
+	private Date parseDate(String date) throws Exception {
+		try {
+			return dateFormat.parse(date);
+		} catch (ParseException e) {
+			throw new Exception("Invalid date");
+		} catch (NullPointerException e) {
+			throw new Exception("Invalid date");
+		}
 	}
 	
 	private void changeAttribute(String id, String attribute, Object value, 
@@ -46,10 +75,10 @@ public class BlmsFacade {
 	// from us-standings.txt:340,343,346,373,374,375 us-history.txt:453,454,455,471 us-win-loss.txt:535,538,541,582,610,620,621,622,640,644,673,674,675,676,677,678,679,680,681,682,683,684,685,691,692,693,694,695,696,697,698,699,700,701,702,704,705,706,708,709,710,712,713,714,715,717,718,719,720,749,761,776,793,814,824,834,844,854,864,874,911 
 	public String addMatchResult(String leagueId, String date, String winner, String loser) throws Exception {
 		// addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
-		League league = (League)registry.getObject(leagueId);
-		Date parsedDate = dateFormat.parse(date);
-		User userWinner = (User)registry.getObject(winner);
-		User userLoser = (User)registry.getObject(loser);
+		League league = getObject(leagueId, League.class);
+		Date parsedDate = parseDate(date);
+		User userWinner = getObject(winner, User.class);
+		User userLoser = getObject(loser, User.class);
 		
 		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser);
 		return registry.getId(m);
@@ -59,7 +88,7 @@ public class BlmsFacade {
 			String loser, String length, String score,
 			String longestRunForWinner, String longestRunForLoser) throws Throwable {
 		League league = (League)registry.getObject(leagueId);
-		Date parsedDate = dateFormat.parse(date);
+		Date parsedDate = parseDate(date);
 		User userWinner = (User)registry.getObject(winner);
 		User userLoser = (User)registry.getObject(loser);
 		int intLength = Integer.parseInt(length);
@@ -71,8 +100,6 @@ public class BlmsFacade {
 				intLength, intScore, intLongestRunForWinner, intLongestRunForLoser);
 		return registry.getId(m);
 	}
-	// matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} 
-	// length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
 
 	// from us-leagues.txt:88,89,90,93,94,102,103,104,105,106,109 
 	public void changeLeagueAttribute(String id, String attribute, String value) throws Throwable {
@@ -216,8 +243,8 @@ public class BlmsFacade {
 	// from us-win-loss.txt:634,635,777,778,779,780,781,782,783,784,785,786,787,794,795,796,797,798,799,800,801,802,803,804,805,806,807 
 	public String getMatchByDate(String leagueId, String startDate, String endDate, String index) throws Exception {
 		League league = (League)registry.getObject(leagueId);
-		Date start = dateFormat.parse(startDate);
-		Date end = dateFormat.parse(endDate);
+		Date start = parseDate(startDate);
+		Date end = parseDate(endDate);
 		int _index = Integer.parseInt(index);
 		
 		int i = 0;
@@ -237,8 +264,8 @@ public class BlmsFacade {
 	public String getMatchByDate(String userId, String leagueId, String startDate, String endDate, String index) throws Exception {
 		User user = (User)registry.getObject(userId);
 		League league = (League)registry.getObject(leagueId);
-		Date start = dateFormat.parse(startDate);
-		Date end = dateFormat.parse(endDate);
+		Date start = parseDate(startDate);
+		Date end = parseDate(endDate);
 		int _index = Integer.parseInt(index);
 		
 		int i = 0;
@@ -313,13 +340,13 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:530,531,532,536,537,539,540,542,543,609,611,613,656,662,663,664,665,666,667 
 	public String getNumberOfMatches(String leagueId) throws Exception {
-		League league = (League)registry.getObject(leagueId);
+		League league = getObject(leagueId, League.class);
 		return "" + league.getMatches().length;
 	}
 	
 	public String getNumberOfMatches(String id, String leagueId) throws Exception {
-		User user = (User)registry.getObject(id);
-		League league = (League)registry.getObject(leagueId);
+		User user = getObject(id, User.class);
+		League league = getObject(leagueId, League.class);;
 		return "" + user.getMatches(league).length;
 	}
 
@@ -413,7 +440,7 @@ public class BlmsFacade {
 		// updateMatchResult matchId=${matchId} date=2/12/2007 winner=${userId2} loser=${userId1} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
 		Match m = (Match)registry.getObject(matchId);
 		
-		Date parsedDate = dateFormat.parse(date);
+		Date parsedDate = parseDate(date);
 		User userWinner = (User)registry.getObject(winner);
 		User userLoser = (User)registry.getObject(loser);
 		int intLength = Integer.parseInt(length);

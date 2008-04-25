@@ -240,23 +240,15 @@ public class Registry {
 	}
 
 	public Match addMatchResult(League league, Date date,
-			User winner, User loser) {
-		Match m = new Match(league, date, winner, loser);
-		league.addMatch(m);
-		winner.addMatch(m);
-		loser.addMatch(m);
-		
-		matches.add(m);
-//		long x = nextId;
-		insertIntoTables(m);
-//		assert nextId == x + 1;
-		
-		return m;
+			User winner, User loser) throws BlmsException {
+		return addMatchResult(league, date, winner, loser, Match.UNDEFINED,
+				Match.UNDEFINED, Match.UNDEFINED, Match.UNDEFINED);
 	}
 
 	public Match addMatchResult(League league, Date date,
 			User winner, User loser, int length, int score,
-			int longestRunForWinner, int longestRunForLoser) {
+			int longestRunForWinner, int longestRunForLoser) 
+			throws BlmsException {
 		Match m = new Match(league, date, winner, loser, length,
 				score, longestRunForWinner, longestRunForLoser);
 		
