@@ -4,6 +4,7 @@ import java.util.Date;
 
 import blms.exceptions.BlmsException;
 
+// TODO: check invariant: 0 <= score < length && 1 <= longestRunForWinner <= length && 0 <= longestRunForLoser <= score  
 public class Match implements Comparable<Match> {
 	Date date;
 	League league;
@@ -31,9 +32,9 @@ public class Match implements Comparable<Match> {
 		this.winner = winner;
 		this.loser = loser;
 		setLength(length);
-		this.score = score;
-		this.longestRunForWinner = longestRunForWinner;
-		this.longestRunForLoser = longestRunForLoser;
+		setScore(score);
+		setLongestRunForWinner(longestRunForWinner);
+		setLongestRunForLoser(longestRunForLoser);
 	}
 
 	public League getLeague() {
@@ -94,15 +95,21 @@ public class Match implements Comparable<Match> {
 		this.length = length;
 	}
 
-	public void setScore(int score) {
+	public void setScore(int score) throws BlmsException {
+		if (score != UNDEFINED && !(score >= 0 && score < length))
+			throw new BlmsException("Invalid score");
 		this.score = score;
 	}
-
-	public void setLongestRunForWinner(int longestRunForWinner) {
+	
+	public void setLongestRunForWinner(int longestRunForWinner) throws BlmsException {
+		if (longestRunForWinner != UNDEFINED && !(longestRunForWinner >= 1 && longestRunForWinner <= length))
+			throw new BlmsException("Invalid run");
 		this.longestRunForWinner = longestRunForWinner;
 	}
 
-	public void setLongestRunForLoser(int longestRunForLoser) {
+	public void setLongestRunForLoser(int longestRunForLoser) throws BlmsException {
+		if (longestRunForLoser != UNDEFINED && !(longestRunForLoser >= 0 && longestRunForLoser <= score))
+			throw new BlmsException("Invalid run");
 		this.longestRunForLoser = longestRunForLoser;
 	}
 
