@@ -431,12 +431,15 @@ public class BlmsFacade {
 	public String getUserLeagueAttribute(String userId, String id, String attribute) throws Exception {
 		User user = (User) registry.getObject(userId);
 		League league = (League) registry.getObject(id);
+		if (!registry.isUserLeague(user, league)){
+			throw new BlmsException("User is not a league member");
+		}
 		Join join = registry.findJoin(user, league);
-		if (join == null){
-			throw new BlmsException("The user " + userId + " didn't join in the league " + id);
-		}		
 
 		Object value = registry.getAttribute(join, id, attribute);
+		if (value == null){
+			throw new BlmsException("Unknown user attribute");
+		}
 		if (value instanceof Date)
 			return dateFormat.format((Date)value);
 		else
