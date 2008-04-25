@@ -102,4 +102,8 @@ public class Match implements Comparable<Match> {
 	public int compareTo(Match other) {
 		return this.getDate().compareTo(other.getDate());
 	}
+	
+	public String toString() {
+		return String.format("Match at %s. Winner: %s. Loser: %s", date, winner, loser);
+	}
 }

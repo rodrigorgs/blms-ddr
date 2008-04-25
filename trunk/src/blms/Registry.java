@@ -43,6 +43,7 @@ public class Registry {
 		idToObj.put(s, obj);
 		objToId.put(obj, s);
 		nextId++;
+//		System.out.printf("---Object %s has id %s.\n", obj, getId(obj));
 		return s;
 	}
 	
@@ -246,7 +247,9 @@ public class Registry {
 		loser.addMatch(m);
 		
 		matches.add(m);
+//		long x = nextId;
 		insertIntoTables(m);
+//		assert nextId == x + 1;
 		
 		return m;
 	}
@@ -263,6 +266,7 @@ public class Registry {
 		
 		matches.add(m);
 		insertIntoTables(m);
+		assert !getId(m).isEmpty();
 		
 		return m;
 	}

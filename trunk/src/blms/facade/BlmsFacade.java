@@ -215,8 +215,48 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:634,635,777,778,779,780,781,782,783,784,785,786,787,794,795,796,797,798,799,800,801,802,803,804,805,806,807 
 	public String getMatchByDate(String leagueId, String startDate, String endDate, String index) throws Exception {
+		League league = (League)registry.getObject(leagueId);
+		Date start = dateFormat.parse(startDate);
+		Date end = dateFormat.parse(endDate);
+		int _index = Integer.parseInt(index);
+		
+		int i = 0;
+		Match[] matches = league.getMatches();
+		for (Match match : matches) {
+			if (match.getDate().compareTo(start) >= 0 &&
+					match.getDate().compareTo(end) <= 0) {
+				i++;
+				if (i == _index)
+					return registry.getId(match);
+			}
+		}
+		
 		return "";
 	}
+	
+	public String getMatchByDate(String userId, String leagueId, String startDate, String endDate, String index) throws Exception {
+		User user = (User)registry.getObject(userId);
+		League league = (League)registry.getObject(leagueId);
+		Date start = dateFormat.parse(startDate);
+		Date end = dateFormat.parse(endDate);
+		int _index = Integer.parseInt(index);
+		
+		int i = 0;
+		Match[] matches = user.getMatches(league);
+		for (Match match : matches) {
+			if (match.getDate().compareTo(start) >= 0 &&
+					match.getDate().compareTo(end) <= 0) {
+				i++;
+				if (i == _index)
+					return registry.getId(match);
+			}
+		}
+		
+		return "";
+	}
+	
+	// expect ${matchId2} getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
+	// expect ${matchId2} getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
 
 	// from us-win-loss.txt:552,560,568,583,596,641,643,645,647 
 	public String getMatchDate(String matchId) {
