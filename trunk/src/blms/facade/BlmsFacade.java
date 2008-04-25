@@ -146,7 +146,7 @@ public class BlmsFacade {
 
 	// from us-standings.txt:360,363,366 us-win-loss.txt:612,912,913,914 
 	public void deleteMatch(String matchId) throws Exception {
-		
+		registry.deleteMatch((Match)registry.getObject(matchId));
 	}
 
 	// from us-leagues.txt:114,130,135,136 us-users.txt:279,281 
@@ -344,7 +344,7 @@ public class BlmsFacade {
 	 */
  
 	public void removeAllMatches() {
-		
+		registry.removeAllMatches();
 	}
 
 	/**
