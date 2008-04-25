@@ -14,7 +14,7 @@ public class Match implements Comparable<Match> {
 	int longestRunForWinner;
 	int longestRunForLoser;
 	public enum Role {WINNER, LOSER};
-	public static final int UNDEFINED = -1;
+	public static final int UNDEFINED = Integer.MIN_VALUE;
 	
 	public Match(League league, Date date, User winner, User loser) throws BlmsException {
 		this(league, date, winner, loser, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED);
@@ -30,7 +30,7 @@ public class Match implements Comparable<Match> {
 		this.date = date;
 		this.winner = winner;
 		this.loser = loser;
-		this.length = length;
+		setLength(length);
 		this.score = score;
 		this.longestRunForWinner = longestRunForWinner;
 		this.longestRunForLoser = longestRunForLoser;
@@ -88,7 +88,9 @@ public class Match implements Comparable<Match> {
 		this.loser = loser;
 	}
 
-	public void setLength(int length) {
+	public void setLength(int length) throws BlmsException {
+		if (length != UNDEFINED && length < 1)
+			throw new BlmsException("Invalid match length");
 		this.length = length;
 	}
 
