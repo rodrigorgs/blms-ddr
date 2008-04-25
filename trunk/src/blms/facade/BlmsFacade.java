@@ -361,7 +361,24 @@ public class BlmsFacade {
 
 	// from us-standings.txt:353 us-win-loss.txt:595,875,876,877,878,879,880,881,882,883,884,885,886,888,889,890,892,893,894,896,897,898,899,901,902,903,904 
 	public void updateMatchResult(String matchId, String date, String winner, String loser, String length, String score, String longestRunForWinner, String longestRunForLoser) throws Exception {
+		// updateMatchResult matchId=${matchId} date=2/12/2007 winner=${userId2} loser=${userId1} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
+		Match m = (Match)registry.getObject(matchId);
 		
+		Date parsedDate = dateFormat.parse(date);
+		User userWinner = (User)registry.getObject(winner);
+		User userLoser = (User)registry.getObject(loser);
+		int intLength = Integer.parseInt(length);
+		int intScore = Integer.parseInt(score);
+		int intLongestRunForWinner = Integer.parseInt(longestRunForWinner);
+		int intLongestRunForLoser = Integer.parseInt(longestRunForLoser);
+		
+		m.setDate(parsedDate);
+		m.setWinner(userWinner);
+		m.setLoser(userLoser);
+		m.setLength(intLength);
+		m.setScore(intScore);
+		m.setLongestRunForWinner(intLongestRunForWinner);
+		m.setLongestRunForLoser(intLongestRunForLoser);
 	}
 
 	/**
