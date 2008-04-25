@@ -24,19 +24,26 @@ public class Match implements Comparable<Match> {
 	public Match(League league, Date date, User winner, User loser,
 			int length, int score, int longestRunForWinner,
 			int longestRunForLoser) throws BlmsException {
+		this.league = league;
+		update(date, winner, loser, length, score, 
+				longestRunForWinner, longestRunForLoser);
+	}
+
+	public void update(Date date, User winner, User loser,
+			int length, int score, int longestRunForWinner,
+			int longestRunForLoser) throws BlmsException {
 		if (winner == loser)
 			throw new BlmsException("Users must be different");
 		
-		this.league = league;
 		this.date = date;
 		this.winner = winner;
 		this.loser = loser;
 		setLength(length);
 		setScore(score);
 		setLongestRunForWinner(longestRunForWinner);
-		setLongestRunForLoser(longestRunForLoser);
+		setLongestRunForLoser(longestRunForLoser);		
 	}
-
+	
 	public League getLeague() {
 		return league;
 	}
@@ -73,41 +80,41 @@ public class Match implements Comparable<Match> {
 		return longestRunForLoser;
 	}
 
-	public void setDate(Date date) {
+	protected void setDate(Date date) {
 		this.date = date;
 	}
 
-	public void setLeague(League league) {
+	protected void setLeague(League league) {
 		this.league = league;
 	}
 
-	public void setWinner(User winner) {
+	protected void setWinner(User winner) {
 		this.winner = winner;
 	}
 
-	public void setLoser(User loser) {
+	protected void setLoser(User loser) {
 		this.loser = loser;
 	}
 
-	public void setLength(int length) throws BlmsException {
+	protected void setLength(int length) throws BlmsException {
 		if (length != UNDEFINED && length < 1)
 			throw new BlmsException("Invalid match length");
 		this.length = length;
 	}
 
-	public void setScore(int score) throws BlmsException {
+	protected void setScore(int score) throws BlmsException {
 		if (score != UNDEFINED && !(score >= 0 && score < length))
 			throw new BlmsException("Invalid score");
 		this.score = score;
 	}
 	
-	public void setLongestRunForWinner(int longestRunForWinner) throws BlmsException {
+	protected void setLongestRunForWinner(int longestRunForWinner) throws BlmsException {
 		if (longestRunForWinner != UNDEFINED && !(longestRunForWinner >= 1 && longestRunForWinner <= length))
 			throw new BlmsException("Invalid run");
 		this.longestRunForWinner = longestRunForWinner;
 	}
 
-	public void setLongestRunForLoser(int longestRunForLoser) throws BlmsException {
+	protected void setLongestRunForLoser(int longestRunForLoser) throws BlmsException {
 		if (longestRunForLoser != UNDEFINED && !(longestRunForLoser >= 0 && longestRunForLoser <= score))
 			throw new BlmsException("Invalid run");
 		this.longestRunForLoser = longestRunForLoser;
