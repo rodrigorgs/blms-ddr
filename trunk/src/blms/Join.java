@@ -16,6 +16,7 @@ public class Join {
 		this.joinDate = new Date();
 	}
 	
+	
 	/*
 	 * For our tests, just interest us if the user and league attributes are equals.
 	 * The joinDate and initialHandicap attributes don't matter.
