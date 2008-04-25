@@ -267,6 +267,20 @@ public class Registry {
 		return m;
 	}
 
+	public void removeAllMatches() {
+		for (Match m : matches) {
+			m.getLeague().matches.remove(m);
+			m.getWinner().matches.remove(m);
+			m.getWinner().matches.remove(m);
+		}
+		matches.clear();
+	}
 
-
+	public void deleteMatch(Match m) {
+		matches.remove(m);
+		m.getLeague().matches.remove(m);
+		m.getWinner().matches.remove(m);
+		m.getWinner().matches.remove(m);
+	}
+	
 }
