@@ -188,7 +188,13 @@ public class BlmsFacade {
 
 	// from us-standings.txt:320 us-history.txt:438 us-win-loss.txt:515,642,646,919,920,921 
 	public void dateFormat(String format) throws Exception {
-		dateFormat.applyPattern(format.replaceAll("m", "M"));
+		try {
+			if (format.isEmpty())
+				throw new Exception("Unknown date format");
+			dateFormat.applyPattern(format.replaceAll("m", "M"));
+		} catch (Exception e) {
+			throw new Exception("Unknown date format");
+		}
 	}
 
 	// from us-standings.txt:335,378,381,384,395,396,397,398,399,412 
@@ -473,7 +479,6 @@ public class BlmsFacade {
 
 	// from us-standings.txt:353 us-win-loss.txt:595,875,876,877,878,879,880,881,882,883,884,885,886,888,889,890,892,893,894,896,897,898,899,901,902,903,904 
 	public void updateMatchResult(String matchId, String date, String winner, String loser, String length, String score, String longestRunForWinner, String longestRunForLoser) throws Exception {
-		// updateMatchResult matchId=${matchId} date=2/12/2007 winner=${userId2} loser=${userId1} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
 		Match m = getObject(matchId, Match.class);
 		
 		Date parsedDate = parseDate(date);
@@ -484,13 +489,14 @@ public class BlmsFacade {
 		int intLongestRunForWinner = parseRun(longestRunForWinner);
 		int intLongestRunForLoser = parseRun(longestRunForLoser);
 		
-		m.setDate(parsedDate);
-		m.setWinner(userWinner);
-		m.setLoser(userLoser);
-		m.setLength(intLength);
-		m.setScore(intScore);
-		m.setLongestRunForWinner(intLongestRunForWinner);
-		m.setLongestRunForLoser(intLongestRunForLoser);
+		registry.updateMatchResult(m, parsedDate, userWinner, userLoser, intLength, intScore, intLongestRunForWinner, intLongestRunForLoser);
+//		m.setDate(parsedDate);
+//		m.setWinner(userWinner);
+//		m.setLoser(userLoser);
+//		m.setLength(intLength);
+//		m.setScore(intScore);
+//		m.setLongestRunForWinner(intLongestRunForWinner);
+//		m.setLongestRunForLoser(intLongestRunForLoser);
 	}
 
 	/**

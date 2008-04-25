@@ -289,5 +289,11 @@ public class Registry {
 		m.getWinner().matches.remove(m);
 		removeFromTables(m);
 	}
+
+	public void updateMatchResult(Match match, Date date, User winner,
+			User loser, int length, int score,
+			int longestRunForWinner, int longestRunForLoser) throws BlmsException {
+		match.update(date, winner, loser, length, score, longestRunForWinner, longestRunForLoser);
+	}
 	
 }

@@ -405,7 +405,6 @@ expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 w
 expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=xxx length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
 expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser="" length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
 expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser= length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
-quit
 # length >= 1
 expectError "Invalid match length" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=0 score=87 longestRunForWinner=23 longestRunForLoser=30
 expectError "Invalid match length" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=-1 score=87 longestRunForWinner=23 longestRunForLoser=30
