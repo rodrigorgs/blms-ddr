@@ -249,7 +249,13 @@ public class Registry {
 		Class clas = target.getClass();
 		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
 		Method met = clas.getMethod("get" + s, new Class[] {});
-		return met.invoke(target, new Object[] {});
+		Method[] methods = clas.getMethods();
+		for (int i = 0; i < methods.length; i++){
+			if ((methods[i].getName()).equals(met.getName())){
+				return met.invoke(target, new Object[] {});
+			}
+		}
+		return null; 
 	}
 
 	public void removeAllUsers() {
@@ -295,8 +301,11 @@ public class Registry {
 
 
 	public Join findJoin(User user, League league) throws BlmsException {
-		if (user == null || league == null){
-			throw new BlmsException("User/league is null");
+		if (user == null){
+			throw new BlmsException("Unknown user");
+		}
+		if (league == null){
+			throw new BlmsException("Unknown league");
 		}
 		for (Iterator it = joins.iterator(); it.hasNext(); ){
 			Join join = (Join) it.next();
