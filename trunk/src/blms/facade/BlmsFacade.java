@@ -60,6 +60,14 @@ public class BlmsFacade {
 	private int parseRun(String number) throws Exception {
 		return parseInt(number, "Invalid run");
 	}
+
+	private int parseIndex(String index) throws Exception {
+		String str = "Invalid index";
+		int i = parseInt(index, str);
+		if (i < 1)
+			throw new Exception(str);
+		return i;
+	}
 	
 	private Date parseDate(String date) throws Exception {
 		try {
@@ -195,7 +203,7 @@ public class BlmsFacade {
 
 	// from us-standings.txt:360,363,366 us-win-loss.txt:612,912,913,914 
 	public void deleteMatch(String matchId) throws Exception {
-		registry.deleteMatch((Match)registry.getObject(matchId));
+		registry.deleteMatch(getObject(matchId, Match.class));
 	}
 
 	// from us-leagues.txt:114,130,135,136 us-users.txt:279,281 
@@ -243,15 +251,15 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:551,559,567,594,623,624,625,626,628,629,750,751,752,753,754,762,763,764,765,766,767,768,769 
 	public String getMatch(String leagueId, String index) throws Exception {
-		League league = (League)registry.getObject(leagueId);
-		Match match = league.getMatch(Integer.parseInt(index));
+		League league = getObject(leagueId, League.class);
+		Match match = league.getMatch(parseIndex(index)); // TODO
 		return registry.getId(match);
 	}
 	
 	public String getMatch(String userId, String leagueId, String index) throws Exception {
-		User user = (User)registry.getObject(userId);
-		League league = (League)registry.getObject(leagueId);
-		int i = Integer.parseInt(index);
+		User user = getObject(userId, User.class);
+		League league = getObject(leagueId, League.class);
+		int i = parseIndex(index);
 		
 		Match m = user.getMatch(league, i);
 		return registry.getId(m);
@@ -259,15 +267,15 @@ public class BlmsFacade {
 
 	// from us-history.txt:456,457,458,459,460,461,472,473,474,475,476,477,478,479 
 	public String getMatchAsString(String userId, String leagueId, String index) throws Exception {
-		return "";
+		return "not implemented yet";
 	}
 
 	// from us-win-loss.txt:634,635,777,778,779,780,781,782,783,784,785,786,787,794,795,796,797,798,799,800,801,802,803,804,805,806,807 
 	public String getMatchByDate(String leagueId, String startDate, String endDate, String index) throws Exception {
-		League league = (League)registry.getObject(leagueId);
+		League league = getObject(leagueId, League.class);
 		Date start = parseDate(startDate);
 		Date end = parseDate(endDate);
-		int _index = Integer.parseInt(index);
+		int _index = parseIndex(index);
 		
 		int i = 0;
 		Match[] matches = league.getMatches();
@@ -280,15 +288,18 @@ public class BlmsFacade {
 			}
 		}
 		
+		if (_index > i)
+			throw new BlmsException("Invalid index");
+		
 		return "";
 	}
 	
 	public String getMatchByDate(String userId, String leagueId, String startDate, String endDate, String index) throws Exception {
-		User user = (User)registry.getObject(userId);
-		League league = (League)registry.getObject(leagueId);
+		User user = getObject(userId, User.class);
+		League league = getObject(leagueId, League.class);;
 		Date start = parseDate(startDate);
 		Date end = parseDate(endDate);
-		int _index = Integer.parseInt(index);
+		int _index = parseIndex(index);
 		
 		int i = 0;
 		Match[] matches = user.getMatches(league);
@@ -300,6 +311,9 @@ public class BlmsFacade {
 					return registry.getId(match);
 			}
 		}
+	
+		if (_index > i)
+			throw new BlmsException("Invalid index");
 		
 		return "";
 	}
@@ -308,48 +322,48 @@ public class BlmsFacade {
 	// expect ${matchId2} getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
 
 	// from us-win-loss.txt:552,560,568,583,596,641,643,645,647 
-	public String getMatchDate(String matchId) {
-		Match m = (Match)registry.getObject(matchId);
+	public String getMatchDate(String matchId) throws Exception {
+		Match m = getObject(matchId, Match.class);
 		return dateFormat.format(m.getDate());
 	}
 
 	// from us-win-loss.txt:555,563,571,586,599,835,836,837 
 	public String getMatchLength(String matchId) throws Exception {
-		Match m = (Match)registry.getObject(matchId);
+		Match m = getObject(matchId, Match.class);
 		int x = m.getLength();
 		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:558,566,574,589,602,865,866,867 
 	public String getMatchLongestRunForLoser(String matchId) throws Exception {
-		Match m = (Match)registry.getObject(matchId);
+		Match m = getObject(matchId, Match.class);
 		int x = m.getLongestRunForLoser();
 		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:557,565,573,588,601,855,856,857 
 	public String getMatchLongestRunForWinner(String matchId) throws Exception {
-		Match m = (Match)registry.getObject(matchId);		
+		Match m = getObject(matchId, Match.class);		
 		int x = m.getLongestRunForWinner();
 		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:554,562,570,585,598,825,826,827 
 	public String getMatchLoser(String matchId) throws Exception {
-		Match m = (Match)registry.getObject(matchId);
+		Match m = getObject(matchId, Match.class);
 		return registry.getId(m.getLoser());
 	}
 
 	// from us-win-loss.txt:556,564,572,587,600,845,846,847 
 	public String getMatchScore(String matchId) throws Exception {
-		Match m = (Match)registry.getObject(matchId);
+		Match m = getObject(matchId, Match.class);
 		int x = m.getScore();
 		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:553,561,569,584,597,815,816,817 
 	public String getMatchWinner(String matchId) throws Exception {
-		Match m = (Match)registry.getObject(matchId);
+		Match m = getObject(matchId, Match.class);
 		return registry.getId(m.getWinner());
 	}
 
@@ -460,11 +474,11 @@ public class BlmsFacade {
 	// from us-standings.txt:353 us-win-loss.txt:595,875,876,877,878,879,880,881,882,883,884,885,886,888,889,890,892,893,894,896,897,898,899,901,902,903,904 
 	public void updateMatchResult(String matchId, String date, String winner, String loser, String length, String score, String longestRunForWinner, String longestRunForLoser) throws Exception {
 		// updateMatchResult matchId=${matchId} date=2/12/2007 winner=${userId2} loser=${userId1} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
-		Match m = (Match)registry.getObject(matchId);
+		Match m = getObject(matchId, Match.class);
 		
 		Date parsedDate = parseDate(date);
-		User userWinner = (User)registry.getObject(winner);
-		User userLoser = (User)registry.getObject(loser);
+		User userWinner = getObject(winner, User.class);
+		User userLoser = getObject(loser, User.class);
 		int intLength = parseMatchLength(length);
 		int intScore = parseScore(score);
 		int intLongestRunForWinner = parseRun(longestRunForWinner);
