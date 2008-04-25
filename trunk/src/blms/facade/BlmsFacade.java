@@ -41,6 +41,18 @@ public class BlmsFacade {
 		return obj;
 	}
 	
+	private int parseInt(String number, String exception) throws Exception {
+		try {
+			return Integer.parseInt(number);
+		} catch (NumberFormatException e) {
+			throw new Exception(exception);
+		}
+	}
+	
+	private int parseMatchLength(String number) throws Exception {
+		return parseInt(number, "Invalid match length");
+	}
+	
 	private Date parseDate(String date) throws Exception {
 		try {
 			return dateFormat.parse(date);
@@ -73,25 +85,27 @@ public class BlmsFacade {
 	}
 	
 	// from us-standings.txt:340,343,346,373,374,375 us-history.txt:453,454,455,471 us-win-loss.txt:535,538,541,582,610,620,621,622,640,644,673,674,675,676,677,678,679,680,681,682,683,684,685,691,692,693,694,695,696,697,698,699,700,701,702,704,705,706,708,709,710,712,713,714,715,717,718,719,720,749,761,776,793,814,824,834,844,854,864,874,911 
-	public String addMatchResult(String leagueId, String date, String winner, String loser) throws Exception {
+	public String addMatchResult(String leagueId, String date, String winner, String loser) throws Throwable {
 		// addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
-		League league = getObject(leagueId, League.class);
-		Date parsedDate = parseDate(date);
-		User userWinner = getObject(winner, User.class);
-		User userLoser = getObject(loser, User.class);
-		
-		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser);
-		return registry.getId(m);
+//		League league = getObject(leagueId, League.class);
+//		Date parsedDate = parseDate(date);
+//		User userWinner = getObject(winner, User.class);
+//		User userLoser = getObject(loser, User.class);
+//		
+//		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser);
+//		return registry.getId(m);
+		String x = "" + Match.UNDEFINED; 
+		return addMatchResult(leagueId, date, winner, loser, x, x, x, x); 
 	}
 	
 	public String addMatchResult(String leagueId, String date, String winner, 
 			String loser, String length, String score,
 			String longestRunForWinner, String longestRunForLoser) throws Throwable {
-		League league = (League)registry.getObject(leagueId);
+		League league = getObject(leagueId, League.class);
 		Date parsedDate = parseDate(date);
-		User userWinner = (User)registry.getObject(winner);
-		User userLoser = (User)registry.getObject(loser);
-		int intLength = Integer.parseInt(length);
+		User userWinner = getObject(winner, User.class);
+		User userLoser = getObject(loser, User.class);
+		int intLength = parseMatchLength(length);
 		int intScore = Integer.parseInt(score);
 		int intLongestRunForWinner = Integer.parseInt(longestRunForWinner);
 		int intLongestRunForLoser = Integer.parseInt(longestRunForLoser);
@@ -443,7 +457,7 @@ public class BlmsFacade {
 		Date parsedDate = parseDate(date);
 		User userWinner = (User)registry.getObject(winner);
 		User userLoser = (User)registry.getObject(loser);
-		int intLength = Integer.parseInt(length);
+		int intLength = parseMatchLength(length);
 		int intScore = Integer.parseInt(score);
 		int intLongestRunForWinner = Integer.parseInt(longestRunForWinner);
 		int intLongestRunForLoser = Integer.parseInt(longestRunForLoser);
