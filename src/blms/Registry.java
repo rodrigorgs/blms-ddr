@@ -263,6 +263,20 @@ public class Registry {
 		return m;
 	}
 
+
+	public Join findJoin(User user, League league) throws BlmsException {
+		if (user.equals(null) || league.equals(null)){
+			throw new BlmsException("User/league is null");
+		}
+		for (Iterator it = joins.iterator(); it.hasNext(); ){
+			Join join = (Join) it.next();
+			if ((join.league).equals(league) && (join.user).equals(user)){
+				return join;
+			}
+		}
+		return null;
+	}
+
 	public void removeAllMatches() {
 		for (Match m : matches)
 			removeFromTables(m);
@@ -281,6 +295,7 @@ public class Registry {
 //		matches.clear();
 	}
 
+
 	// TODO: verify
 	public void deleteMatch(Match m) {
 		matches.remove(m);
@@ -290,10 +305,10 @@ public class Registry {
 		removeFromTables(m);
 	}
 
+
 	public void updateMatchResult(Match match, Date date, User winner,
 			User loser, int length, int score,
 			int longestRunForWinner, int longestRunForLoser) throws BlmsException {
 		match.update(date, winner, loser, length, score, longestRunForWinner, longestRunForLoser);
 	}
-	
 }

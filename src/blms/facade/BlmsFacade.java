@@ -424,10 +424,14 @@ public class BlmsFacade {
 	public String getUserLeagueAttribute(String userId, String id, String attribute) throws Exception {
 		User user = (User) registry.getObject(userId);
 		League league = (League) registry.getObject(id);
-		Join join = new Join(user, league, 0);
-		String joinId = registry.getId(join);
-		
-		return dateFormat.format(getAttribute(id, attribute));
+		Join join = registry.findJoin(user, league);
+		if (join.equals(null)){
+			throw new BlmsException("The user " + userId + " didn't join in the league " + id);
+		}		
+		//Rodrigo, até aqui eu depurei e o objeto "join" não estava null... qnd passei dessa linha
+		//ele não depurou mais por causa do "easyaccept"... então nao sei exatamente a causa do null pointer...
+		//outra coisa é q, neste caso, nao vejo necessidade deste "id" no segundo parâmetro
+		return (String) registry.getAttribute(join, id, attribute);
 	}
 
 	// from us-join.txt:957,958,963,968,975,999,1001 
