@@ -453,7 +453,7 @@ public class BlmsFacade {
 	}
 
 	// from us-standings.txt:331,332 us-history.txt:449,450 us-join.txt:965,980,981,987,1013,1015,1017,1019,1020,1022 us-win-loss.txt:526,527 
-	public void joinLeague(String idUser, String idLeague, int initialHandicap) throws Exception {
+	public void joinLeague(String idUser, String idLeague, String initialHandicap) throws Exception {
 		User user = (User) registry.getObject(idUser);
 		League league = (League) registry.getObject(idLeague);
 		registry.userJoinLeague(user, league, initialHandicap);

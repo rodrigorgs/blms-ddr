@@ -54,8 +54,6 @@ leaveLeague id=${idUser3} leagueId=${idLeague1}
 expect "" getPlayerLeagues userId=${idUser3}
 expect "Sauve" getLeagueMembers leagueId=${idLeague1}
 expect false isLeagueMember id=${idUser3} leagueId=${idLeague1}
-##############################
-quit
 
 ##################################################################
 # another user joins same league
@@ -98,12 +96,14 @@ expectError "Unknown user" joinLeague id=xxx leagueId=${idLeague1} initialHandic
 expectError "Unknown league" joinLeague id=${idUser3} leagueId=xxx initialHandicap=200
 #  already a member
 expectError "User is already a league member" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=200
+
 #  handicap can be null or empty
 expectError "Must provide initial player handicap" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=
 expectError "Must provide initial player handicap" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=""
 #  handicap cant be negative
 expectError "Handicap cant be negative" joinLeague id=${idUser3} leagueId=${idLeague1} initialHandicap=-200
-
+##############################
+quit
 # command: getUserLeagueAttribute
 #  bad user id
 expectError "Unknown user" getUserLeagueAttribute userId=xxx id=${idLeague1} attribute=joinDate
