@@ -50,14 +50,29 @@ public class BlmsFacade {
 		Date parsedDate = dateFormat.parse(date);
 		User userWinner = (User)registry.getObject(winner);
 		User userLoser = (User)registry.getObject(loser);
-		assert league != null;
-		assert parsedDate != null;
-		assert userWinner != null;
-		assert userLoser != null;
 		
 		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser);
 		return registry.getId(m);
 	}
+	
+	public String addMatchResult(String leagueId, String date, String winner, 
+			String loser, String length, String score,
+			String longestRunForWinner, String longestRunForLoser) throws Throwable {
+		League league = (League)registry.getObject(leagueId);
+		Date parsedDate = dateFormat.parse(date);
+		User userWinner = (User)registry.getObject(winner);
+		User userLoser = (User)registry.getObject(loser);
+		int intLength = Integer.parseInt(length);
+		int intScore = Integer.parseInt(score);
+		int intLongestRunForWinner = Integer.parseInt(longestRunForWinner);
+		int intLongestRunForLoser = Integer.parseInt(longestRunForLoser);
+		
+		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser, 
+				intLength, intScore, intLongestRunForWinner, intLongestRunForLoser);
+		return registry.getId(m);
+	}
+	// matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} 
+	// length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
 
 	// from us-leagues.txt:88,89,90,93,94,102,103,104,105,106,109 
 	public void changeLeagueAttribute(String id, String attribute, String value) throws Throwable {
@@ -202,17 +217,23 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:555,563,571,586,599,835,836,837 
 	public String getMatchLength(String matchId) throws Exception {
-		return "";
+		Match m = (Match)registry.getObject(matchId);
+		int x = m.getLength();
+		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:558,566,574,589,602,865,866,867 
 	public String getMatchLongestRunForLoser(String matchId) throws Exception {
-		return "";
+		Match m = (Match)registry.getObject(matchId);
+		int x = m.getLongestRunForLoser();
+		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:557,565,573,588,601,855,856,857 
 	public String getMatchLongestRunForWinner(String matchId) throws Exception {
-		return "";
+		Match m = (Match)registry.getObject(matchId);		
+		int x = m.getLongestRunForWinner();
+		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:554,562,570,585,598,825,826,827 
@@ -223,7 +244,9 @@ public class BlmsFacade {
 
 	// from us-win-loss.txt:556,564,572,587,600,845,846,847 
 	public String getMatchScore(String matchId) throws Exception {
-		return "";
+		Match m = (Match)registry.getObject(matchId);
+		int x = m.getScore();
+		return x == Match.UNDEFINED ? "" : "" + x;
 	}
 
 	// from us-win-loss.txt:553,561,569,584,597,815,816,817 
