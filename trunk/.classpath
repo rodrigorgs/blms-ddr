@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="jars"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="jars/easyaccept.jar"/>
+	<classpathentry kind="lib" path="jars/jeplite-0.8.7a-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
