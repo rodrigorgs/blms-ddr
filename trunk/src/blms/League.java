@@ -1,6 +1,7 @@
 package blms;
 
 import java.text.Collator;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -55,7 +56,9 @@ public class League implements Comparable<League> {
 	}
 	
 	public Match[] getMatches() {
-		return matches.toArray(new Match[] {});
+		Match[] ret = matches.toArray(new Match[] {});
+		Arrays.sort(ret);
+		return ret;
 	}
 	
 	public Match getMatch(int index) {
@@ -73,10 +76,6 @@ public class League implements Comparable<League> {
 
 
 	public void addMatch(Match m) {
-//		Match m = new Match(this, date, winner, loser);
 		matches.add(m);
-//		winner.addMatch(m);
-//		loser.addMatch(m);
-//		return m;
 	}
 }

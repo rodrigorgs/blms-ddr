@@ -198,6 +198,15 @@ public class BlmsFacade {
 		Match match = league.getMatch(Integer.parseInt(index));
 		return registry.getId(match);
 	}
+	
+	public String getMatch(String userId, String leagueId, String index) throws Exception {
+		User user = (User)registry.getObject(userId);
+		League league = (League)registry.getObject(leagueId);
+		int i = Integer.parseInt(index);
+		
+		Match m = user.getMatch(league, i);
+		return registry.getId(m);
+	}
 
 	// from us-history.txt:456,457,458,459,460,461,472,473,474,475,476,477,478,479 
 	public String getMatchAsString(String userId, String leagueId, String index) throws Exception {
@@ -389,5 +398,8 @@ public class BlmsFacade {
 		
 	}
 
+	public void print(String x) {
+		System.out.println(x);
+	}
 }
 

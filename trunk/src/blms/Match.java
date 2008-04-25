@@ -2,7 +2,7 @@ package blms;
 
 import java.util.Date;
 
-public class Match {
+public class Match implements Comparable<Match> {
 	Date date;
 	League league;
 	User winner;
@@ -97,5 +97,9 @@ public class Match {
 
 	public void setLongestRunForLoser(int longestRunForLoser) {
 		this.longestRunForLoser = longestRunForLoser;
+	}
+
+	public int compareTo(Match other) {
+		return this.getDate().compareTo(other.getDate());
 	}
 }

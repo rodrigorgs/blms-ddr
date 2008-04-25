@@ -268,19 +268,30 @@ public class Registry {
 	}
 
 	public void removeAllMatches() {
-		for (Match m : matches) {
-			m.getLeague().matches.remove(m);
-			m.getWinner().matches.remove(m);
-			m.getWinner().matches.remove(m);
-		}
+		for (Match m : matches)
+			removeFromTables(m);
 		matches.clear();
+		for (User u : users)
+			u.matches.clear();
+		for (League l : leagues)
+			l.matches.clear();
+//			matches.clear();
+//		{
+//			m.getLeague().matches.remove(m);
+//			m.getWinner().matches.remove(m);
+//			m.getWinner().matches.remove(m);
+//			removeFromTables(m);
+//		}
+//		matches.clear();
 	}
 
+	// TODO: verify
 	public void deleteMatch(Match m) {
 		matches.remove(m);
 		m.getLeague().matches.remove(m);
 		m.getWinner().matches.remove(m);
 		m.getWinner().matches.remove(m);
+		removeFromTables(m);
 	}
 	
 }

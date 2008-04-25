@@ -141,7 +141,6 @@ removeAllMatches
 matchId1=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
 matchId2=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId3}
 matchId3=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
-quit
 expect ${matchId1} getMatch userId=${userId1} leagueId=${leagueId1} index=1
 expect ${matchId2} getMatch userId=${userId1} leagueId=${leagueId1} index=2
 expect ${matchId1} getMatch userId=${userId2} leagueId=${leagueId1} index=1
@@ -149,6 +148,7 @@ expect ${matchId3} getMatch userId=${userId2} leagueId=${leagueId1} index=2
 # for following tests, remember tests are ordered by date
 expect ${matchId3} getMatch userId=${userId3} leagueId=${leagueId1} index=1
 expect ${matchId2} getMatch userId=${userId3} leagueId=${leagueId1} index=2
+quit
 
 ##################################################################
 # Get info by date

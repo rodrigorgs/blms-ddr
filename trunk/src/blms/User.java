@@ -110,11 +110,21 @@ public class User {
 	}
 	
 	public Match[] getMatches(League l) {
-		Collection<Match> ret = new LinkedList<Match>();
+		Collection<Match> col = new LinkedList<Match>();
 		for (Match m : matches)
 			if (m.getLeague() == l)
-				ret.add(m);
-		return ret.toArray(new Match[] {});
+				col.add(m);
+		
+		Match[] ret = col.toArray(new Match[] {});
+		Arrays.sort(ret);
+		return ret;
+	}
+	
+	public Match getMatch(League l, int index) {
+		Match[] m = getMatches(l);
+//		System.out.printf("%d of %d\n", index - 1, m.length);
+//		System.out.println(Arrays.toString(m));
+		return m[index - 1];
 	}
 	
 	public int getNumberOfWinsOrLosses(League league, Match.Role role) {
