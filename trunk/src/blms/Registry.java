@@ -162,6 +162,15 @@ public class Registry {
 		insertIntoTables(join);
 	}
 	
+	public void userLeaveLeague(User user, League league) throws Exception{
+		Join join = findJoin(user, league);
+		leagues.remove(league);
+		users.remove(user);
+		if (join != null){
+			joins.remove(join);
+		} else throw new BlmsException("User/league is null");
+	}
+	
 	public boolean isUserLeague(User user, League league) throws BlmsException {
 		if (Util.isNullOrEmpty(league.name))
 			throw new BlmsException("Required: league");
@@ -265,7 +274,7 @@ public class Registry {
 
 
 	public Join findJoin(User user, League league) throws BlmsException {
-		if (user.equals(null) || league.equals(null)){
+		if (user == null || league == null){
 			throw new BlmsException("User/league is null");
 		}
 		for (Iterator it = joins.iterator(); it.hasNext(); ){

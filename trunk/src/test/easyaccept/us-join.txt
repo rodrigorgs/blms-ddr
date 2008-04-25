@@ -48,13 +48,14 @@ expect "Sauve, ln1" getLeagueMembers leagueId=${idLeague1}
 expect true isLeagueMember id=${idUser3} leagueId=${idLeague1}
 expect ${today} getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=joinDate
 expect 200 getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=currentHandicap
-##############################
-quit
+
 # player leaves league
 leaveLeague id=${idUser3} leagueId=${idLeague1}
 expect "" getPlayerLeagues userId=${idUser3}
 expect "Sauve" getLeagueMembers leagueId=${idLeague1}
 expect false isLeagueMember id=${idUser3} leagueId=${idLeague1}
+##############################
+quit
 
 ##################################################################
 # another user joins same league

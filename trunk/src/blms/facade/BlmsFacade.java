@@ -455,7 +455,9 @@ public class BlmsFacade {
 
 	// from us-join.txt:972,1036,1038,1040,1042 
 	public void leaveLeague(String id, String leagueId) throws Exception {
-		
+		User user = (User) registry.getObject(id);
+		League league = (League) registry.getObject(leagueId);
+		registry.userLeaveLeague(user, league);
 	}
 
 	/**
