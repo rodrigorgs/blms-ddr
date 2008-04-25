@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import blms.exceptions.BlmsException;
+import org.cheffo.jeplite.JEP;
+import org.cheffo.jeplite.ParseException;
 
-import util.StringUtil;
+import blms.exceptions.BlmsException;
 
 // Invariant: the user has a firstName, a lastName and a email (not null and not empty).
 // Invariant: the user has at least one phone number.
@@ -175,5 +176,31 @@ public class User {
 
 	public void addMatch(Match m) {
 		matches.add(m);
+	}
+
+	public double getStanding(League league) throws BlmsException {
+		String standingsExpression = league.getStandingsExpression();
+		
+		int wins = 0;
+		int losses = 0;
+		for (Match m : getMatches(league)) {
+			if (m.getWinner() == this)
+				wins++;
+			else if (m.getLoser() == this)
+				losses++;
+			else
+				throw new BlmsException("Implementation error in User.getStanding()");
+		}
+
+		JEP jep = new JEP();
+		jep.addVariable("seasonWins", (double)wins);
+		jep.addVariable("seasonLosses", (double)losses);
+		jep.parseExpression(standingsExpression);
+		try {
+			return jep.getValue();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			return 3.1415; // :P TODO
+		}
 	}
 }
