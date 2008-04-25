@@ -429,14 +429,13 @@ public class BlmsFacade {
 		if (join == null){
 			throw new BlmsException("The user " + userId + " didn't join in the league " + id);
 		}		
-		//Rodrigo, at� aqui eu depurei e o objeto "join" n�o estava null... qnd passei dessa linha
-		//ele n�o depurou mais por causa do "easyaccept"... ent�o nao sei exatamente a causa do null pointer...
-		//outra coisa � q, neste caso, nao vejo necessidade deste "id" no segundo par�metro
+
 		Object value = registry.getAttribute(join, id, attribute);
 		if (value instanceof Date)
 			return dateFormat.format((Date)value);
 		else
-			return (String)value;
+			return value.toString();
+
 	}
 
 	// from us-join.txt:957,958,963,968,975,999,1001 
