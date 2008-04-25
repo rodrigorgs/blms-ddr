@@ -113,8 +113,8 @@ expectError "Unknown league" getUserLeagueAttribute userId=${idUser3} id=xxx att
 expectError "Unknown user attribute" getUserLeagueAttribute userId=${idUser3} id=${idLeague1} attribute=xxx
 #  user not member of league
 expectError "User is not a league member" getUserLeagueAttribute userId=${idUser4} id=${idLeague2} attribute=joinDate
-##############################
-quit
+
+
 # command: leaveLeague
 #  bad user id
 expectError "Unknown user" leaveLeague id=xxx leagueId=${idLeague1}
