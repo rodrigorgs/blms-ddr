@@ -103,6 +103,8 @@ public class Registry {
 	public void deleteLeague(League league) {
 		leagues.remove(league);
 		removeFromTables(league);
+		for (Match m : league.getMatches())
+			deleteMatch(m);
 	}
 	
 	// --------------------------------------
@@ -242,8 +244,11 @@ public class Registry {
 
 	// TODO: remove seasons, win/loss...
 	public void removeAllLeagues() {
-		for (League l : leagues)
+		for (League l : leagues) {
 			removeFromTables(l);
+			for (Match m : l.getMatches())
+				deleteMatch(m);
+		}
 		leagues.clear();
 		
 	}
