@@ -436,15 +436,16 @@ public class BlmsFacade {
 		}
 		Join join = registry.findJoin(user, league);
 
-		Object value = registry.getAttribute(join, id, attribute);
-		if (value == null){
+		try {
+			Object value = registry.getAttribute(join, id, attribute);
+			
+			if (value instanceof Date)
+				return dateFormat.format((Date)value);
+			else
+				return value.toString();
+		} catch (NoSuchMethodException e) {
 			throw new BlmsException("Unknown user attribute");
 		}
-		if (value instanceof Date)
-			return dateFormat.format((Date)value);
-		else
-			return value.toString();
-
 	}
 
 	// from us-join.txt:957,958,963,968,975,999,1001 
