@@ -16,7 +16,7 @@ class Inteiro implements Comparable {
 	public void set(int i) {
 		x = i;
 	}
-	@Override
+
 	public int compareTo(Object o) {
 		int y = ((Inteiro)o).x;
 		return x - y;

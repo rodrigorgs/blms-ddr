@@ -189,7 +189,7 @@ public class BlmsFacade {
 	// from us-standings.txt:320 us-history.txt:438 us-win-loss.txt:515,642,646,919,920,921 
 	public void dateFormat(String format) throws Exception {
 		try {
-			if (format.isEmpty())
+			if (format.trim().length() == 0)
 				throw new Exception("Unknown date format");
 			dateFormat.applyPattern(format.replaceAll("m", "M"));
 		} catch (Exception e) {
