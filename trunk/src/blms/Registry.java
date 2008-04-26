@@ -307,7 +307,6 @@ public class Registry {
 		
 		matches.add(m);
 		insertIntoTables(m);
-		assert !getId(m).isEmpty();
 		
 		return m;
 	}
