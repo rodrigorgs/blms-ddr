@@ -1,3 +1,4 @@
+
 package blms;
 
 import java.lang.reflect.InvocationTargetException;
@@ -189,6 +190,9 @@ public class Registry {
 		}
 		if (!this.isUserLeague(user, league)){
 			throw new BlmsException("User is not a league member");
+		}
+		if ((league.operator).equals(user)){
+			throw new BlmsException("Operator cannot leave league");
 		}
 		Join join = findJoin(user, league);
 		leagues.remove(league);
