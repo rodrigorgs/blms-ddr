@@ -97,6 +97,12 @@ public class Registry {
 		for (League l : leagues)
 			if (l.getOperator() == user)
 				throw new BlmsException("Cannot remove league operator");
+		for (Join j : joins){
+			if ((j.user).equals(user)){
+				joins.remove(j);
+				removeFromTables(j);
+			}
+		}
 		users.remove(user);
 		removeFromTables(user);
 	}
@@ -106,6 +112,12 @@ public class Registry {
 		removeFromTables(league);
 		for (Match m : league.getMatches())
 			deleteMatch(m);
+		for (Join j : joins){
+			if ((j.league).equals(league)){
+				removeFromTables(j);
+				joins.remove(j);
+			}
+		}
 	}
 	
 	// --------------------------------------
@@ -195,11 +207,10 @@ public class Registry {
 			throw new BlmsException("Operator cannot leave league");
 		}
 		Join join = findJoin(user, league);
-		leagues.remove(league);
-		users.remove(user);
 		if (join != null){
 			joins.remove(join);
 		} else throw new BlmsException("User/league is null");
+		leagues.remove(league);
 	}
 	
 	public boolean isUserLeague(User user, League league) throws BlmsException {
@@ -284,7 +295,11 @@ public class Registry {
 			for (Match m : l.getMatches())
 				deleteMatch(m);
 		}
+		for (Join j : joins){
+			removeFromTables(j);
+		}
 		leagues.clear();
+		joins.clear();
 		
 	}
 
