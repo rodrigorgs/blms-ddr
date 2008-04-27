@@ -97,12 +97,14 @@ public class Registry {
 		for (League l : leagues)
 			if (l.getOperator() == user)
 				throw new BlmsException("Cannot remove league operator");
+		LinkedList<Join> auxJoins = new LinkedList<Join>();
 		for (Join j : joins){
 			if ((j.user).equals(user)){
-				joins.remove(j);
+				auxJoins.add(j);
 				removeFromTables(j);
 			}
 		}
+		joins.removeAll(auxJoins);
 		users.remove(user);
 		removeFromTables(user);
 	}
@@ -112,12 +114,14 @@ public class Registry {
 		removeFromTables(league);
 		for (Match m : league.getMatches())
 			deleteMatch(m);
+		LinkedList<Join> auxJoins = new LinkedList<Join>();
 		for (Join j : joins){
 			if ((j.league).equals(league)){
 				removeFromTables(j);
-				joins.remove(j);
+				auxJoins.add(j);
 			}
 		}
+		joins.removeAll(auxJoins);
 	}
 	
 	// --------------------------------------
