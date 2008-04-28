@@ -102,14 +102,6 @@ public class BlmsFacade {
 	
 	// from us-standings.txt:340,343,346,373,374,375 us-history.txt:453,454,455,471 us-win-loss.txt:535,538,541,582,610,620,621,622,640,644,673,674,675,676,677,678,679,680,681,682,683,684,685,691,692,693,694,695,696,697,698,699,700,701,702,704,705,706,708,709,710,712,713,714,715,717,718,719,720,749,761,776,793,814,824,834,844,854,864,874,911 
 	public String addMatchResult(String leagueId, String date, String winner, String loser) throws Throwable {
-		// addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
-//		League league = getObject(leagueId, League.class);
-//		Date parsedDate = parseDate(date);
-//		User userWinner = getObject(winner, User.class);
-//		User userLoser = getObject(loser, User.class);
-//		
-//		Match m = registry.addMatchResult(league, parsedDate, userWinner, userLoser);
-//		return registry.getId(m);
 		String x = "" + Match.UNDEFINED; 
 		return addMatchResult(leagueId, date, winner, loser, x, x, x, x); 
 	}
@@ -517,7 +509,7 @@ public class BlmsFacade {
 	 * @param databaseName The name of database instance.
 	 */ 
 	public void useDatabase(String databaseName) {
-		
+		registry.useDatabase(databaseName);
 	}
 
 	public void print(String x) {

@@ -21,9 +21,10 @@ files = %w(users leagues win-loss standings join)
         end
     end
 
+JARS='../../jars/easyaccept.jar:../../jars/jeplite-0.8.7a-bin.jar:../../jars/bloat-1.0.jar:../../jars/db4o-6.1-db4ounit.jar:../../jars/db4o-6.1-java5.jar:../../jars/db4o-6.1-nqopt.jar'
 files.permute do |l|
 	puts "Rodando os testes na seguinte ordem: #{l.join(', ')}"
 	params = l.inject('') { |sum, e| sum + (template % e) + ' ' } 
-	s = "java -cp ../../bin:../../jars/easyaccept.jar:../../jars/jeplite-0.8.7a-bin.jar easyaccept.EasyAccept blms.facade.BlmsFacade #{params}"
+	s = "java -cp ../../bin:#{JARS} easyaccept.EasyAccept blms.facade.BlmsFacade #{params}"
 	puts `#{s}`
 end

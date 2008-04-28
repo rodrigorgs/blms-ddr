@@ -15,6 +15,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.db4o.Db4o;
+import com.db4o.ObjectContainer;
+
 import blms.exceptions.BlmsException;
 
 // Invariant: there aren't two users with the same email address. 
@@ -28,8 +31,11 @@ public class Registry {
 	Map<Object, String> objToId;
 	
 	long nextId = 0;
+	ObjectContainer db = null;
 
 	public Registry() {
+//		db = Db4o.openFile(database);
+		
 		users = new LinkedList<User>();
 		leagues = new LinkedList<League>();
 		matches = new LinkedList<Match>();
@@ -37,6 +43,12 @@ public class Registry {
 		
 		idToObj = new HashMap<String, Object>();
 		objToId = new HashMap<Object, String>();
+	}
+	
+	public void useDatabase(String databaseName) {
+		if (db != null)
+			db.close();
+		db = Db4o.openFile(databaseName);
 	}
 	
 	private String insertIntoTables(Object obj) {

@@ -1,5 +1,6 @@
 package blms.sandbox;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -7,6 +8,12 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import org.cheffo.jeplite.JEP;
+
+import blms.User;
+import blms.exceptions.BlmsException;
+
+import com.db4o.Db4o;
+import com.db4o.ObjectContainer;
 
 class Inteiro implements Comparable {
 	int x;
@@ -29,7 +36,7 @@ class Inteiro implements Comparable {
 
 
 public class Sandbox {
-
+	final static String dbfilename = "sandbox.db";
 	/**
 	 * @param args
 	 */
@@ -41,8 +48,20 @@ public class Sandbox {
 		expressionWithUndefinedVariable();
 		expressionInvalid();
 		expressionDivideByZero();
+		db4o();
 	}
 	
+	private static void db4o() throws BlmsException {
+		assert (new File(dbfilename).delete());
+		ObjectContainer db = Db4o.openFile(dbfilename);
+		try {
+			User u = new User("Rodrigo", "Souza", "555", "444", "333", "eu@x", "bli.jpg");
+			db.set(u);
+		} finally {
+			db.close();
+		}
+	}
+
 	private static void expressionDivideByZero() {
 		JEP jep = new JEP();
 		jep.parseExpression("1/0");
