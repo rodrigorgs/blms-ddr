@@ -17,66 +17,68 @@ import java.util.regex.Pattern;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+import com.db4o.ext.ExtObjectContainer;
 
 import blms.exceptions.BlmsException;
 
 // Invariant: there aren't two users with the same email address. 
 public class Registry {
-	Collection<User> users;
-	Collection<League> leagues;
-	Collection<Match> matches;
-	Collection<Join> joins;
+	BlmsDataStore store;
+	String databaseName;
 	
-	Map<String, Object> idToObj;
-	Map<Object, String> objToId;
-	
-	long nextId = 0;
-	ObjectContainer db = null;
+	ExtObjectContainer db = null;
 
 	public Registry() {
-//		db = Db4o.openFile(database);
-		
-		users = new LinkedList<User>();
-		leagues = new LinkedList<League>();
-		matches = new LinkedList<Match>();
-		joins = new LinkedList<Join>(); 
-		
-		idToObj = new HashMap<String, Object>();
-		objToId = new HashMap<Object, String>();
+		Db4o.configure().updateDepth(20);
 	}
 	
 	public void useDatabase(String databaseName) {
-		if (db != null)
+		if (db != null) {
 			db.close();
-		db = Db4o.openFile(databaseName);
+		}
+		db = (ExtObjectContainer)Db4o.openFile(databaseName);
+		store = new BlmsDataStore();
+		ObjectSet<BlmsDataStore> result = db.get(BlmsDataStore.class);
+		if (result.isEmpty()) {
+			store = new BlmsDataStore();
+			db.set(store);
+		}
+		else
+			store = result.next();
 	}
 	
-	private String insertIntoTables(Object obj) {
-		String s = "" + nextId;
-		idToObj.put(s, obj);
-		objToId.put(obj, s);
-		nextId++;
-//		System.out.printf("---Object %s has id %s.\n", obj, getId(obj));
-		return s;
+	private void updateDb() {
+		db.set(store);
 	}
 	
-	private void removeFromTables(Object obj) {
-		idToObj.remove(objToId.get(obj));
-		objToId.remove(obj);
-	}
-	
+	/**
+	 * 
+	 * @param id
+	 * @return the object associated with the passed ID or null, if no object is associated with this ID
+	 */
 	public Object getObject(String id) {
-		return idToObj.get(id);
+		try {
+			long longId = Long.parseLong(id);
+			return db.getByID(longId);
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 	
+	// TODO: should we use UUID?
 	public String getId(Object o) {
-		return objToId.get(o);
+		long id = db.getID(o);
+		if (id != 0)
+			return "" + id;
+		else
+			return null; // TODO: maybe throw an exception?
 	}
 	
 	public User[] findUserByLastName(String lastName) {
 		Pattern pat = Pattern.compile(lastName, Pattern.CASE_INSENSITIVE);
 		Collection<User> ret = new LinkedList<User>();
-		for (User user : users) {
+		for (User user : store.users) {
 			Matcher m = pat.matcher(user.getLastName());
 			if (m.matches())
 				ret.add(user);
@@ -87,7 +89,7 @@ public class Registry {
 	public League[] findLeague(String name) {
 		Pattern pat = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
 		TreeSet<League> ret = new TreeSet<League>();
-		for (League league : leagues) {
+		for (League league : store.leagues) {
 			Matcher m = pat.matcher(league.getName());
 			if (m.matches())
 				ret.add(league);
@@ -98,42 +100,45 @@ public class Registry {
 	public User createUser(String firstName, String lastName, String homePhone,
 			String workPhone, String cellPhone, String email, String picture) throws BlmsException {
 		User user = new User(firstName, lastName, homePhone, workPhone, cellPhone, email, picture);
-		if (users.contains(user))
+		if (store.users.contains(user))
 			throw new BlmsException("User with this email exists");
-		users.add(user);
-		insertIntoTables(user);
+		store.users.add(user);
+//		insertIntoTables(user);
+		updateDb();
 		return user;
 	}
 
 	public void deleteUser(User user) throws BlmsException {
-		for (League l : leagues)
+		for (League l : store.leagues)
 			if (l.getOperator() == user)
 				throw new BlmsException("Cannot remove league operator");
 		LinkedList<Join> auxJoins = new LinkedList<Join>();
-		for (Join j : joins){
+		for (Join j : store.joins){
 			if ((j.user).equals(user)){
 				auxJoins.add(j);
-				removeFromTables(j);
+//				removeFromTables(j);
 			}
 		}
-		joins.removeAll(auxJoins);
-		users.remove(user);
-		removeFromTables(user);
+		store.joins.removeAll(auxJoins);
+		store.users.remove(user);
+//		removeFromTables(user);
+		updateDb();
 	}
 	
 	public void deleteLeague(League league) {
-		leagues.remove(league);
-		removeFromTables(league);
+		store.leagues.remove(league);
+//		removeFromTables(league);
 		for (Match m : league.getMatches())
 			deleteMatch(m);
 		LinkedList<Join> auxJoins = new LinkedList<Join>();
-		for (Join j : joins){
+		for (Join j : store.joins){
 			if ((j.league).equals(league)){
-				removeFromTables(j);
+//				removeFromTables(j);
 				auxJoins.add(j);
 			}
 		}
-		joins.removeAll(auxJoins);
+		store.joins.removeAll(auxJoins);
+		updateDb();
 	}
 	
 	// --------------------------------------
@@ -141,13 +146,14 @@ public class Registry {
 	public League createLeague(String name, User operator) throws BlmsException {
 		League league = new League(name, operator);
 		
-		if (leagues.contains(league))
+		if (store.leagues.contains(league))
 			throw new BlmsException("This league already exists");
 		Join join = new Join(operator, league, 0);
-		leagues.add(league);
-		joins.add(join);
-		insertIntoTables(league);
-		insertIntoTables(join);
+		store.leagues.add(league);
+		store.joins.add(join);
+//		insertIntoTables(league);
+//		insertIntoTables(join);
+		updateDb();
 		return league;
 	}
 	
@@ -158,7 +164,7 @@ public class Registry {
 		
 		if (user == null)
 			throw new BlmsException("Unknown user");
-		for (Iterator it = joins.iterator(); it.hasNext(); ){
+		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
 			Join join = (Join)it.next();
 			User userJoin = join.user;
 			if (user.equals(userJoin)){
@@ -175,7 +181,7 @@ public class Registry {
 			throw new BlmsException("Unknown league");
 		String stringMembers = "";
 		
-		for (Iterator it = joins.iterator(); it.hasNext(); ){
+		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
 			Join join = (Join) it.next();
 			League leagueJoin = join.league;
 			if (league.equals(leagueJoin)){
@@ -204,8 +210,9 @@ public class Registry {
 		Join existentJoin = findJoin(user, league);
 		if (existentJoin == null){
 			Join join = new Join(user, league, handicap);
-			joins.add(join);
-			insertIntoTables(join);
+			store.joins.add(join);
+//			insertIntoTables(join);
+			updateDb();
 		} else throw new BlmsException("User is already a league member");
 	}
 	
@@ -224,9 +231,9 @@ public class Registry {
 		}
 		Join join = findJoin(user, league);
 		if (join != null){
-			joins.remove(join);
+			store.joins.remove(join);
 		} else throw new BlmsException("User/league is null");
-		leagues.remove(league);
+		store.leagues.remove(league);
 	}
 	
 	public boolean isUserLeague(User user, League league) throws BlmsException {
@@ -235,7 +242,7 @@ public class Registry {
 		if (user == null)
 			throw new BlmsException("Unknown user");
 		Join join = new Join(user, league, 200);
-		for (Iterator it = joins.iterator(); it.hasNext(); ){
+		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
 			Join auxJoin = (Join) it.next();
 			if (join.equals(auxJoin)){
 				return true;
@@ -269,13 +276,13 @@ public class Registry {
 		/* TODO: generalize. Each class must define an unique attribute which
 		   is to be checked */
 		if (clas == User.class && attribute.equals("email")) {
-			for (User u : users)
+			for (User u : store.users)
 				if (u.getEmail().equals(value) && !u.equals(target))
 					throw new BlmsException("User with this email exists");
 		}
 		
 		if (clas == League.class && attribute.equals("name")) {
-			for (League l : leagues)
+			for (League l : store.leagues)
 				if (l.getName().equals(value) && !l.equals(target))
 					throw new BlmsException("This league already exists");
 		}
@@ -299,24 +306,38 @@ public class Registry {
 	}
 
 	public void removeAllUsers() {
-		for (User u : users)
-			removeFromTables(u);
-		users.clear();
+//		for (User u : store.users)
+//			removeFromTables(u);
+		store.users.clear();
+		updateDb();
 	}
 
 	// TODO: remove seasons, win/loss...
 	public void removeAllLeagues() {
-		for (League l : leagues) {
-			removeFromTables(l);
+		for (League l : store.leagues) {
+//			removeFromTables(l);
 			for (Match m : l.getMatches())
 				deleteMatch(m);
 		}
-		for (Join j : joins){
-			removeFromTables(j);
+		for (Join j : store.joins){
+//			removeFromTables(j);
 		}
-		leagues.clear();
-		joins.clear();
+		store.leagues.clear();
+		store.joins.clear();
+		updateDb();
 		
+	}
+	
+	public void removeAllMatches() {
+//		for (Match m : store.matches)
+//			removeFromTables(m);
+		store.matches.clear();
+		for (User u : store.users)
+			u.matches.clear();
+		for (League l : store.leagues)
+			l.matches.clear();
+		
+		updateDb();
 	}
 
 	public Match addMatchResult(League league, Date date,
@@ -336,8 +357,9 @@ public class Registry {
 		winner.addMatch(m);
 		loser.addMatch(m);
 		
-		matches.add(m);
-		insertIntoTables(m);
+		store.matches.add(m);
+//		insertIntoTables(m);
+		updateDb();
 		
 		return m;
 	}
@@ -350,7 +372,7 @@ public class Registry {
 		if (league == null){
 			throw new BlmsException("Unknown league");
 		}
-		for (Iterator it = joins.iterator(); it.hasNext(); ){
+		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
 			Join join = (Join) it.next();
 			if ((join.league).equals(league) && (join.user).equals(user)){
 				return join;
@@ -359,32 +381,14 @@ public class Registry {
 		return null;
 	}
 
-	public void removeAllMatches() {
-		for (Match m : matches)
-			removeFromTables(m);
-		matches.clear();
-		for (User u : users)
-			u.matches.clear();
-		for (League l : leagues)
-			l.matches.clear();
-//			matches.clear();
-//		{
-//			m.getLeague().matches.remove(m);
-//			m.getWinner().matches.remove(m);
-//			m.getWinner().matches.remove(m);
-//			removeFromTables(m);
-//		}
-//		matches.clear();
-	}
-
-
 	// TODO: verify
 	public void deleteMatch(Match m) {
-		matches.remove(m);
+		store.matches.remove(m);
 		m.getLeague().matches.remove(m);
 		m.getWinner().matches.remove(m);
 		m.getLoser().matches.remove(m);
-		removeFromTables(m);
+//		removeFromTables(m);
+		updateDb();
 	}
 
 

@@ -3,17 +3,21 @@ package blms.sandbox;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
 import org.cheffo.jeplite.JEP;
 
+import blms.BlmsDataStore;
 import blms.User;
 import blms.exceptions.BlmsException;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+import com.db4o.ext.ExtObjectContainer;
 
 class Inteiro implements Comparable {
 	int x;
@@ -53,13 +57,33 @@ public class Sandbox {
 	
 	private static void db4o() throws BlmsException {
 		assert (new File(dbfilename).delete());
-		ObjectContainer db = Db4o.openFile(dbfilename);
-		try {
-			User u = new User("Rodrigo", "Souza", "555", "444", "333", "eu@x", "bli.jpg");
-			db.set(u);
-		} finally {
-			db.close();
-		}
+		Db4o.configure().updateDepth(10);
+		ExtObjectContainer db = (ExtObjectContainer)Db4o.openFile(dbfilename);
+		BlmsDataStore store = new BlmsDataStore();
+		
+		User u1 = new User("Rodrigo", "Souza", "555", "444", "333", "eu@x", "bli.jpg");
+		User u2 = new User("Henrique", "Souza", "555", "444", "333", "eu@yyy", "bla.jpg");
+		store.users.add(u1);
+		db.set(store); 
+		store.users.add(u2);
+		db.set(store);
+		assert db.getID(u1) != 0;
+		assert db.getID(u2) != 0;
+//		System.out.printf("Object %s has id %s\n", u1.toString(), "" + db.getID(u1));
+//		System.out.printf("Object %s has id %s\n", u2.toString(), "" + db.getID(u2));
+		db.close();
+		
+		db = (ExtObjectContainer)Db4o.openFile(dbfilename);
+		store = (BlmsDataStore)db.get(BlmsDataStore.class).next();
+		assert store.users.size() == 2;
+		store.users.remove(u1);
+		db.set(store);
+		db.close();
+		
+		db = (ExtObjectContainer)Db4o.openFile(dbfilename);
+		store = (BlmsDataStore)db.get(BlmsDataStore.class).next();
+		assert store.users.size() == 1;
+		db.close();
 	}
 
 	private static void expressionDivideByZero() {
