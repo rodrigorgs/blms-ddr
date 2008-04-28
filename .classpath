@@ -5,5 +5,10 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="jars/easyaccept.jar"/>
 	<classpathentry kind="lib" path="jars/jeplite-0.8.7a-bin.jar"/>
+	<classpathentry kind="lib" path="jars/ant.jar"/>
+	<classpathentry kind="lib" path="jars/bloat-1.0.jar"/>
+	<classpathentry kind="lib" path="jars/db4o-6.1-db4ounit.jar"/>
+	<classpathentry kind="lib" path="jars/db4o-6.1-java5.jar"/>
+	<classpathentry kind="lib" path="jars/db4o-6.1-nqopt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
