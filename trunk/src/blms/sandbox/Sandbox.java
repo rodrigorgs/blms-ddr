@@ -3,7 +3,6 @@ package blms.sandbox;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -15,8 +14,6 @@ import blms.User;
 import blms.exceptions.BlmsException;
 
 import com.db4o.Db4o;
-import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 import com.db4o.ext.ExtObjectContainer;
 
 class Inteiro implements Comparable {
