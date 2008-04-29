@@ -3,24 +3,18 @@ package blms;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import blms.exceptions.BlmsException;
+
 import com.db4o.Db4o;
-import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.ext.ExtObjectContainer;
-
-import blms.exceptions.BlmsException;
 
 // Invariant: there aren't two users with the same email address. 
 public class Registry {
@@ -72,7 +66,7 @@ public class Registry {
 		if (id != 0)
 			return "" + id;
 		else
-			return null; // TODO: maybe throw an exception?
+			return null;
 	}
 	
 	public User[] findUserByLastName(String lastName) {
@@ -103,7 +97,6 @@ public class Registry {
 		if (store.users.contains(user))
 			throw new BlmsException("User with this email exists");
 		store.users.add(user);
-//		insertIntoTables(user);
 		updateDb();
 		return user;
 	}
@@ -116,26 +109,21 @@ public class Registry {
 		for (Join j : store.joins){
 			if ((j.user).equals(user)){
 				auxJoins.add(j);
-//				removeFromTables(j);
 			}
 		}
 		store.joins.removeAll(auxJoins);
 		store.users.remove(user);
-//		removeFromTables(user);
 		updateDb();
 	}
 	
 	public void deleteLeague(League league) {
 		store.leagues.remove(league);
-//		removeFromTables(league);
 		for (Match m : league.getMatches())
 			deleteMatch(m);
 		LinkedList<Join> auxJoins = new LinkedList<Join>();
 		for (Join j : store.joins){
-			if ((j.league).equals(league)){
-//				removeFromTables(j);
+			if ((j.league).equals(league))
 				auxJoins.add(j);
-			}
 		}
 		store.joins.removeAll(auxJoins);
 		updateDb();
@@ -151,8 +139,6 @@ public class Registry {
 		Join join = new Join(operator, league, 0);
 		store.leagues.add(league);
 		store.joins.add(join);
-//		insertIntoTables(league);
-//		insertIntoTables(join);
 		updateDb();
 		return league;
 	}
@@ -164,8 +150,7 @@ public class Registry {
 		
 		if (user == null)
 			throw new BlmsException("Unknown user");
-		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
-			Join join = (Join)it.next();
+		for (Join join : store.joins) {
 			User userJoin = join.user;
 			if (user.equals(userJoin)){
 				if (stringLeagues.length() > 0){
@@ -180,9 +165,8 @@ public class Registry {
 		if (league == null)
 			throw new BlmsException("Unknown league");
 		String stringMembers = "";
-		
-		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
-			Join join = (Join) it.next();
+
+		for (Join join : store.joins) {
 			League leagueJoin = join.league;
 			if (league.equals(leagueJoin)){
 				if (stringMembers.length() > 0){
@@ -211,7 +195,6 @@ public class Registry {
 		if (existentJoin == null){
 			Join join = new Join(user, league, handicap);
 			store.joins.add(join);
-//			insertIntoTables(join);
 			updateDb();
 		} else throw new BlmsException("User is already a league member");
 	}
@@ -242,12 +225,9 @@ public class Registry {
 		if (user == null)
 			throw new BlmsException("Unknown user");
 		Join join = new Join(user, league, 200);
-		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
-			Join auxJoin = (Join) it.next();
-			if (join.equals(auxJoin)){
+		for (Join auxJoin : store.joins)
+			if (join.equals(auxJoin))
 				return true;
-			}
-		}
 		return false;
 	}
 	
@@ -268,20 +248,19 @@ public class Registry {
 	public void changeAttribute(Object target, String attribute, Object value, Class valueType)
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException, BlmsException {
-		//Class parameterClass = (value == null) ? String.class : value.getClass();
-		Class clas = target.getClass();
+		Class targetClass = target.getClass();
 		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-		Method met = clas.getMethod("set" + s, new Class[] {valueType});
+		Method met = targetClass.getMethod("set" + s, new Class[] {valueType});
 		
 		/* TODO: generalize. Each class must define an unique attribute which
 		   is to be checked */
-		if (clas == User.class && attribute.equals("email")) {
+		if (targetClass == User.class && attribute.equals("email")) {
 			for (User u : store.users)
 				if (u.getEmail().equals(value) && !u.equals(target))
 					throw new BlmsException("User with this email exists");
 		}
 		
-		if (clas == League.class && attribute.equals("name")) {
+		if (targetClass == League.class && attribute.equals("name")) {
 			for (League l : store.leagues)
 				if (l.getName().equals(value) && !l.equals(target))
 					throw new BlmsException("This league already exists");
@@ -293,10 +272,10 @@ public class Registry {
 	public Object getAttribute(Object target, String id, String attribute) 
 			throws SecurityException, NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		Class clas = target.getClass();
+		Class targetClass = target.getClass();
 		String s = attribute.substring(0, 1).toUpperCase() + attribute.substring(1);
-		Method met = clas.getMethod("get" + s, new Class[] {});
-		Method[] methods = clas.getMethods();
+		Method met = targetClass.getMethod("get" + s, new Class[] {});
+		Method[] methods = targetClass.getMethods();
 		for (int i = 0; i < methods.length; i++){
 			if ((methods[i].getName()).equals(met.getName())){
 				return met.invoke(target, new Object[] {});
@@ -306,31 +285,22 @@ public class Registry {
 	}
 
 	public void removeAllUsers() {
-//		for (User u : store.users)
-//			removeFromTables(u);
 		store.users.clear();
 		updateDb();
 	}
 
-	// TODO: remove seasons, win/loss...
 	public void removeAllLeagues() {
-		for (League l : store.leagues) {
-//			removeFromTables(l);
-			for (Match m : l.getMatches())
-				deleteMatch(m);
-		}
-		for (Join j : store.joins){
-//			removeFromTables(j);
-		}
+//		for (League l : store.leagues)
+//			for (Match m : l.getMatches())
+//				deleteMatch(m);
 		store.leagues.clear();
+		store.matches.clear();
 		store.joins.clear();
 		updateDb();
 		
 	}
 	
 	public void removeAllMatches() {
-//		for (Match m : store.matches)
-//			removeFromTables(m);
 		store.matches.clear();
 		for (User u : store.users)
 			u.matches.clear();
@@ -358,7 +328,6 @@ public class Registry {
 		loser.addMatch(m);
 		
 		store.matches.add(m);
-//		insertIntoTables(m);
 		updateDb();
 		
 		return m;
@@ -372,22 +341,18 @@ public class Registry {
 		if (league == null){
 			throw new BlmsException("Unknown league");
 		}
-		for (Iterator it = store.joins.iterator(); it.hasNext(); ){
-			Join join = (Join) it.next();
-			if ((join.league).equals(league) && (join.user).equals(user)){
+		for (Join join : store.joins)
+			if ((join.league).equals(league) && (join.user).equals(user))
 				return join;
-			}
-		}
+		
 		return null;
 	}
 
-	// TODO: verify
 	public void deleteMatch(Match m) {
 		store.matches.remove(m);
 		m.getLeague().matches.remove(m);
 		m.getWinner().matches.remove(m);
 		m.getLoser().matches.remove(m);
-//		removeFromTables(m);
 		updateDb();
 	}
 

@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.cheffo.jeplite.JEP;
-import org.cheffo.jeplite.ParseException;
 
 import blms.exceptions.BlmsException;
 
 // Invariant: the user has a firstName, a lastName and a email (not null and not empty).
 // Invariant: the user has at least one phone number.
+/**
+ * A user of the system.
+ */
 public class User {
 	String firstName, lastName, homePhone, workPhone, cellPhone, email;
 	String picture;

@@ -2,19 +2,21 @@ package blms;
 
 import java.text.Collator;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.cheffo.jeplite.JEP;
-import org.cheffo.jeplite.ParseException;
 
 import blms.exceptions.BlmsException;
 
 // invariant: name and operator are non-empty
+/**
+ * A league. It has a name, an user which operates it, a creation date and
+ * a list of matches. The standings of its players are computed from a expression
+ * based on the results of its matches. This expression can be changed per league.
+ */
 public class League implements Comparable<League> {
 	String name;
 	User operator;
@@ -22,6 +24,13 @@ public class League implements Comparable<League> {
 	Vector<Match> matches;
 	String standingsExpression;
 	
+	/**
+	 * Creates a league with the given name and the given operator. The creation
+	 * date is recorded.
+	 * @param name the league's name.
+	 * @param operator user that operates this league.
+	 * @throws BlmsException if name is null or empty or if operator is null. 
+	 */
 	public League(String name, User operator) throws BlmsException {
 		matches = new Vector<Match>();
 		if (Util.isNullOrEmpty(name))
@@ -34,9 +43,13 @@ public class League implements Comparable<League> {
 	}
 	
 
+	/**
+	 * Two leagues are equal if they have the same name (the comparison is
+	 * case-insensitive).
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof League && ((League)obj).getName().equals(this.name));
+		return (obj instanceof League && ((League)obj).getName().equalsIgnoreCase(this.name));
 	}
 
 	
@@ -44,7 +57,7 @@ public class League implements Comparable<League> {
 		return name;
 	}
 
-	// TODO: check if name is available
+	// TODO: check for non-emptiness
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -53,6 +66,7 @@ public class League implements Comparable<League> {
 		return operator;
 	}
 
+	// TODO: check for non-emptiness
 	public void setOperator(User operator) {
 		this.operator = operator;
 	}
@@ -80,6 +94,9 @@ public class League implements Comparable<League> {
 		return name;
 	}
 
+	/**
+	 * Leagues are ordered by its names (case-insensitively).
+	 */
 	public int compareTo(League other) {
 		return Collator.getInstance().compare(name, other.getName());
 	}
@@ -89,7 +106,16 @@ public class League implements Comparable<League> {
 		matches.add(m);
 	}
 
-
+	/**
+	 * Provide a way of entering an expression to calculate player standing in current season.
+	 * @param expression an arithmetic expression that assigns an integer to each player.
+	 *   It may use 4 arithmetic operators with the usual precedence and associativity
+	 *   rules as well as parentheses. It may refer to the variables <code>seasonWins</code>
+	 *   and <code>seasonLosses</code> that mean, respectively, the number of wins and losses
+	 *   of the player in the league. Example: "3 * seasonWins + seasonLosses".
+	 * @throws BlmsException if the expression is not well-formed or if it uses variable names
+	 * other than <code>seasonWins</code> and <code>seasonLosses</code>.
+	 */
 	public void setStandingsExpression(String expression) throws BlmsException {
 		Pattern regex = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)");
 		Matcher m = regex.matcher(expression);

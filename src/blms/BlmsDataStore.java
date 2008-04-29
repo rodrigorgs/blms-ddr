@@ -3,8 +3,12 @@ package blms;
 import java.util.Collection;
 import java.util.LinkedList;
 
+/**
+ * Contains references to every data object in the system: users, leagues
+ * and matches.
+ *
+ */
 public class BlmsDataStore {
-	// TODO: remove public
 	public Collection<User> users;
 	public Collection<League> leagues;
 	public Collection<Join> joins;
@@ -16,11 +20,4 @@ public class BlmsDataStore {
 		matches = new LinkedList<Match>();
 		joins = new LinkedList<Join>(); 
 	}
-	
-//	public void clear() {
-//		users.clear();
-//		leagues.clear();
-//		matches.clear();
-//		joins.clear();
-//	}
 }
