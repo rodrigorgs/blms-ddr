@@ -18,26 +18,28 @@ import com.db4o.ext.ExtObjectContainer;
 
 class Inteiro implements Comparable {
 	int x;
+
 	public Inteiro(int i) {
 		x = i;
 	}
+
 	public void set(int i) {
 		x = i;
 	}
 
 	public int compareTo(Object o) {
-		int y = ((Inteiro)o).x;
+		int y = ((Inteiro) o).x;
 		return x - y;
 	}
-	
+
 	public String toString() {
 		return "" + x;
 	}
 }
 
-
 public class Sandbox {
 	final static String dbfilename = "sandbox.db";
+
 	/**
 	 * @param args
 	 */
@@ -51,34 +53,38 @@ public class Sandbox {
 		expressionDivideByZero();
 		db4o();
 	}
-	
+
 	private static void db4o() throws BlmsException {
 		assert (new File(dbfilename).delete());
 		Db4o.configure().updateDepth(10);
-		ExtObjectContainer db = (ExtObjectContainer)Db4o.openFile(dbfilename);
+		ExtObjectContainer db = (ExtObjectContainer) Db4o.openFile(dbfilename);
 		BlmsDataStore store = new BlmsDataStore();
-		
-		User u1 = new User("Rodrigo", "Souza", "555", "444", "333", "eu@x", "bli.jpg");
-		User u2 = new User("Henrique", "Souza", "555", "444", "333", "eu@yyy", "bla.jpg");
+
+		User u1 = new User("Rodrigo", "Souza", "555", "444", "333", "eu@x",
+				"bli.jpg");
+		User u2 = new User("Henrique", "Souza", "555", "444", "333", "eu@yyy",
+				"bla.jpg");
 		store.users.add(u1);
-		db.set(store); 
+		db.set(store);
 		store.users.add(u2);
 		db.set(store);
 		assert db.getID(u1) != 0;
 		assert db.getID(u2) != 0;
-//		System.out.printf("Object %s has id %s\n", u1.toString(), "" + db.getID(u1));
-//		System.out.printf("Object %s has id %s\n", u2.toString(), "" + db.getID(u2));
+		// System.out.printf("Object %s has id %s\n", u1.toString(), "" +
+		// db.getID(u1));
+		// System.out.printf("Object %s has id %s\n", u2.toString(), "" +
+		// db.getID(u2));
 		db.close();
-		
-		db = (ExtObjectContainer)Db4o.openFile(dbfilename);
-		store = (BlmsDataStore)db.get(BlmsDataStore.class).next();
+
+		db = (ExtObjectContainer) Db4o.openFile(dbfilename);
+		store = (BlmsDataStore) db.get(BlmsDataStore.class).next();
 		assert store.users.size() == 2;
 		store.users.remove(u1);
 		db.set(store);
 		db.close();
-		
-		db = (ExtObjectContainer)Db4o.openFile(dbfilename);
-		store = (BlmsDataStore)db.get(BlmsDataStore.class).next();
+
+		db = (ExtObjectContainer) Db4o.openFile(dbfilename);
+		store = (BlmsDataStore) db.get(BlmsDataStore.class).next();
 		assert store.users.size() == 1;
 		db.close();
 	}

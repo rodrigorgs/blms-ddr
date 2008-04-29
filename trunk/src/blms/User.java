@@ -17,11 +17,12 @@ public class User {
 	String firstName, lastName, homePhone, workPhone, cellPhone, email;
 	String picture;
 	Collection<Match> matches;
-	
+
 	public User(String firstName, String lastName, String homePhone,
-			String workPhone, String cellPhone, String email, 
-			String picture) throws BlmsException {
-		Validator.validateAttributes(firstName, lastName, email, homePhone, workPhone, cellPhone);
+			String workPhone, String cellPhone, String email, String picture)
+			throws BlmsException {
+		Validator.validateAttributes(firstName, lastName, email, homePhone,
+				workPhone, cellPhone);
 		matches = new LinkedList<Match>();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -31,12 +32,12 @@ public class User {
 		this.email = email;
 		this.picture = picture;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof User))
 			return false;
-		User other = (User)o;
+		User other = (User) o;
 		return email.equals(other.getEmail());
 	}
 
@@ -44,7 +45,7 @@ public class User {
 	public String toString() {
 		return lastName;
 	}
-	
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -68,7 +69,7 @@ public class User {
 	public String getPicture() {
 		return picture;
 	}
-	
+
 	public String getCellPhone() {
 		return cellPhone;
 	}
@@ -84,7 +85,9 @@ public class User {
 	}
 
 	/**
-	 * Must not be used directly. Please use {@link Registry#changeAttribute(Object, String, String)}.
+	 * Must not be used directly. Please use
+	 * {@link Registry#changeAttribute(Object, String, String)}.
+	 * 
 	 * @param email
 	 * @throws Exception
 	 */
@@ -92,7 +95,7 @@ public class User {
 		Validator.validateNameAndEmail(this.firstName, this.lastName, email);
 		this.email = email;
 	}
-	
+
 	public void setHomePhone(String homePhone) throws Exception {
 		Validator.validatePhones(homePhone, this.workPhone, this.cellPhone);
 		this.homePhone = homePhone;
@@ -111,18 +114,18 @@ public class User {
 	public void setPicture(String picture) {
 		this.picture = picture;
 	}
-	
+
 	public Match[] getMatches(League l) {
 		Collection<Match> col = new LinkedList<Match>();
 		for (Match m : matches)
 			if (m.getLeague() == l)
 				col.add(m);
-		
+
 		Match[] ret = col.toArray(new Match[] {});
 		Arrays.sort(ret);
 		return ret;
 	}
-	
+
 	public Match getMatch(League l, int index) throws BlmsException {
 		Match[] m = getMatches(l);
 		try {
@@ -131,7 +134,7 @@ public class User {
 			throw new BlmsException("Invalid index");
 		}
 	}
-	
+
 	public int getNumberOfWinsOrLosses(League league, Match.Role role) {
 		int count = 0;
 		for (Match m : matches)
@@ -139,32 +142,32 @@ public class User {
 				count++;
 		return count;
 	}
-	
+
 	static class Validator {
-		private static void validateAttributes(String firstName, String lastName, 
-				String email, String homePhone, String workPhone, 
-				String cellPhone) throws BlmsException {
+		private static void validateAttributes(String firstName,
+				String lastName, String email, String homePhone,
+				String workPhone, String cellPhone) throws BlmsException {
 			validateNameAndEmail(firstName, lastName, email);
 			validatePhones(homePhone, workPhone, cellPhone);
 		}
-		
-		private static void validateNameAndEmail(String firstName, String lastName, 
-				String email) throws BlmsException {
+
+		private static void validateNameAndEmail(String firstName,
+				String lastName, String email) throws BlmsException {
 			String[] missing = missingAttributes(firstName, lastName, email);
 			if (missing.length > 0)
-				throw new BlmsException("Required data: " + Util.join(missing, ", "));		
+				throw new BlmsException("Required data: "
+						+ Util.join(missing, ", "));
 		}
-		
-		private static void validatePhones(String homePhone, String workPhone, 
+
+		private static void validatePhones(String homePhone, String workPhone,
 				String cellPhone) throws BlmsException {
-			if (Util.isNullOrEmpty(homePhone)
-					&& Util.isNullOrEmpty(workPhone)
+			if (Util.isNullOrEmpty(homePhone) && Util.isNullOrEmpty(workPhone)
 					&& Util.isNullOrEmpty(cellPhone))
 				throw new BlmsException("Need at least one phone");
 		}
-		
-		private static String[] missingAttributes(String firstName, String lastName, 
-				String email) {
+
+		private static String[] missingAttributes(String firstName,
+				String lastName, String email) {
 			Collection<String> list = new LinkedList<String>();
 			if (Util.isNullOrEmpty(firstName))
 				list.add("first name");
@@ -173,7 +176,7 @@ public class User {
 			if (Util.isNullOrEmpty(email))
 				list.add("email");
 			return list.toArray(new String[] {});
-		}	
+		}
 	}
 
 	public void addMatch(Match m) {
@@ -182,7 +185,7 @@ public class User {
 
 	public double getStanding(League league) throws BlmsException {
 		String standingsExpression = league.getStandingsExpression();
-		
+
 		int wins = 0;
 		int losses = 0;
 		for (Match m : getMatches(league)) {
@@ -191,14 +194,15 @@ public class User {
 			else if (m.getLoser() == this)
 				losses++;
 			else
-				throw new BlmsException("Implementation error in User.getStanding()");
+				throw new BlmsException(
+						"Implementation error in User.getStanding()");
 		}
 
 		JEP jep = new JEP();
-		jep.addVariable("seasonWins", (double)wins);
-		jep.addVariable("seasonLosses", (double)losses);
+		jep.addVariable("seasonWins", (double) wins);
+		jep.addVariable("seasonLosses", (double) losses);
 		jep.parseExpression(standingsExpression);
-		
+
 		double ret;
 		try {
 			ret = jep.getValue();
