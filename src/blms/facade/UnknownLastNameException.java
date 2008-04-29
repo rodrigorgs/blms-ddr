@@ -11,6 +11,7 @@ import blms.exceptions.BlmsException;
  * 
  */
 public class UnknownLastNameException extends BlmsException {
+	private static final long serialVersionUID = 7153370886177497507L;
 
 	public UnknownLastNameException(String message) {
 		super(message);
