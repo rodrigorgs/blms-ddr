@@ -12,9 +12,14 @@ import blms.League;
 import blms.Match;
 import blms.Registry;
 import blms.User;
-import blms.Util;
 import blms.exceptions.BlmsException;
+import blms.util.Util;
 
+/**
+ * Facade for acceptance tests run by 
+ * <a href="http://www.easyaccept.org">EasyAccept</a>.
+ * Objects are refered by their IDs.
+ */
 public class BlmsFacade {
 	Registry registry;
 	SimpleDateFormat dateFormat;
@@ -32,7 +37,7 @@ public class BlmsFacade {
 
 	private <T> T getObject(String id, Class<T> klass) throws Exception {
 		String commonName = classToString.get(klass);
-		if (Util.isNullOrEmpty(id))
+		if (Util.isBlank(id))
 			throw new Exception("Unknown " + commonName);
 		// throw new Exception("Required data: " + commonName); // TODO: allow
 		// multiple requires
@@ -82,7 +87,7 @@ public class BlmsFacade {
 
 	private void changeAttribute(String id, String attribute, Object value,
 			String type, Class valueType) throws Throwable {
-		if (Util.isNullOrEmpty(attribute))
+		if (Util.isBlank(attribute))
 			throw new Exception("Must provide an attribute to be changed");
 		try {
 			Object target = registry.getObject(id);
@@ -99,7 +104,7 @@ public class BlmsFacade {
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 		Object target = registry.getObject(id);
-		return registry.getAttribute(target, id, attribute);
+		return registry.getAttribute(target, attribute);
 	}
 
 	// from us-standings.txt:340,343,346,373,374,375
@@ -138,7 +143,7 @@ public class BlmsFacade {
 
 		if (attribute != null) {
 			// TODO: this kind of logic must be in League!!
-			if (Util.isNullOrEmpty(value)
+			if (Util.isBlank(value)
 					&& (attribute.equals("operator") || attribute
 							.equals("name"))) {
 				throw new Exception("Required data: league " + attribute);
@@ -165,7 +170,7 @@ public class BlmsFacade {
 	// from us-leagues.txt:45,46,47,74,75,76,77,78,81,82 us-standings.txt:330
 	// us-history.txt:448 us-join.txt:952,953 us-win-loss.txt:525
 	public String createLeague(String name, String operator) throws Exception {
-		if (Util.isNullOrEmpty(operator))
+		if (Util.isBlank(operator))
 			throw new BlmsException("Required data: league operator");
 		User user = (User) registry.getObject(operator);
 		if (user == null)
@@ -175,7 +180,7 @@ public class BlmsFacade {
 	}
 
 	/**
-	 * Creates a new user
+	 * Creates a new user.
 	 * 
 	 * @param firstName
 	 *            The first name of the user.
@@ -480,7 +485,7 @@ public class BlmsFacade {
 		Join join = registry.findJoin(user, league);
 
 		try {
-			Object value = registry.getAttribute(join, id, attribute);
+			Object value = registry.getAttribute(join, attribute);
 
 			if (value instanceof Date)
 				return dateFormat.format((Date) value);

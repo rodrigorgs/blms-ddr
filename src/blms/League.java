@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.cheffo.jeplite.JEP;
 
 import blms.exceptions.BlmsException;
+import blms.util.Util;
 
 // invariant: name and operator are non-empty
 /**
@@ -38,7 +39,7 @@ public class League implements Comparable<League> {
 	 */
 	public League(String name, User operator) throws BlmsException {
 		matches = new Vector<Match>();
-		if (Util.isNullOrEmpty(name))
+		if (Util.isBlank(name))
 			throw new BlmsException("Required data: league name");
 		if (operator == null)
 			throw new BlmsException("Required data: league operator");

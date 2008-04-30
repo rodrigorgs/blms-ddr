@@ -27,28 +27,30 @@ public class Registry {
 	}
 
 	public void useDatabase(String databaseName) {
-		if (db != null) {
+		if (db != null && !db.isClosed())
 			db.close();
-		}
 		db = (ExtObjectContainer) Db4o.openFile(databaseName);
 		store = new BlmsDataStore();
 		ObjectSet<BlmsDataStore> result = db.get(BlmsDataStore.class);
 		if (result.isEmpty()) {
 			store = new BlmsDataStore();
 			db.set(store);
-		} else
+		} 
+		else
 			store = result.next();
 	}
 
 	private void updateDb() {
-		db.set(store);
+		if (db != null && !db.isClosed())
+			db.set(store);
 	}
 
 	/**
-	 * 
-	 * @param id
-	 * @return the object associated with the passed ID or null, if no object is
-	 *         associated with this ID
+	 * Returns the object associated with the given ID.
+	 * @param id the ID of object (as returned by 
+	 * {@link Registry#getId(Object)}).
+	 * @return the object associated with the given ID or <code>null</code>, 
+	 *         if no object is associated with the given ID.
 	 */
 	public Object getObject(String id) {
 		try {
@@ -60,8 +62,13 @@ public class Registry {
 	}
 
 	// TODO: should we use UUID?
-	public String getId(Object o) {
-		long id = db.getID(o);
+	/**
+	 * Returns the ID for a given object.
+	 * @param object the object.
+	 * @return the ID.
+	 */
+	public String getId(Object object) {
+		long id = db.getID(object);
 		if (id != 0)
 			return "" + id;
 		else
@@ -239,18 +246,23 @@ public class Registry {
 
 	/**
 	 * Changes an attribute by calling on the target object a setter method
-	 * which takes one parameter of the type valueType
+	 * which takes one parameter of the type valueType.
+	 * Example: <code>changeAttribute(obj, "name", "John", String.class)</code>
+	 * will call <code>obj.setName("John")</code> (provided that the method
+	 * exists and receives one String parameter). Currently this method handles
+	 * User and League objects.
 	 * 
-	 * @param target
-	 * @param attribute
-	 * @param value
-	 * @param valueType
+	 * @param target the target object.
+	 * @param attribute the attribute to change.
+	 * @param value the new value of the attribute.
+	 * @param valueType the type of the new value.
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
-	 * @throws BlmsException
+	 * @throws BlmsException if the attribute can't be changed without
+	 * violating constraints of the target object.
 	 */
 	public void changeAttribute(Object target, String attribute, Object value,
 			Class valueType) throws SecurityException, NoSuchMethodException,
@@ -281,7 +293,21 @@ public class Registry {
 		met.invoke(target, new Object[] { value });
 	}
 
-	public Object getAttribute(Object target, String id, String attribute)
+	/**
+	 * Returns the value of the given attribute for the given target object.
+	 * Example: <code>getAttribute(obj, "name")</code> will return the value
+	 * of <code>obj.getName()</code> (provided that the method exists).
+	 * 
+	 * @param target the object to get the attribute from.
+	 * @param attribute the name of the attribute to get.
+	 * @return the value of the given attribute for the given target object.
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 */
+	public Object getAttribute(Object target, String attribute)
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
@@ -373,5 +399,6 @@ public class Registry {
 			int longestRunForLoser) throws BlmsException {
 		match.update(date, winner, loser, length, score, longestRunForWinner,
 				longestRunForLoser);
+		// TODO: XXX re-associate winner, loser 
 	}
 }
