@@ -50,6 +50,14 @@ public class User {
 		this.picture = picture;
 	}
 
+	void removeMatch(Match m) {
+		matches.remove(m);
+	}
+
+	void addMatch(Match m) {
+		matches.add(m);
+	}
+	
 	/**
 	 * Two users are equal if and only if they have the same email address
 	 * (case-insensitive comparison).
@@ -184,10 +192,6 @@ public class User {
 		return count;
 	}
 
-	public void addMatch(Match m) {
-		matches.add(m);
-	}
-
 	/**
 	 * Get standing for a given league.
 	 * @param league the league.
@@ -219,8 +223,7 @@ public class User {
 		try {
 			ret = jep.getValue();
 		} catch (Throwable e) {
-			e.printStackTrace();
-			return 3.1415; // :P TODO
+			throw new BlmsException("Exception in Java Expression Parser.");
 		}
 		if (Double.isInfinite(ret))
 			throw new BlmsException("Division by zero in standings expression");
