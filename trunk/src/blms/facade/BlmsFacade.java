@@ -39,7 +39,7 @@ public class BlmsFacade {
 		String commonName = classToString.get(klass);
 		if (Util.isBlank(id))
 			throw new Exception("Unknown " + commonName);
-		// throw new Exception("Required data: " + commonName); // TODO: allow
+		// throw new Exception("Required data: " + commonName);
 		// multiple requires
 		T obj = (T) registry.getObject(id);
 		if (obj == null)
@@ -142,7 +142,7 @@ public class BlmsFacade {
 		Class<? extends Object> klass = String.class;
 
 		if (attribute != null) {
-			// TODO: this kind of logic must be in League!!
+			// TODO: this kind of logic should be in League
 			if (Util.isBlank(value)
 					&& (attribute.equals("operator") || attribute
 							.equals("name"))) {
