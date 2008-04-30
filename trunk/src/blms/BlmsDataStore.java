@@ -14,6 +14,9 @@ public class BlmsDataStore {
 	public Collection<Join> joins;
 	public Collection<Match> matches;
 
+	/**
+	 * Initializes the collections to manipulate the data in the persistence.
+	 */
 	public BlmsDataStore() {
 		users = new LinkedList<User>();
 		leagues = new LinkedList<League>();

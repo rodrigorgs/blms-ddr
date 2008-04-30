@@ -50,10 +50,18 @@ public class User {
 		this.picture = picture;
 	}
 
+	/**
+	 * Removes the match m of the collection of matches.
+	 * @param m the given match (to be removed).
+	 */
 	void removeMatch(Match m) {
 		matches.remove(m);
 	}
 
+	/**
+	 * Adds a the match m to the collection of matches. 
+	 * @param m the given match (to be added).
+	 */
 	void addMatch(Match m) {
 		matches.add(m);
 	}
@@ -75,39 +83,65 @@ public class User {
 		return lastName;
 	}
 
+	/**
+	 * @return the first name of the user.
+	 */
 	public String getFirstName() {
 		return firstName;
 	}
 
+	/**
+	 * @return the last name of the user.
+	 */
 	public String getLastName() {
 		return lastName;
 	}
-
+	/**
+	 * @return the home phone of the user.
+	 */
 	public String getHomePhone() {
 		return homePhone;
 	}
 
+	/**
+	 * @return the work phone of the user.
+	 */
 	public String getWorkPhone() {
 		return workPhone;
 	}
-
+	/**
+	 * @return the email of the user.
+	 */
 	public String getEmail() {
 		return email;
 	}
-
+	/**
+	 * @return the picture of the user.
+	 */
 	public String getPicture() {
 		return picture;
 	}
-
+	/**
+	 * @return the cell phone of the user.
+	 */
 	public String getCellPhone() {
 		return cellPhone;
 	}
-
+	/**
+	 * Sets the first name of the user.
+	 * @param firstName the new first name.
+	 * @throws Exception if the first name is null or an empty string.
+	 */
 	public void setFirstName(String firstName) throws Exception {
 		Validator.validateNameAndEmail(firstName, this.lastName, this.email);
 		this.firstName = firstName;
 	}
 
+	/**
+	 * Sets the last name of the user.
+	 * @param lastName the new last name.
+	 * @throws Exception if the last name is null or an empty string.
+	 */
 	public void setLastName(String lastName) throws Exception {
 		Validator.validateNameAndEmail(this.firstName, lastName, this.email);
 		this.lastName = lastName;
@@ -117,29 +151,48 @@ public class User {
 	 * Must not be used directly. Please use
 	 * {@link Registry#changeAttribute(Object, String, String)} instead.
 	 * 
-	 * @param email
-	 * @throws Exception
+	 * @param email the new user's email.
+	 * @throws Exception if the email is null or an empty string.
 	 */
 	public void setEmail(String email) throws Exception {
 		Validator.validateNameAndEmail(this.firstName, this.lastName, email);
 		this.email = email;
 	}
 
+	/**
+	 * Sets the home phone of the user.
+	 * @param homePhone the new home phone.
+	 * @throws Exception if the home phone is null or an empty string.
+	 */
 	public void setHomePhone(String homePhone) throws Exception {
 		Validator.validatePhones(homePhone, this.workPhone, this.cellPhone);
 		this.homePhone = homePhone;
 	}
 
+	/**
+	 * Sets the work phone of the user.
+	 * @param workPhone the new work phone.
+	 * @throws Exception if the work phone is null or an empty string.
+	 */
 	public void setWorkPhone(String workPhone) throws Exception {
 		Validator.validatePhones(this.homePhone, workPhone, this.cellPhone);
 		this.workPhone = workPhone;
 	}
 
+	/**
+	 * Sets the cell phone of the user.
+	 * @param cellPhone the new cell phone.
+	 * @throws Exception if the cell phone is null or an empty string.
+	 */
 	public void setCellPhone(String cellPhone) throws Exception {
 		Validator.validatePhones(this.homePhone, this.workPhone, cellPhone);
 		this.cellPhone = cellPhone;
 	}
 
+	/**
+	 * Sets the picture of the user.
+	 * @param picture the string representing the name of the picture.
+	 */
 	public void setPicture(String picture) {
 		this.picture = picture;
 	}
@@ -241,6 +294,13 @@ public class User {
 			validatePhones(homePhone, workPhone, cellPhone);
 		}
 
+		/**
+		 * Validate attributes.
+		 * @param firstName
+		 * @param lastName
+		 * @param email
+		 * @throws BlmsException if any attribute is null or an empty string.
+		 */
 		private static void validateNameAndEmail(String firstName,
 				String lastName, String email) throws BlmsException {
 			String[] missing = missingAttributes(firstName, lastName, email);
@@ -249,6 +309,13 @@ public class User {
 						+ Util.join(missing, ", "));
 		}
 
+		/**
+		 * Validate phones
+		 * @param homePhone
+		 * @param workPhone
+		 * @param cellPhone
+		 * @throws BlmsException if the any number phone is null or an empty string.
+		 */
 		private static void validatePhones(String homePhone, String workPhone,
 				String cellPhone) throws BlmsException {
 			if (Util.isBlank(homePhone) && Util.isBlank(workPhone)
@@ -256,6 +323,13 @@ public class User {
 				throw new BlmsException("Need at least one phone");
 		}
 
+		/**
+		 * Verify which attributes are needed.
+		 * @param firstName
+		 * @param lastName
+		 * @param email
+		 * @return a list with the missing attributes.
+		 */
 		private static String[] missingAttributes(String firstName,
 				String lastName, String email) {
 			Collection<String> list = new LinkedList<String>();
