@@ -35,6 +35,11 @@ public class Registry {
 	 * Load a database in memory. (can change in future: loading directly in DB) 
 	 * @param databaseName the database name.
 	 */
+        public void closeDatabase() {
+            if (db != null && !db.isClosed())
+                db.close();
+        }
+        
 	public void useDatabase(String databaseName) {
 		if (db != null && !db.isClosed())
 			db.close();
