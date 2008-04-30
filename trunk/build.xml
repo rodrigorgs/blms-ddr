@@ -34,9 +34,23 @@
 	
     <!-- <taskdef resource="org/apache/commons/attributes/anttasks.properties"/> -->
     
-    <target name="clean" description="o Clean up the generated files">
+    <target name="init">
+        <echo>o Creating folders</echo>
+        <mkdir dir="${bin}" />
+        <mkdir dir="${doc}" />
+        <tstamp/>
+    </target>
+
+    <target name="clean" description="o Clean up the generated files" depends="init">
         <delete>
             <fileset dir="${bin}" includes="**/*.class,**/*$*"/>
+            <fileset dir="${bin}" includes="**/*.class" />
+            <fileset dir="${lib}">
+                <filename name="blms.jar"/>
+            </fileset>
+            <fileset dir="${doc}">
+                <filename name="**/*.*"/>
+            </fileset>
         </delete>
     </target>
     
@@ -51,7 +65,7 @@
 	<!-- depends="compile-attributes" 
 	classpath="${ant.home}/lib/commons-attributes-api-2.2.jar;."
 	-->
-    <target name="compile" description="o Compile the code">
+    <target name="compile" description="o Compile the code" depends="init">
         <javac 
             srcdir="${source}" 
             destdir="${bin}" 
@@ -61,6 +75,14 @@
             optimize="false">
         </javac>
     </target>
+
+	<target name="jar" depends="init,clean,compile">
+        <echo>o Creating jar file</echo>
+        <jar destfile="${lib}/blms.jar" basedir="${bin}">
+        </jar>
+    </target>
+
+	
     
     <target name="runTests" description="o Compile and run the demo" depends="compile">
         <java 
@@ -85,7 +107,7 @@
                 name="org.apache.commons.attributes.javadoc.CATaglet"
                 path="${ant.home}/lib/commons-attributes-compiler-2.2.jar"
                 /> -->
-            <fileset dir="${basedir}/" includes="**/*.java" />
+            <fileset dir="${source}/" includes="**/*.java" />
         </javadoc>
     </target>
    
