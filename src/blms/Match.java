@@ -83,6 +83,18 @@ public class Match implements Comparable<Match> {
 				longestRunForLoser);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Match) {
+			Match other = (Match)obj;
+			return date.equals(other.date) && winner == other.winner &&
+					loser == other.loser && league == other.league;
+//			winner.equals(other.winner) && loser.equals(other.loser) && league.equals(other.league);
+		}
+		else
+			return false;
+	}
+
 	public void update(Date date, User winner, User loser, int length,
 			int score, int longestRunForWinner, int longestRunForLoser)
 			throws BlmsException {

@@ -291,7 +291,7 @@ public class BlmsFacade {
 	// us-win-loss.txt:551,559,567,594,623,624,625,626,628,629,750,751,752,753,754,762,763,764,765,766,767,768,769
 	public String getMatch(String leagueId, String index) throws Exception {
 		League league = getObject(leagueId, League.class);
-		Match match = league.getMatch(parseIndex(index)); // TODO
+		Match match = league.getMatch(parseIndex(index));
 		return registry.getId(match);
 	}
 

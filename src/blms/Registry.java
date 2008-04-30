@@ -230,6 +230,8 @@ public class Registry {
 		} else
 			throw new BlmsException("User/league is null");
 		store.leagues.remove(league);
+		
+		updateDb();
 	}
 
 	public boolean isUserLeague(User user, League league) throws BlmsException {
@@ -274,23 +276,22 @@ public class Registry {
 		Method met = targetClass
 				.getMethod("set" + s, new Class[] { valueType });
 
-		/*
-		 * TODO: generalize. Each class must define an unique attribute which is
-		 * to be checked
-		 */
+		// XXX: this code is redundant with code in equals.
 		if (targetClass == User.class && attribute.equals("email")) {
 			for (User u : store.users)
-				if (u.getEmail().equals(value) && !u.equals(target))
+				if (u.getEmail().equalsIgnoreCase((String)value) && !u.equals(target))
 					throw new BlmsException("User with this email exists");
 		}
 
 		if (targetClass == League.class && attribute.equals("name")) {
 			for (League l : store.leagues)
-				if (l.getName().equals(value) && !l.equals(target))
+				if (l.getName().equalsIgnoreCase((String)value) && !l.equals(target))
 					throw new BlmsException("This league already exists");
 		}
 
 		met.invoke(target, new Object[] { value });
+		
+		updateDb();
 	}
 
 	/**
@@ -397,8 +398,21 @@ public class Registry {
 	public void updateMatchResult(Match match, Date date, User winner,
 			User loser, int length, int score, int longestRunForWinner,
 			int longestRunForLoser) throws BlmsException {
+		User oldLoser = match.getLoser();
+		User oldWinner = match.getWinner();
+		
+		if (loser != oldLoser) {
+			oldLoser.removeMatch(match);
+			loser.addMatch(match);
+		}
+		if (winner != oldWinner) {
+			oldWinner.removeMatch(match);
+			winner.addMatch(match);
+		}
+		
 		match.update(date, winner, loser, length, score, longestRunForWinner,
 				longestRunForLoser);
-		// TODO: XXX re-associate winner, loser 
+
+		updateDb();
 	}
 }
