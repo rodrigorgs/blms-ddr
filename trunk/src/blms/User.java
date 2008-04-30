@@ -6,18 +6,35 @@ import java.util.LinkedList;
 
 import org.cheffo.jeplite.JEP;
 
+import blms.Match.Role;
 import blms.exceptions.BlmsException;
+import blms.util.Util;
 
 // Invariant: the user has a firstName, a lastName and a email (not null and not empty).
 // Invariant: the user has at least one phone number.
 /**
- * A user of the system.
+ * A user of the system. It has first name, last name, home phone, work phone,
+ * cell phone, email and picture.
  */
 public class User {
 	String firstName, lastName, homePhone, workPhone, cellPhone, email;
 	String picture;
 	Collection<Match> matches;
 
+	/**
+	 * Creates a user with the given parameters. At least one phone number
+	 * must be provided. The parameters firstName, lastName and email are
+	 * mandatory.
+	 * @param firstName user's first name. Mandatory.
+	 * @param lastName user's last name. Mandatory.
+	 * @param homePhone user's home phone.
+	 * @param workPhone user's work phone.
+	 * @param cellPhone user's cell phone.
+	 * @param email user's email address. Mandatory.
+	 * @param picture user's picture.
+	 * @throws BlmsException if a mandatory field is missing or if no
+	 * phone number is provided.
+	 */
 	public User(String firstName, String lastName, String homePhone,
 			String workPhone, String cellPhone, String email, String picture)
 			throws BlmsException {
@@ -33,12 +50,16 @@ public class User {
 		this.picture = picture;
 	}
 
+	/**
+	 * Two users are equal if and only if they have the same email address
+	 * (case-insensitive comparison).
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof User))
 			return false;
 		User other = (User) o;
-		return email.equals(other.getEmail());
+		return email.equalsIgnoreCase(other.getEmail());
 	}
 
 	@Override
@@ -86,7 +107,7 @@ public class User {
 
 	/**
 	 * Must not be used directly. Please use
-	 * {@link Registry#changeAttribute(Object, String, String)}.
+	 * {@link Registry#changeAttribute(Object, String, String)} instead.
 	 * 
 	 * @param email
 	 * @throws Exception
@@ -115,10 +136,15 @@ public class User {
 		this.picture = picture;
 	}
 
-	public Match[] getMatches(League l) {
+	/**
+	 * Returns matches played by this player in a league, sorted by date.
+	 * @param league the league
+	 * @return matches played by this player in a league, sorted by date.
+	 */
+	public Match[] getMatches(League league) {
 		Collection<Match> col = new LinkedList<Match>();
 		for (Match m : matches)
-			if (m.getLeague() == l)
+			if (m.getLeague() == league)
 				col.add(m);
 
 		Match[] ret = col.toArray(new Match[] {});
@@ -126,15 +152,30 @@ public class User {
 		return ret;
 	}
 
-	public Match getMatch(League l, int index) throws BlmsException {
-		Match[] m = getMatches(l);
+	/**
+	 * Returns the index-th match played by this player in a league.
+	 * @param league the league
+	 * @param index index to the match (e.g., 1 returns the first match, 
+	 * 2 returns the second, etc.)
+	 * @return the index-th match played by this player in the given league.
+	 * @throws BlmsException if index is invalid.
+	 */
+	public Match getMatch(League league, int index) throws BlmsException {
+		Match[] m = getMatches(league);
 		try {
 			return m[index - 1];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new BlmsException("Invalid index");
 		}
 	}
-
+	
+	/**
+	 * Returns the number of wins (if role == {@link Role#WINNER}) or losses
+	 * (if role == {@link Role#LOSER}) of this player in the given league. 
+	 * @param league the league.
+	 * @param role one of {@link Role#WINNER}, {@link Role#LOSER}
+	 * @return how many matches the user has won (or lost) in the given league.
+	 */
 	public int getNumberOfWinsOrLosses(League league, Match.Role role) {
 		int count = 0;
 		for (Match m : matches)
@@ -143,46 +184,17 @@ public class User {
 		return count;
 	}
 
-	static class Validator {
-		private static void validateAttributes(String firstName,
-				String lastName, String email, String homePhone,
-				String workPhone, String cellPhone) throws BlmsException {
-			validateNameAndEmail(firstName, lastName, email);
-			validatePhones(homePhone, workPhone, cellPhone);
-		}
-
-		private static void validateNameAndEmail(String firstName,
-				String lastName, String email) throws BlmsException {
-			String[] missing = missingAttributes(firstName, lastName, email);
-			if (missing.length > 0)
-				throw new BlmsException("Required data: "
-						+ Util.join(missing, ", "));
-		}
-
-		private static void validatePhones(String homePhone, String workPhone,
-				String cellPhone) throws BlmsException {
-			if (Util.isNullOrEmpty(homePhone) && Util.isNullOrEmpty(workPhone)
-					&& Util.isNullOrEmpty(cellPhone))
-				throw new BlmsException("Need at least one phone");
-		}
-
-		private static String[] missingAttributes(String firstName,
-				String lastName, String email) {
-			Collection<String> list = new LinkedList<String>();
-			if (Util.isNullOrEmpty(firstName))
-				list.add("first name");
-			if (Util.isNullOrEmpty(lastName))
-				list.add("last name");
-			if (Util.isNullOrEmpty(email))
-				list.add("email");
-			return list.toArray(new String[] {});
-		}
-	}
-
 	public void addMatch(Match m) {
 		matches.add(m);
 	}
 
+	/**
+	 * Get standing for a given league.
+	 * @param league the league.
+	 * @return the standing for the player in the given league.
+	 * @throws BlmsException if there's an error while computing the
+	 * standing (e.g. division by zero).
+	 */
 	public double getStanding(League league) throws BlmsException {
 		String standingsExpression = league.getStandingsExpression();
 
@@ -213,5 +225,44 @@ public class User {
 		if (Double.isInfinite(ret))
 			throw new BlmsException("Division by zero in standings expression");
 		return ret;
+	}
+	
+	/**
+	 * Contains helper methods that validate user parameters.
+	 */
+	static class Validator {
+		private static void validateAttributes(String firstName,
+				String lastName, String email, String homePhone,
+				String workPhone, String cellPhone) throws BlmsException {
+			validateNameAndEmail(firstName, lastName, email);
+			validatePhones(homePhone, workPhone, cellPhone);
+		}
+
+		private static void validateNameAndEmail(String firstName,
+				String lastName, String email) throws BlmsException {
+			String[] missing = missingAttributes(firstName, lastName, email);
+			if (missing.length > 0)
+				throw new BlmsException("Required data: "
+						+ Util.join(missing, ", "));
+		}
+
+		private static void validatePhones(String homePhone, String workPhone,
+				String cellPhone) throws BlmsException {
+			if (Util.isBlank(homePhone) && Util.isBlank(workPhone)
+					&& Util.isBlank(cellPhone))
+				throw new BlmsException("Need at least one phone");
+		}
+
+		private static String[] missingAttributes(String firstName,
+				String lastName, String email) {
+			Collection<String> list = new LinkedList<String>();
+			if (Util.isBlank(firstName))
+				list.add("first name");
+			if (Util.isBlank(lastName))
+				list.add("last name");
+			if (Util.isBlank(email))
+				list.add("email");
+			return list.toArray(new String[] {});
+		}
 	}
 }
