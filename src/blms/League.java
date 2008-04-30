@@ -39,12 +39,8 @@ public class League implements Comparable<League> {
 	 */
 	public League(String name, User operator) throws BlmsException {
 		matches = new Vector<Match>();
-		if (Util.isBlank(name))
-			throw new BlmsException("Required data: league name");
-		if (operator == null)
-			throw new BlmsException("Required data: league operator");
-		this.name = name;
-		this.operator = operator;
+		setName(name);
+		setOperator(operator);
 		this.creationDate = new Date();
 	}
 
@@ -62,8 +58,9 @@ public class League implements Comparable<League> {
 		return name;
 	}
 
-	// TODO: check for non-emptiness
-	public void setName(String name) {
+	public void setName(String name) throws BlmsException {
+		if (Util.isBlank(name))
+			throw new BlmsException("Required data: league name");
 		this.name = name;
 	}
 
@@ -71,8 +68,9 @@ public class League implements Comparable<League> {
 		return operator;
 	}
 
-	// TODO: check for non-emptiness
-	public void setOperator(User operator) {
+	public void setOperator(User operator) throws BlmsException {
+		if (operator == null)
+			throw new BlmsException("Required data: league operator");
 		this.operator = operator;
 	}
 
