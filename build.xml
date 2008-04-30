@@ -103,10 +103,10 @@
         <javadoc 
             destdir="${doc}"
             additionalparam="-J-Dorg.apache.commons.attributes.javadoc.CATaglet.sources=${basedir}">
-            <!-- <taglet
+            <taglet
                 name="org.apache.commons.attributes.javadoc.CATaglet"
                 path="${ant.home}/lib/commons-attributes-compiler-2.2.jar"
-                /> -->
+                />
             <fileset dir="${source}/" includes="**/*.java" />
         </javadoc>
     </target>

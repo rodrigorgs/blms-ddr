@@ -95,6 +95,18 @@ public class Match implements Comparable<Match> {
 			return false;
 	}
 
+	/**
+	 * @param date the given date (date of the match).
+	 * @param winner the match's winner.
+	 * @param loser the match's loser.
+	 * @param length number of balls to be made by highest-ranked player or
+	 *            {@link Match#UNDEFINED}.
+	 * @param score the final score or {@link Match#UNDEFINED}.
+	 * @param longestRunForWinner longest run for the winner or {@link Match#UNDEFINED}.
+	 * @param longestRunForLoser longest run for the loser or {@link Match#UNDEFINED}.
+	 * @throws BlmsException if winner equals loser, or see {@link Match#setLongestRunForLoser(int)}
+	 *         and see {@link Match#setLongestRunForWinner(int)}.
+	 */
 	public void update(Date date, User winner, User loser, int length,
 			int score, int longestRunForWinner, int longestRunForLoser)
 			throws BlmsException {

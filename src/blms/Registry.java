@@ -14,7 +14,9 @@ import blms.exceptions.BlmsException;
 import com.db4o.Db4o;
 import com.db4o.ObjectSet;
 import com.db4o.ext.ExtObjectContainer;
-
+/**
+ * Handle object collections and access the database. 
+ */
 // Invariant: there aren't two users with the same email address. 
 public class Registry {
 	BlmsDataStore store;
@@ -22,10 +24,17 @@ public class Registry {
 
 	ExtObjectContainer db = null;
 
+	/**
+	 * Constructor default.
+	 */
 	public Registry() {
 		Db4o.configure().updateDepth(20);
 	}
 
+	/**
+	 * Load a database in memory. (can change in future: loading directly in DB) 
+	 * @param databaseName the database name.
+	 */
 	public void useDatabase(String databaseName) {
 		if (db != null && !db.isClosed())
 			db.close();
@@ -40,6 +49,9 @@ public class Registry {
 			store = result.next();
 	}
 
+	/**
+	 * Updates the DB.
+	 */
 	private void updateDb() {
 		if (db != null && !db.isClosed())
 			db.set(store);
@@ -75,6 +87,11 @@ public class Registry {
 			return null;
 	}
 
+	/**
+	 * Finds users with the last name given.
+	 * @param lastName the last name of user (s).
+	 * @return the users list (possibly empty).
+	 */
 	public User[] findUserByLastName(String lastName) {
 		Pattern pat = Pattern.compile(lastName, Pattern.CASE_INSENSITIVE);
 		Collection<User> ret = new LinkedList<User>();
@@ -86,6 +103,11 @@ public class Registry {
 		return ret.toArray(new User[] {});
 	}
 
+	/**
+	 * Finds a league with the given name .
+	 * @param name the name of league (s).
+	 * @return the leagues list (possibly empty).
+	 */
 	public League[] findLeague(String name) {
 		Pattern pat = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
 		TreeSet<League> ret = new TreeSet<League>();
@@ -97,6 +119,22 @@ public class Registry {
 		return ret.toArray(new League[] {});
 	}
 
+
+	/**
+	* Creates a user with the given parameters. At least one phone number
+	* must be provided. The parameters firstName, lastName and email are
+	* mandatory.
+	* @param firstName user's first name. Mandatory.
+	* @param lastName user's last name. Mandatory.
+	* @param homePhone user's home phone.
+	* @param workPhone user's work phone.
+	* @param cellPhone user's cell phone.
+	* @param email user's email address. Mandatory.
+	* @param picture user's picture.
+	* @return a user
+	* @throws BlmsException if a mandatory field is missing or if no
+	* phone number is provided.
+	*/	 
 	public User createUser(String firstName, String lastName, String homePhone,
 			String workPhone, String cellPhone, String email, String picture)
 			throws BlmsException {
@@ -109,6 +147,11 @@ public class Registry {
 		return user;
 	}
 
+	/**
+	 * Deletes the given user.
+	 * @param user the user to be deleted.
+	 * @throws BlmsException if the user doesn't exist in the leagues. 
+	 */
 	public void deleteUser(User user) throws BlmsException {
 		for (League l : store.leagues)
 			if (l.getOperator() == user)
@@ -124,6 +167,10 @@ public class Registry {
 		updateDb();
 	}
 
+	/**
+	 * Deletes the given league.
+	 * @param league the league to be deleted.
+	 */
 	public void deleteLeague(League league) {
 		store.leagues.remove(league);
 		for (Match m : league.getMatches())
@@ -139,6 +186,18 @@ public class Registry {
 
 	// --------------------------------------
 
+	/**
+	 * Creates a league with the given name and the given operator. The creation
+	 * date is recorded.
+	 * 
+	 * @param name
+	 *            the league's name.
+	 * @param operator
+	 *            user that operates this league.
+	 * @return league a league
+	 * @throws BlmsException
+	 *             if name is null or empty or if operator is null.
+	 */
 	public League createLeague(String name, User operator) throws BlmsException {
 		League league = new League(name, operator);
 
@@ -153,6 +212,14 @@ public class Registry {
 
 	// --------------------------------------
 
+	/**
+	 * Gets a String with the leagues which the user joined. 
+	 * @param user
+	 *            user that joined in the leagues returned.
+	 * @return stringLeagues a list with the leagues' names which the user joined.
+	 * @throws BlmsException
+	 *             if user is null. 
+	 */
 	public String getUserLeagues(User user) throws Exception {
 		String stringLeagues = "";
 
@@ -170,6 +237,12 @@ public class Registry {
 		return stringLeagues;
 	}
 
+	/**
+	 * Gets a String with the users of the given league.
+	 * @param league the given league.
+	 * @return a list with users' names of the given league.
+	 * @throws Exception if the given league is null.
+	 */
 	public String getLeagueUsers(League league) throws Exception {
 		if (league == null)
 			throw new BlmsException("Unknown league");
@@ -187,6 +260,14 @@ public class Registry {
 		return stringMembers;
 	}
 
+	/**
+	 * Joins the user in the league, with the initial handicap.
+	 * @param user the given user.
+	 * @param league the given league.
+	 * @param initialHandicap the given initial handicap.
+	 * @throws Exception if the user is null, or the league is null, or the initial 
+	 *         handicap is null or negative.
+	 */
 	public void userJoinLeague(User user, League league, String initialHandicap)
 			throws Exception {
 		if (user == null) {
@@ -211,6 +292,13 @@ public class Registry {
 			throw new BlmsException("User is already a league member");
 	}
 
+	/**
+	 * Removes the given user of the given league (the user leaves the league).
+	 * @param user the given user.
+	 * @param league the given league.
+	 * @throws Exception if the user is null or the league is null, or if the league doesn't
+	 *         contain the user, or if the user is the league's operator.
+	 */
 	public void userLeaveLeague(User user, League league) throws Exception {
 		if (user == null) {
 			throw new BlmsException("Unknown user");
@@ -234,6 +322,13 @@ public class Registry {
 		updateDb();
 	}
 
+	/**
+	 * Verify if the given user is a member of the league.
+	 * @param user the given user.
+	 * @param league the given league.
+	 * @return true if the user is a member of the league or false, otherwise.
+	 * @throws BlmsException if the league or the user are null.
+	 */
 	public boolean isUserLeague(User user, League league) throws BlmsException {
 		if (league == null)
 			throw new BlmsException("Unknown league");
@@ -325,11 +420,17 @@ public class Registry {
 		return null;
 	}
 
+	/**
+	 * Removes all users from DB (in this case, persistence file).
+	 */
 	public void removeAllUsers() {
 		store.users.clear();
 		updateDb();
 	}
 
+	/**
+	 * Removes all leagues from DB (in this case, persistence file).
+	 */
 	public void removeAllLeagues() {
 		// for (League l : store.leagues)
 		// for (Match m : l.getMatches())
@@ -338,9 +439,11 @@ public class Registry {
 		store.matches.clear();
 		store.joins.clear();
 		updateDb();
-
 	}
 
+	/**
+	 * Removes all matches from DB (in this case, persistence file)
+	 */
 	public void removeAllMatches() {
 		store.matches.clear();
 		for (User u : store.users)
@@ -351,12 +454,24 @@ public class Registry {
 		updateDb();
 	}
 
+	/**
+	 * Adds a result of a match.
+	 * @param league the league which the match happened.
+	 * @param date the date of the match.
+	 * @param winner the match's winner.
+	 * @param loser the match's loser.
+	 * @return a match.
+	 * @throws BlmsException see {@link Match#Match(League, Date, User, User, int, int, int, int)}. 
+	 */
 	public Match addMatchResult(League league, Date date, User winner,
 			User loser) throws BlmsException {
 		return addMatchResult(league, date, winner, loser, Match.UNDEFINED,
 				Match.UNDEFINED, Match.UNDEFINED, Match.UNDEFINED);
 	}
 
+	/**
+	 * see {@link Match#Match(League, Date, User, User, int, int, int, int)}.
+	 */
 	public Match addMatchResult(League league, Date date, User winner,
 			User loser, int length, int score, int longestRunForWinner,
 			int longestRunForLoser) throws BlmsException {
@@ -373,6 +488,13 @@ public class Registry {
 		return m;
 	}
 
+	/**
+	 * Finds a join with the given user and league: the user joined the league, in any moment.
+	 * @param user the given user.
+	 * @param league the given league.
+	 * @return the join found.
+	 * @throws BlmsException if the user or the league are null.
+	 */
 	public Join findJoin(User user, League league) throws BlmsException {
 		if (user == null) {
 			throw new BlmsException("Unknown user");
@@ -387,6 +509,10 @@ public class Registry {
 		return null;
 	}
 
+	/**
+	 * Deletes the given match.
+	 * @param m the given match.
+	 */
 	public void deleteMatch(Match m) {
 		store.matches.remove(m);
 		m.getLeague().matches.remove(m);
@@ -395,6 +521,20 @@ public class Registry {
 		updateDb();
 	}
 
+	/**
+	 * Updates the match result.
+	 * @param match the given (current) match.
+	 * @param date the given date (date of the match).
+	 * @param winner the match's winner.
+	 * @param loser the match's loser.
+	 * @param length number of balls to be made by highest-ranked player or
+	 *            {@link Match#UNDEFINED}.
+	 * @param score the final score or {@link Match#UNDEFINED}.
+	 * @param longestRunForWinner longest run for the winner or {@link Match#UNDEFINED}.
+	 * @param longestRunForLoser longest run for the loser or {@link Match#UNDEFINED}.
+	 * @throws BlmsException if winner equals loser, or see {@link Match#setLongestRunForLoser(int)}
+	 *         and see {@link Match#setLongestRunForWinner(int)}.
+	 */
 	public void updateMatchResult(Match match, Date date, User winner,
 			User loser, int length, int score, int longestRunForWinner,
 			int longestRunForLoser) throws BlmsException {
