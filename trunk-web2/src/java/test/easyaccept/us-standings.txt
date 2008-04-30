@@ -1,0 +1,119 @@
+##################################################################
+# PLEASE REPORT ANY ERRORS IN THE TESTS TO jacques@dsc.ufcg.edu.br
+##################################################################
+# Provide a way of entering an expression to calculate player standing in current season.
+# Example: Standing = 3 * seasonWins + seasonLosses
+# The variables seasonWins and seasonLosses are available and 
+# the expression may use 4 arithmetic operators with the usual precedence 
+# and associativity as well as parentheses. 
+# More variables may be available in future versions.
+# Provide a view of current standings for all players in a single web page, 
+# allowing ordering on any column of the resulting table (at least by player name and by standing).
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+# date format is country-dependent
+dateFormat format=dd/mm/yyyy
+
+##################################################################
+# simple case - everything nice and rosy
+##################################################################
+# setup
+userId1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+userId2=createUser firstName=fn1 lastName=ln1 homePhone=111-222-3334 workPhone= cellPhone= email=fl1@a.com picture=
+userId3=createUser firstName=fn2 lastName=ln2 homePhone=111-222-3335 workPhone= cellPhone= email=fl2@a.com picture=
+leagueId1=createLeague name=LSCG operator=${userId1}
+joinLeague id=${userId2} leagueId=${leagueId1} initialHandicap=200
+joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
+
+# define expression for standings
+defineStandingsExpression leagueId=${leagueId1} expression="3 * seasonWins + seasonLosses"
+
+# enter a match result
+expect 0 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 0 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+matchId1=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
+expect 3 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 1 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+matchId2=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
+expect 6 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 2 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+matchId3=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId3} loser=${userId2}
+expect 7 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 5 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+
+##################################################################
+# Update match info
+##################################################################
+updateMatchResult matchId=${matchId1} date=1/12/2007 winner=${userId3} loser=${userId2} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
+expect 5 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 7 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+
+##################################################################
+# Delete matches
+##################################################################
+deleteMatch matchId=${matchId1}
+expect 4 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 4 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+deleteMatch matchId=${matchId2}
+expect 1 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 3 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+deleteMatch matchId=${matchId3}
+expect 0 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 0 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+
+##################################################################
+# Change standings expression
+##################################################################
+matchId1=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
+matchId2=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
+matchId3=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId3} loser=${userId2}
+expect 7 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 5 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+defineStandingsExpression leagueId=${leagueId1} expression="4 * seasonWins + 2 * seasonLosses"
+expect 10 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 8 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+defineStandingsExpression leagueId=${leagueId1} expression="4 * seasonWins - 10 / seasonLosses"
+expect -2 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect -1 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+defineStandingsExpression leagueId=${leagueId1} expression="4 * (seasonWins + 2) / seasonLosses"
+expect 16 getPlayerStanding id=${userId2} leagueId=${leagueId1}
+expect 6 getPlayerStanding id=${userId3} leagueId=${leagueId1}
+
+##################################################################
+# Testing error conditions
+##################################################################
+# --------------------------------------------
+# command: defineStandingsExpression
+# syntax: defineStandingsExpression leagueId expression
+# --------------------------------------------
+expectError "Syntax error in standings expression" defineStandingsExpression leagueId=${leagueId1} expression="4*"
+expectError "Syntax error in standings expression" defineStandingsExpression leagueId=${leagueId1} expression="*4"
+expectError "Syntax error in standings expression" defineStandingsExpression leagueId=${leagueId1} expression="4*(2+seasonWins"
+expectError "Syntax error in standings expression" defineStandingsExpression leagueId=${leagueId1} expression="4*2+seasonWins)"
+expectError "Unknown variable in standings expression" defineStandingsExpression leagueId=${leagueId1} expression="xxx"
+
+# --------------------------------------------
+# command: getPlayerStanding
+# syntax: getPlayerStanding userId leagueId
+# --------------------------------------------
+expectError "Unknown league" getPlayerStanding id=${userId1} leagueId=xxx
+expectError "Unknown league" getPlayerStanding id=${userId1} leagueId=""
+expectError "Unknown league" getPlayerStanding id=${userId1} leagueId=
+expectError "Unknown user" getPlayerStanding id=xxx leagueId=${leagueId1}
+expectError "Unknown user" getPlayerStanding id="" leagueId=${leagueId1}
+expectError "Unknown user" getPlayerStanding id= leagueId=${leagueId1}
+removeAllMatches
+defineStandingsExpression leagueId=${leagueId1} expression="1/seasonWins"
+expectError "Division by zero in standings expression" getPlayerStanding id=${userId2} leagueId=${leagueId1}
