@@ -579,6 +579,10 @@ public class BlmsFacade {
 	public void useDatabase(String databaseName) {
 		registry.useDatabase(databaseName);
 	}
+        
+        public void closeDatabase() {
+            registry.closeDatabase();
+        }
 
 	public void print(String x) {
 		System.out.println(x);
