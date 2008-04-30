@@ -122,38 +122,67 @@ public class Match implements Comparable<Match> {
 		setLongestRunForLoser(longestRunForLoser);
 	}
 
+	/**
+	 * @return the league.
+	 */
 	public League getLeague() {
 		return league;
 	}
 
+	/**
+	 * 
+	 * @param user the given user.
+	 * @return the role of user.
+	 */
 	public Role getUserRole(User user) {
 		return (user == winner) ? Role.WINNER : Role.LOSER;
 	}
 
+	/**
+	 * @return the match's winner.
+	 */
 	public User getWinner() {
 		return winner;
 	}
 
+	/**
+	 * @return the match's loser.
+	 */
 	public User getLoser() {
 		return loser;
 	}
 
+	/**
+	 * @return the date of match.
+	 */
 	public Date getDate() {
 		return date;
 	}
 
+	/**
+	 * @return the number of balls to be made by highest-ranked player
+	 */
 	public int getLength() {
 		return length;
 	}
 
+	/**
+	 * @return the final score or {@link Match#UNDEFINED}.
+	 */
 	public int getScore() {
 		return score;
 	}
 
+	/**
+	 * @return longest run for the winner or {@link Match#UNDEFINED}.
+	 */
 	public int getLongestRunForWinner() {
 		return longestRunForWinner;
 	}
 
+	/**
+	 * @return longest run for the loser or {@link Match#UNDEFINED}.
+	 */
 	public int getLongestRunForLoser() {
 		return longestRunForLoser;
 	}
@@ -174,6 +203,12 @@ public class Match implements Comparable<Match> {
 		this.loser = loser;
 	}
 
+	/**
+	 * Sets the number of balls to be made by highest-ranked player or
+	 *            {@link Match#UNDEFINED}.
+	 * @param length the new length.
+	 * @throws BlmsException if length is undefined or less than one.
+	 */
 	protected void setLength(int length) throws BlmsException {
 		if (length != UNDEFINED && length < 1)
 			throw new BlmsException("Invalid match length");
@@ -181,8 +216,8 @@ public class Match implements Comparable<Match> {
 	}
 
 	/**
-	 * 
-	 * @param score
+	 * Sets the final score or {@link Match#UNDEFINED}.
+	 * @param score the new score. 
 	 * @throws BlmsException
 	 *             if score < 0 or score >= the match's length (number of balls
 	 *             to be made by highest-ranked player).
@@ -194,8 +229,8 @@ public class Match implements Comparable<Match> {
 	}
 
 	/**
-	 * 
-	 * @param longestRunForWinner
+	 * Sets the longest run for the winner or {@link Match#UNDEFINED}.
+	 * @param longestRunForWinner the new longestRunForWinner 
 	 * @throws BlmsException
 	 *             unless 1 <= longestRunForWinner <= length.
 	 */
@@ -208,8 +243,8 @@ public class Match implements Comparable<Match> {
 	}
 
 	/**
-	 * 
-	 * @param longestRunForLoser
+	 * Sets the run for the loser or {@link Match#UNDEFINED}.
+	 * @param longestRunForLoser the new longestRunForLoser
 	 * @throws BlmsException
 	 *             unless 0 <= longestRunForLoser <= score.
 	 */

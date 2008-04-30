@@ -54,36 +54,63 @@ public class League implements Comparable<League> {
 				.equalsIgnoreCase(this.name));
 	}
 
+	/**
+	 * @return the league's name.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets the league's name.
+	 * @param name the new league's name.
+	 * @throws BlmsException if the new name is null or an empty string.
+	 */
 	public void setName(String name) throws BlmsException {
 		if (Util.isBlank(name))
 			throw new BlmsException("Required data: league name");
 		this.name = name;
 	}
 
+	/**
+	 * @return the league's operator.
+	 */
 	public User getOperator() {
 		return operator;
 	}
 
+	/**
+	 * Sets the league's operator.
+	 * @param operator the new operator.
+	 * @throws BlmsException if operator is null.
+	 */
 	public void setOperator(User operator) throws BlmsException {
 		if (operator == null)
 			throw new BlmsException("Required data: league operator");
 		this.operator = operator;
 	}
 
+	/**
+	 * @return the creation date of the league.
+	 */
 	public Date getCreationDate() {
 		return creationDate;
 	}
 
+	/**
+	 * @return the matches of a league.
+	 */
 	public Match[] getMatches() {
 		Match[] ret = matches.toArray(new Match[] {});
 		Arrays.sort(ret);
 		return ret;
 	}
 
+	/**
+	 * @param index the given index (of match position).
+	 * @return the match found at a position given by the index. 
+	 * @throws BlmsException if the index is out of array's bounds.
+	 */
 	public Match getMatch(int index) throws BlmsException {
 		try {
 			return matches.elementAt(index - 1);
@@ -104,6 +131,10 @@ public class League implements Comparable<League> {
 		return Collator.getInstance().compare(name, other.getName());
 	}
 
+	/**
+	 * Adds a match m in the list of league's matches.
+	 * @param m the given match.
+	 */
 	public void addMatch(Match m) {
 		matches.add(m);
 	}
@@ -148,6 +179,9 @@ public class League implements Comparable<League> {
 		standingsExpression = expression;
 	}
 
+	/**
+	 * @return the standings expression.
+	 */
 	public String getStandingsExpression() {
 		return standingsExpression;
 	}
