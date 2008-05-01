@@ -3,12 +3,21 @@
 <%@ page import="blms.struts.*" %>
 <%@ page import="java.lang.reflect.*" %>
 <%@ page import="java.util.*" %>
+<%@ taglib uri='/WEB-INF/struts-tiles.tld' prefix='t' %>
 <%
+String method = request.getParameter("method");
+String title = request.getParameter("title");
+if (title == null)
+    title = "";
+String fieldsStr = request.getParameter("fields");
+
 try {
+    /*
     Vector<String> special = new Vector<String>();
     special.add("method");
     special.add("title");
     special.add("fields");
+    */
 
     String methodName = request.getParameter("method");
 
@@ -16,12 +25,11 @@ try {
 
     Class klass = BlmsFacade.class;
     Method[] methods = klass.getMethods();
-    for (Method method : methods) {
-        if (method.getName().equals(methodName)) {
+    for (Method m : methods) {
+        if (m.getName().equals(methodName)) {
             LinkedList<String> params = new LinkedList<String>();
             Enumeration<String> names = request.getParameterNames();
 
-            //int i = 0;        
             for (int i = 1; i < 1000; i++) {
                 String s = (String)request.getParameter("p" + i);
                 if (s != null)
@@ -34,7 +42,7 @@ try {
                 try {
                     facade.useDatabase(BlmsConfig.DBNAME);
                     
-                    method.invoke(facade, params.toArray());
+                    m.invoke(facade, params.toArray());
                 } catch (InvocationTargetException e) {
                     request.setAttribute("exception", e.getCause());
                     pageContext.forward("exception.jsp");
@@ -44,9 +52,7 @@ try {
                 } finally {
                     facade.closeDatabase();
                 }
-                request.setAttribute("operation", "bli");
-                //
-                pageContext.forward("ok.jsp");
+                pageContext.forward("ok.jsp?operation=" + title);
             }
         }
     }
@@ -55,47 +61,10 @@ try {
     out.println(e.getMessage());
 }
 %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%
-String method = request.getParameter("method");
-String title = request.getParameter("title");
-String fieldsStr = request.getParameter("fields");
-
-%>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title><%= title %></title>
-    </head>
-    <body>
-        <table border="0" cols="2" rows="1">
-        <tr><td><ul>
-        <li><a href="do.jsp?method=createUser&title=Create User&fields=First name,Last name,Home Phone,Work Phone,Cell Phone,Email,Picture">Create User</a></li>
-        <li><a href="do.jsp?method=deleteUser&title=Delete User&fields=User ID">Delete User</a></li>
-        <!-- TODO: update user info -->
-        <!-- TODO: list users -->
-        
-        <li><a href="do.jsp?method=createLeague&title=Create League&fields=League name,User operator ID">Create League</a></li>
-        <li><a href="do.jsp?method=deleteLeague&title=Delete User&fields=League ID">Delete League</a></li>
-        <!-- TODO: update league -->
-        <!-- TODO: list leagues -->
-        
-        <li><a href="do.jsp?method=joinLeague&title=User Join League&fields=User ID,League ID,Initial Handicap">User Join League</a></li>
-        <li><a href="do.jsp?method=joinLeague&title=User Leave League&fields=User ID,League ID,Initial Handicap">User Leave League</a></li>
-        
-        <li><a href="do.jsp?method=addMatchResult&title=Add Match Result&fields=League ID,Date,Winner user ID,Loser user ID,Length,Score,Longest run for winner,Longest run for loser">Add Match Result</a></li> 
-        <li><a href="do.jsp?method=deleteMatch&title=Delete Match Result&fields=Match ID">Delete Match Result</a></li> 
-        <li><a href="do.jsp?method=updateMatchResult&title=Update Match Result&fields=Match ID,Date,Winner user ID,Loser user ID,Length,Score,Longest run for winner,Longest run for loser">Add Match Result</a></li> 
-        <!-- TODO: list matches -->
-
-        </ul>
-            
-        <li><a href="do.jsp?method=findUserByLastName&title=Find Users&fields=Last name (regular expressions allowed)">Find Users</a></li>
-                
-        </td><td>
+<t:insert template="template.jsp">
+    <t:put name="title"><%= title %></t:put>
+    <t:put name="body">
         <%
         if (fieldsStr != null) {
             String[] fields = fieldsStr.split(",");
@@ -103,7 +72,6 @@ String fieldsStr = request.getParameter("fields");
         <h2><%= title %></h2>
         <form action="do.jsp" method="GET">
         <input type="hidden" name="method" value="<%= method %>"/>
-        
         <%
         int i = 0;
         for (String field : fields) {
@@ -116,18 +84,8 @@ String fieldsStr = request.getParameter("fields");
         <input type="submit"/>
         <%
         } // if fieldsStr != null
-        
         %>
-        
-        
-        
-        </form>            
-            
-        </td></tr>
-        </table>
+        </form>
+    </t:put>
+</t:insert>    
 
-
-        
-        
-    </body>
-</html>
