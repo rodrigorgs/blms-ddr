@@ -19,7 +19,7 @@ import com.db4o.ext.ExtObjectContainer;
  */
 // Invariant: there aren't two users with the same email address. 
 public class Registry {
-	BlmsDataStore store;
+	public BlmsDataStore store;
 	String databaseName;
 
 	ExtObjectContainer db = null;

@@ -75,6 +75,14 @@
         </javac>
     </target>
 
+	<target name="copyweb" depends="jar">
+		<copy todir="../blms-web/jars">
+			<fileset dir=".">
+				<filename name="blms.jar"/>
+			</fileset>
+		</copy>
+	</target>
+
 	<target name="jar" depends="init,clean,compile">
         <echo>o Creating jar file</echo>
         <jar destfile="blms.jar" basedir="${bin}">
