@@ -106,13 +106,13 @@
         <mkdir dir="${doc}"/>
         <javadoc 
             destdir="${doc}"
-            additionalparam="-J-Dorg.apache.commons.attributes.javadoc.CATaglet.sources=${basedir}">
-            <taglet
-                name="org.apache.commons.attributes.javadoc.CATaglet"
-                path="${ant.home}/lib/commons-attributes-compiler-2.2.jar"
-                />
+			sourcepath="${source}"
+			packagenames="blms,blms.facade,blms.util,blms.exceptions"
+			classpath="${bin}"
+			classpathref="jars"/>
+<!--                />
             <fileset dir="${source}/" includes="**/*.java" />
-        </javadoc>
+        </javadoc> -->
     </target>
    
 </project>
