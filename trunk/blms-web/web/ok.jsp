@@ -13,8 +13,12 @@
         <title>Successful operation</title>
     </head>
     <body>
-        <h1>Successful operation</h1> <br/><br/>
-        Operation "" was 
+        <h1>Successful operation</h1>
+        <p>
+        Operation <%= request.getParameter("operation") %> was 
         performed successfully
+        </p>
+        <a href="javascript:history.go(-1);">back</a>
+    
     </body>
 </html>
