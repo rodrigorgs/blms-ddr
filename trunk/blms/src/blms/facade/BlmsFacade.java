@@ -587,4 +587,22 @@ public class BlmsFacade {
 	public void print(String x) {
 		System.out.println(x);
 	}
+	
+	public void updateUser(String userId, String firstName, String lastName,
+			String homePhone, String workPhone, String cellPhone, String email,
+			String picture) throws Throwable {
+			changeUserAttribute(userId, "firstName", firstName);
+			changeUserAttribute(userId, "lastName", lastName  );
+			changeUserAttribute(userId, "homePhone", homePhone);
+			changeUserAttribute(userId, "workPhone", workPhone);
+			changeUserAttribute(userId, "cellPhone", cellPhone);
+			changeUserAttribute(userId, "email",     email    );
+			changeUserAttribute(userId, "picture",   picture  );
+	}
+
+	public void updateLeague(String leagueID, String name, String operator)
+			throws Throwable {
+		changeLeagueAttribute(leagueID, "name", name);
+		changeLeagueAttribute(leagueID, "operator", operator);
+	}
 }
