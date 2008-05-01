@@ -448,26 +448,24 @@
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
-        <basename file="${libs.struts.classpath.libfile.8}" property="included.lib.libs.struts.classpath.8"/>
-        <basename file="${libs.struts.classpath.libfile.7}" property="included.lib.libs.struts.classpath.7"/>
-        <basename file="${libs.struts.classpath.libfile.6}" property="included.lib.libs.struts.classpath.6"/>
-        <basename file="${libs.struts.classpath.libfile.5}" property="included.lib.libs.struts.classpath.5"/>
-        <basename file="${libs.struts.classpath.libfile.4}" property="included.lib.libs.struts.classpath.4"/>
-        <basename file="${libs.struts.classpath.libfile.3}" property="included.lib.libs.struts.classpath.3"/>
-        <basename file="${libs.struts.classpath.libfile.2}" property="included.lib.libs.struts.classpath.2"/>
-        <basename file="${libs.struts.classpath.libfile.1}" property="included.lib.libs.struts.classpath.1"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.8}" propname="included.lib.libs.struts.classpath.8.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.7}" propname="included.lib.libs.struts.classpath.7.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.6}" propname="included.lib.libs.struts.classpath.6.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.5}" propname="included.lib.libs.struts.classpath.5.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.4}" propname="included.lib.libs.struts.classpath.4.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.3}" propname="included.lib.libs.struts.classpath.3.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.2}" propname="included.lib.libs.struts.classpath.2.X"/>
-        <copy-ear-war file="${libs.struts.classpath.libfile.1}" propname="included.lib.libs.struts.classpath.1.X"/>
         <basename file="${file.reference.ant.jar}" property="included.lib.file.reference.ant.jar"/>
         <copy-ear-war file="${file.reference.ant.jar}" propname="included.lib.file.reference.ant.jar.X"/>
+        <basename file="${file.reference.antlr.jar}" property="included.lib.file.reference.antlr.jar"/>
+        <copy-ear-war file="${file.reference.antlr.jar}" propname="included.lib.file.reference.antlr.jar.X"/>
+        <basename file="${file.reference.blms.jar}" property="included.lib.file.reference.blms.jar"/>
+        <copy-ear-war file="${file.reference.blms.jar}" propname="included.lib.file.reference.blms.jar.X"/>
         <basename file="${file.reference.bloat-1.0.jar}" property="included.lib.file.reference.bloat-1.0.jar"/>
         <copy-ear-war file="${file.reference.bloat-1.0.jar}" propname="included.lib.file.reference.bloat-1.0.jar.X"/>
+        <basename file="${file.reference.commons-beanutils.jar}" property="included.lib.file.reference.commons-beanutils.jar"/>
+        <copy-ear-war file="${file.reference.commons-beanutils.jar}" propname="included.lib.file.reference.commons-beanutils.jar.X"/>
+        <basename file="${file.reference.commons-digester.jar}" property="included.lib.file.reference.commons-digester.jar"/>
+        <copy-ear-war file="${file.reference.commons-digester.jar}" propname="included.lib.file.reference.commons-digester.jar.X"/>
+        <basename file="${file.reference.commons-fileupload-1.0.jar}" property="included.lib.file.reference.commons-fileupload-1.0.jar"/>
+        <copy-ear-war file="${file.reference.commons-fileupload-1.0.jar}" propname="included.lib.file.reference.commons-fileupload-1.0.jar.X"/>
+        <basename file="${file.reference.commons-logging.jar}" property="included.lib.file.reference.commons-logging.jar"/>
+        <copy-ear-war file="${file.reference.commons-logging.jar}" propname="included.lib.file.reference.commons-logging.jar.X"/>
+        <basename file="${file.reference.commons-validator.jar}" property="included.lib.file.reference.commons-validator.jar"/>
+        <copy-ear-war file="${file.reference.commons-validator.jar}" propname="included.lib.file.reference.commons-validator.jar.X"/>
         <basename file="${file.reference.db4o-6.1-db4ounit.jar}" property="included.lib.file.reference.db4o-6.1-db4ounit.jar"/>
         <copy-ear-war file="${file.reference.db4o-6.1-db4ounit.jar}" propname="included.lib.file.reference.db4o-6.1-db4ounit.jar.X"/>
         <basename file="${file.reference.db4o-6.1-java5.jar}" property="included.lib.file.reference.db4o-6.1-java5.jar"/>
@@ -476,33 +474,35 @@
         <copy-ear-war file="${file.reference.db4o-6.1-nqopt.jar}" propname="included.lib.file.reference.db4o-6.1-nqopt.jar.X"/>
         <basename file="${file.reference.easyaccept.jar}" property="included.lib.file.reference.easyaccept.jar"/>
         <copy-ear-war file="${file.reference.easyaccept.jar}" propname="included.lib.file.reference.easyaccept.jar.X"/>
+        <basename file="${file.reference.jakarta-oro.jar}" property="included.lib.file.reference.jakarta-oro.jar"/>
+        <copy-ear-war file="${file.reference.jakarta-oro.jar}" propname="included.lib.file.reference.jakarta-oro.jar.X"/>
         <basename file="${file.reference.jeplite-0.8.7a-bin.jar}" property="included.lib.file.reference.jeplite-0.8.7a-bin.jar"/>
         <copy-ear-war file="${file.reference.jeplite-0.8.7a-bin.jar}" propname="included.lib.file.reference.jeplite-0.8.7a-bin.jar.X"/>
-        <basename file="${file.reference.blms.jar}" property="included.lib.file.reference.blms.jar"/>
-        <copy-ear-war file="${file.reference.blms.jar}" propname="included.lib.file.reference.blms.jar.X"/>
+        <basename file="${file.reference.struts.jar}" property="included.lib.file.reference.struts.jar"/>
+        <copy-ear-war file="${file.reference.struts.jar}" propname="included.lib.file.reference.struts.jar.X"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.libs.struts.classpath.1.X} ${included.lib.libs.struts.classpath.2.X} ${included.lib.libs.struts.classpath.3.X} ${included.lib.libs.struts.classpath.4.X} ${included.lib.libs.struts.classpath.5.X} ${included.lib.libs.struts.classpath.6.X} ${included.lib.libs.struts.classpath.7.X} ${included.lib.libs.struts.classpath.8.X} ${included.lib.file.reference.ant.jar} ${included.lib.file.reference.bloat-1.0.jar} ${included.lib.file.reference.db4o-6.1-db4ounit.jar} ${included.lib.file.reference.db4o-6.1-java5.jar} ${included.lib.file.reference.db4o-6.1-nqopt.jar} ${included.lib.file.reference.easyaccept.jar} ${included.lib.file.reference.jeplite-0.8.7a-bin.jar} ${included.lib.file.reference.blms.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.file.reference.ant.jar} ${included.lib.file.reference.antlr.jar} ${included.lib.file.reference.blms.jar} ${included.lib.file.reference.bloat-1.0.jar} ${included.lib.file.reference.commons-beanutils.jar} ${included.lib.file.reference.commons-digester.jar} ${included.lib.file.reference.commons-fileupload-1.0.jar} ${included.lib.file.reference.commons-logging.jar} ${included.lib.file.reference.commons-validator.jar} ${included.lib.file.reference.db4o-6.1-db4ounit.jar} ${included.lib.file.reference.db4o-6.1-java5.jar} ${included.lib.file.reference.db4o-6.1-nqopt.jar} ${included.lib.file.reference.easyaccept.jar} ${included.lib.file.reference.jakarta-oro.jar} ${included.lib.file.reference.jeplite-0.8.7a-bin.jar} ${included.lib.file.reference.struts.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
-        <copy file="${libs.struts.classpath.libfile.8}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.7}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.6}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.5}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.4}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.3}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.2}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${libs.struts.classpath.libfile.1}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.ant.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.antlr.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.blms.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.bloat-1.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.commons-beanutils.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.commons-digester.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.commons-fileupload-1.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.commons-logging.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.commons-validator.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.db4o-6.1-db4ounit.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.db4o-6.1-java5.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.db4o-6.1-nqopt.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.easyaccept.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.jakarta-oro.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.jeplite-0.8.7a-bin.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${file.reference.blms.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.struts.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest" name="do-ear-dist">
         <dirname file="${dist.ear.war}" property="dist.jar.dir"/>
