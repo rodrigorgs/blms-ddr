@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionForward;
 import blms.actionforms.CreateUserForm;
 import blms.facade.BlmsFacade;
+import blms.struts.BlmsConfig;
 
 /**
  *
@@ -23,6 +24,7 @@ public class CreateUserAction extends org.apache.struts.action.Action {
     
     /* forward name="success" path="" */
     private final static String SUCCESS = "success";
+    private final static String ERROR = "error";
     private final static String OPERATION = "user creation";
     
     /**
@@ -40,13 +42,19 @@ public class CreateUserAction extends org.apache.struts.action.Action {
         CreateUserForm userForm = (CreateUserForm)form;
         
         BlmsFacade facade = new BlmsFacade();
-        facade.useDatabase("pageDB2");
-        
-        facade.createUser(userForm.getFirstName(), userForm.getLastName(), 
-                userForm.getHomePhone(), userForm.getWorkPhone(), userForm.getCellPhone(),
-                userForm.getEmail(), "");
-        
-        facade.closeDatabase();
+        try {
+            facade.useDatabase(BlmsConfig.DBNAME);
+
+            facade.createUser(userForm.getFirstName(), userForm.getLastName(), 
+                    userForm.getHomePhone(), userForm.getWorkPhone(), userForm.getCellPhone(),
+                    userForm.getEmail(), "");
+        } catch (Throwable e) {
+            request.setAttribute("exception", e);
+            return mapping.findForward(ERROR);
+        }
+        finally {
+            facade.closeDatabase();
+        }
         request.setAttribute("operation", OPERATION);
         return mapping.findForward(SUCCESS);
     }

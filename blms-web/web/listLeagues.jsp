@@ -1,3 +1,8 @@
+<%-- 
+    Document   : listLeagues
+    Created on : 01/05/2008, 13:06:11
+--%>
+
 <%@ page import="blms.facade.*" %>
 <%@ page import="blms.*" %>
 <%@ page import="blms.struts.*" %>
@@ -9,29 +14,28 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>User list</title>
+        <title>Leagues</title>
     </head>
     <body>
-        <h2>Users</h2>
-        <ul>
+        <h2>Leagues</h2>
+                <ul>
         <%         
         Registry r = new Registry();
         r.useDatabase(BlmsConfig.DBNAME);
-        User[] users = r.findUserByLastName(".*");
-        for (User u : users) {
+        League[] leagues = r.findLeague(".*");
+        for (League l : leagues) {
         %>
-        <li><%=
-        String.format("%s %s <%s> ID = %s",
-            u.getFirstName(),
-            u.getLastName(),
-            u.getEmail(),
-            r.getId(u))                       
+        <li><%= String.format("%s (operated by %s %s) ID = %s", 
+                l.getName(),
+                l.getOperator().getFirstName(),
+                l.getOperator().getLastName(),
+                r.getId(l)
+                )
         %></li>
         <%
         }
         r.closeDatabase();
         %>
         </ul>
-        
     </body>
 </html>

@@ -15,6 +15,8 @@ League Management System</h1>
 <ul style="font-family: Helvetica,Arial,sans-serif;">
 <li><a href="createUser.jsp">Create user</a></li>
 <li><a href="listUsers.jsp">List users</a></li>
+<li><a href="createLeague.jsp">Create league</a></li>
+<li><a href="listLeagues.jsp">List leagues</a></li>
 </ul>
 </body>
 </html>
