@@ -22,6 +22,7 @@
     <action-mappings>
         <action input="/createUser.jsp" name="CreateUserForm" path="/createUserAction" scope="session" type="blms.actions.CreateUserAction">
             <forward name="success" path="/ok.jsp"/>
+            <forward name="error" path="/exception.jsp"/>
         </action>
         <action path="/Welcome" forward="/welcomeStruts.jsp"/>
     </action-mappings>
