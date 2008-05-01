@@ -43,8 +43,7 @@
 
     <target name="clean" description="o Clean up the generated files" depends="init">
         <delete>
-            <fileset dir="${bin}" includes="**/*.class,**/*$*"/>
-            <fileset dir="${bin}" includes="**/*.class" />
+            <fileset dir="${bin}" includes="**/*.class,**/*$*,**/*.jar"/>
             <fileset dir="${lib}">
                 <filename name="blms.jar"/>
             </fileset>
@@ -96,6 +95,11 @@
             <arg value="${test}/us-win-loss.txt"/>
             <arg value="${test}/us-standings.txt"/>
     	</java>
+		<delete>
+			<fileset dir=".">
+				<filename name="test"/>
+			</fileset>
+		</delete>
     </target>
     
     <target name="javadoc" description="o Create Javadocs for the demo (Requires Javadoc 1.4+)">
