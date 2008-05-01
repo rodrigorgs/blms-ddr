@@ -77,7 +77,7 @@
 
 	<target name="jar" depends="init,clean,compile">
         <echo>o Creating jar file</echo>
-        <jar destfile="${lib}/blms.jar" basedir="${bin}">
+        <jar destfile="blms.jar" basedir="${bin}">
         </jar>
     </target>
 
