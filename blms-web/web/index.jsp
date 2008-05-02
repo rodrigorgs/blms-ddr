@@ -1,1 +1,0 @@
-<jsp:forward page="view.jsp?title=BLMS Home"/>
