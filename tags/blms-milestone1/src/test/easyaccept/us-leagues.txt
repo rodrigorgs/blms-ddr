@@ -1,0 +1,141 @@
+# PLEASE REPORT ANY ERRORS IN THE TESTS TO jacques@dsc.ufcg.edu.br
+##################################################################
+# [Leagues] League registry maintenance
+# 
+# Registry maintenance operations (CRUD - Create/Read/Update/Delete) must be possible for leagues.
+# 
+# League attributes are:
+# 
+#     * Name
+#     * User who is League Operator
+#     * Creation date
+# 
+# Deleting a league must be confirmed and will remove the seasons, 
+# win/loss results (and other data, but not players) associated with the league.
+# Any league attribute may be changed at any time.
+# Observe that there is no interference between leagues. 
+# Results in a league will not affect any data in other leagues.
+# However, league operators may wish to access public data from other leagues for their own internal need.
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+##################################################################
+# league creation
+##################################################################
+# leagues should not exist
+expectError "Could not find league LSCG" findLeague name=LSCG
+expectError "Could not find league LSPB" findLeague name=LSPB
+
+# make sure we can create a few of leagues
+idUser1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+idUser2=createUser firstName=Mark lastName=Twain homePhone=123-222-3333 \
+	workPhone=123-444-5555 cellPhone=123-666-7777 email=mt@a.com picture=mark-twain.jpg
+# a league operator can operate more than one league
+idLeague1=createLeague name=LSCG operator=${idUser1}
+idLeague2=createLeague name=LSPB operator=${idUser1}
+idLeague3=createLeague name=LSMS operator=${idUser2}
+
+##################################################################
+# check that leagues were created ok
+##################################################################
+expect LSCG getLeagueAttribute id=${idLeague1} attribute=name
+idTemp=getLeagueAttribute id=${idLeague1} attribute=operator
+expect ${idUser1} echo ${idTemp}
+today=todaysDate
+expect ${today} getLeagueAttribute id=${idLeague1} attribute=creationDate
+
+expect LSPB getLeagueAttribute id=${idLeague2} attribute=name
+idTemp=getLeagueAttribute id=${idLeague2} attribute=operator
+expect ${idUser1} echo ${idTemp}
+today=todaysDate
+expect ${today} getLeagueAttribute id=${idLeague2} attribute=creationDate
+
+expect LSMS getLeagueAttribute id=${idLeague3} attribute=name
+idTemp=getLeagueAttribute id=${idLeague3} attribute=operator
+expect ${idUser2} echo ${idTemp}
+today=todaysDate
+expect ${today} getLeagueAttribute id=${idLeague3} attribute=creationDate
+
+##################################################################
+# rules concerning league attributes
+##################################################################
+# Rule: name and operator are required
+expectError "Required data: league name" createLeague name= operator=${idUser1}
+expectError "Required data: league name" createLeague name="" operator=${idUser1}
+expectError "Required data: league operator" createLeague name=abc operator=
+expectError "Required data: league operator" createLeague name=abc operator=""
+expectError "Unknown user" createLeague name=abc operator=xxx
+
+# Rule: league name must be unique
+expectError "This league already exists" createLeague name=LSCG operator=${idUser1}
+expectError "This league already exists" createLeague name=LSCG operator=${idUser2}
+
+##################################################################
+# Changing league attributes
+##################################################################
+# check errors
+expectError "Must provide an attribute to be changed" changeLeagueAttribute id=${idLeague1} attribute= value=xxx
+expectError "Must provide an attribute to be changed" changeLeagueAttribute id=${idLeague1} attribute="" value=xxx
+expectError "Unknown league attribute" changeLeagueAttribute id=${idLeague1} attribute=abc value=xxx
+
+# normal change
+changeLeagueAttribute id=${idLeague1} attribute=name value="LSCG A"
+changeLeagueAttribute id=${idLeague1} attribute=operator value=${idUser2}
+
+expect "LSCG A" getLeagueAttribute id=${idLeague1} attribute=name
+idTemp=getLeagueAttribute id=${idLeague1} attribute=operator
+expect ${idTemp} echo ${idUser2}
+
+# Check some rules again ...
+# Rule: name and operator are required
+expectError "Required data: league name" changeLeagueAttribute id=${idLeague1} attribute=name value=
+expectError "Required data: league name" changeLeagueAttribute id=${idLeague1} attribute=name value=""
+expectError "Required data: league operator" changeLeagueAttribute id=${idLeague1} attribute=operator value=
+expectError "Required data: league operator" changeLeagueAttribute id=${idLeague1} attribute=operator value=""
+expectError "Unknown user" changeLeagueAttribute id=${idLeague1} attribute=operator value=xxx
+
+# Rule: league name must be unique
+expectError "This league already exists" changeLeagueAttribute id=${idLeague1} attribute=name value=LSMS
+
+##################################################################
+# cannot remove user who is league operator
+##################################################################
+expectError "Cannot remove league operator" deleteUser id=${idUser1}
+
+##################################################################
+# can find league
+##################################################################
+expect "[LSCG A, LSPB]"  findLeague name=LS[CP].*
+expect "[LSCG A, LSPB]"  findLeague name=Ls[cp].*
+expectError "Could not find league z.*" findLeague name=z.*
+
+##################################################################
+# League deletion
+##################################################################
+# list is ordered by league name
+expect "[LSCG A, LSMS, LSPB]"  findLeague name=.*
+deleteLeague id=${idLeague1}
+expect "[LSMS, LSPB]"  findLeague name=.*
+expectError "Cannot remove league operator" deleteUser id=${idUser1}
+deleteLeague id=${idLeague2}
+deleteLeague id=${idLeague3}
+expectError "Could not find league .*" findLeague name=.*
+# can now delete users (no longer league operators)
+deleteUser ${idUser1}
+deleteUser ${idUser2}
+
+##################################################################
+# when removing league, remove associated data
+##################################################################
+# this will be done later when we have win/loss results, etc.

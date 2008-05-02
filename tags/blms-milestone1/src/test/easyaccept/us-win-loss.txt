@@ -1,0 +1,442 @@
+##################################################################
+# PLEASE REPORT ANY ERRORS IN THE TESTS TO jacques@dsc.ufcg.edu.br
+##################################################################
+# [Win/Loss] Enter win/loss results
+# A match result can be entered with the following required info:
+# 
+#     * date
+#     * winning player
+#     * losing player
+# 
+# For straight pool (the initial game supported), the handicapping system uses only this information.
+# The following optional information can also be informed:
+# 
+#     * race length (number of balls to be made by highest-ranked player)
+#     * the final score
+#     * the match's longest run for each player 
+# 
+# Full CRUD operations must be provided for win/loss results.
+# Provide a view of win/loss results for the season on a single web page, either for all players of for a particular player.
+# Provide a view of high runs with player name, run length, ordered by run length. 
+# For ease of data entry, several win/loss results may be entered at once on the same web page.
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+# date format is country-dependent
+dateFormat format=dd/mm/yyyy
+
+##################################################################
+# simple case - everything nice and rosy
+##################################################################
+# setup
+userId1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+userId2=createUser firstName=fn1 lastName=ln1 homePhone=111-1111 workPhone= cellPhone= email=fl1@a.com picture=
+userId3=createUser firstName=fn2 lastName=ln2 homePhone=222-2222 workPhone= cellPhone= email=fl2@a.com picture=
+leagueId1=createLeague name=LSCG operator=${userId1}
+joinLeague id=${userId2} leagueId=${leagueId1} initialHandicap=200
+joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
+
+# after joining league, player starts with no match results
+expect 0 getNumberOfMatches leagueId=${leagueId1}
+expect 0 getNumberOfMatches id=${userId1} leagueId=${leagueId1}
+expect 0 getNumberOfMatches id=${userId2} leagueId=${leagueId1}
+
+# enter a match result
+addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
+expect 1 getNumberOfMatches id=${userId1} leagueId=${leagueId1}
+expect 1 getNumberOfMatches id=${userId2} leagueId=${leagueId1}
+addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
+expect 2 getNumberOfMatches id=${userId1} leagueId=${leagueId1}
+expect 2 getNumberOfMatches id=${userId2} leagueId=${leagueId1}
+addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId2} loser=${userId1}
+expect 3 getNumberOfMatches id=${userId1} leagueId=${leagueId1}
+expect 3 getNumberOfMatches id=${userId2} leagueId=${leagueId1}
+
+expect 2 getNumberOfWins id=${userId1} leagueId=${leagueId1}
+expect 1 getNumberOfWins id=${userId2} leagueId=${leagueId1}
+expect 1 getNumberOfLosses id=${userId1} leagueId=${leagueId1}
+expect 2 getNumberOfLosses id=${userId2} leagueId=${leagueId1}
+
+# index starts at 1
+matchId=getMatch leagueId=${leagueId1} index=1
+expect 01/12/2007 getMatchDate matchId=${matchId}
+expect ${userId1} getMatchWinner matchId=${matchId}
+expect ${userId2} getMatchLoser matchId=${matchId}
+expect "" getMatchLength matchId=${matchId}
+expect "" getMatchScore matchId=${matchId}
+expect "" getMatchLongestRunForWinner matchId=${matchId}
+expect "" getMatchLongestRunForLoser matchId=${matchId}
+matchId=getMatch leagueId=${leagueId1} index=2
+expect 01/12/2007 getMatchDate matchId=${matchId}
+expect ${userId1} getMatchWinner matchId=${matchId}
+expect ${userId2} getMatchLoser matchId=${matchId}
+expect "" getMatchLength matchId=${matchId}
+expect "" getMatchScore matchId=${matchId}
+expect "" getMatchLongestRunForWinner matchId=${matchId}
+expect "" getMatchLongestRunForLoser matchId=${matchId}
+matchId=getMatch leagueId=${leagueId1} index=3
+expect 02/12/2007 getMatchDate matchId=${matchId}
+expect ${userId2} getMatchWinner matchId=${matchId}
+expect ${userId1} getMatchLoser matchId=${matchId}
+expect "" getMatchLength matchId=${matchId}
+expect "" getMatchScore matchId=${matchId}
+expect "" getMatchLongestRunForWinner matchId=${matchId}
+expect "" getMatchLongestRunForLoser matchId=${matchId}
+
+##################################################################
+# Adding optional info
+##################################################################
+# start again, so as not to depend on previous tests
+removeAllMatches
+# "score" is the number of balls made by losing player
+matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expect 01/12/2007 getMatchDate matchId=${matchId}
+expect ${userId1} getMatchWinner matchId=${matchId}
+expect ${userId2} getMatchLoser matchId=${matchId}
+expect 150 getMatchLength matchId=${matchId}
+expect 87 getMatchScore matchId=${matchId}
+expect 23 getMatchLongestRunForWinner matchId=${matchId}
+expect 30 getMatchLongestRunForLoser matchId=${matchId}
+
+##################################################################
+# Updating match info
+##################################################################
+matchId=getMatch leagueId=${leagueId1} index=1
+updateMatchResult matchId=${matchId} date=2/12/2007 winner=${userId2} loser=${userId1} length=120 score=86 longestRunForWinner=22 longestRunForLoser=31
+expect 02/12/2007 getMatchDate matchId=${matchId}
+expect ${userId2} getMatchWinner matchId=${matchId}
+expect ${userId1} getMatchLoser matchId=${matchId}
+expect 120 getMatchLength matchId=${matchId}
+expect 86 getMatchScore matchId=${matchId}
+expect 22 getMatchLongestRunForWinner matchId=${matchId}
+expect 31 getMatchLongestRunForLoser matchId=${matchId}
+
+##################################################################
+# Deleting matches
+##################################################################
+# start again, so as not to depend on previous tests
+removeAllMatches
+expect 0 getNumberOfMatches leagueId=${leagueId1}
+matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expect 1 getNumberOfMatches leagueId=${leagueId1}
+deleteMatch matchId=${matchId}
+expect 0 getNumberOfMatches leagueId=${leagueId1}
+
+##################################################################
+# Get match per player
+##################################################################
+# start again, so as not to depend on previous tests
+removeAllMatches
+matchId1=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2}
+matchId2=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId3}
+matchId3=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId2} loser=${userId3}
+expect ${matchId1} getMatch userId=${userId1} leagueId=${leagueId1} index=1
+expect ${matchId2} getMatch userId=${userId1} leagueId=${leagueId1} index=2
+expect ${matchId1} getMatch userId=${userId2} leagueId=${leagueId1} index=1
+expect ${matchId3} getMatch userId=${userId2} leagueId=${leagueId1} index=2
+# for following tests, remember tests are ordered by date
+expect ${matchId3} getMatch userId=${userId3} leagueId=${leagueId1} index=1
+expect ${matchId2} getMatch userId=${userId3} leagueId=${leagueId1} index=2
+
+##################################################################
+# Get info by date
+##################################################################
+expect ${matchId2} getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
+expect ${matchId2} getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
+
+##################################################################
+# Change date format
+##################################################################
+matchId=addMatchResult leagueId=${leagueId1} date=3/12/2007 winner=${userId1} loser=${userId2}
+expect 03/12/2007 getMatchDate matchId=${matchId}
+dateFormat format=mm/dd/yyyy
+expect 12/03/2007 getMatchDate matchId=${matchId}
+matchId=addMatchResult leagueId=${leagueId1} date=12/4/2007 winner=${userId1} loser=${userId2}
+expect 12/04/2007 getMatchDate matchId=${matchId}
+dateFormat format=dd/mm/yyyy
+expect 04/12/2007 getMatchDate matchId=${matchId}
+
+##################################################################
+# Testing error conditions
+##################################################################
+# --------------------------------------------
+# command: getNumberOfMatches (league)
+# syntax: getNumberOfMatches leagueId
+# --------------------------------------------
+expectError "Unknown league" getNumberOfMatches leagueId=xxx
+
+# --------------------------------------------
+# command: getNumberOfMatches (player)
+# syntax: getNumberOfMatches userId leagueId
+# --------------------------------------------
+expectError "Unknown league" getNumberOfMatches id=${userId1} leagueId=xxx
+expectError "Unknown league" getNumberOfMatches id=${userId1} leagueId=""
+expectError "Unknown league" getNumberOfMatches id=${userId1} leagueId=
+expectError "Unknown user" getNumberOfMatches id=xxx leagueId=${leagueId1}
+expectError "Unknown user" getNumberOfMatches id="" leagueId=${leagueId1}
+expectError "Unknown user" getNumberOfMatches id= leagueId=${leagueId1}
+
+# --------------------------------------------
+# command: addMatchResult (no optional info)
+# syntax: addMatchResult leagueId date winner loser
+# --------------------------------------------
+expectError "Unknown league" addMatchResult leagueId=xxx date=1/12/2007 winner=${userId1} loser=${userId2}
+expectError "Unknown league" addMatchResult leagueId="" date=1/12/2007 winner=${userId1} loser=${userId2}
+expectError "Unknown league" addMatchResult leagueId= date=1/12/2007 winner=${userId1} loser=${userId2}
+expectError "Invalid date" addMatchResult leagueId=${leagueId1} date=1/13/2007 winner=${userId1} loser=${userId2}
+expectError "Invalid date" addMatchResult leagueId=${leagueId1} date="" winner=${userId1} loser=${userId2}
+expectError "Invalid date" addMatchResult leagueId=${leagueId1} date= winner=${userId1} loser=${userId2}
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=xxx loser=${userId2}
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner="" loser=${userId2}
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner= loser=${userId2}
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=xxx
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=""
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=
+expectError "Users must be different" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId1}
+
+# --------------------------------------------
+# command: addMatchResult (optional info)
+# syntax: addMatchResult leagueId date winner loser length score longestRunForWinner longestRunForLoser
+# --------------------------------------------
+expectError "Unknown league" addMatchResult leagueId=xxx date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown league" addMatchResult leagueId="" date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown league" addMatchResult leagueId= date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid date" addMatchResult leagueId=${leagueId1} date=1/13/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid date" addMatchResult leagueId=${leagueId1} date="" winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid date" addMatchResult leagueId=${leagueId1} date= winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=xxx loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner="" loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner= loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=xxx length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser="" length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser= length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+# length >= 1
+expectError "Invalid match length" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=0 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid match length" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=-1 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid match length" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=xxx score=87 longestRunForWinner=23 longestRunForLoser=30
+# 0 <= score < length
+expectError "Invalid score" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=-1 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid score" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=xxx longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid score" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=150 longestRunForWinner=23 longestRunForLoser=30
+# 1 <= longestRunForWinner <= length
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=0 longestRunForLoser=30
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=-1 longestRunForLoser=30
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=xxx longestRunForLoser=30
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=151 longestRunForLoser=30
+# 0 <= longestRunForLoser <= score
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=-1
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=xxx
+expectError "Invalid run" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=88
+expectError "Users must be different" addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId1} length=150 score=87 longestRunForWinner=23 longestRunForLoser=87
+
+# --------------------------------------------
+# command: getNumberOfWins
+# syntax: getNumberOfWins userId leagueId
+# --------------------------------------------
+expectError "Unknown league" getNumberOfWins id=${userId1} leagueId=xxx
+expectError "Unknown league" getNumberOfWins id=${userId1} leagueId=""
+expectError "Unknown league" getNumberOfWins id=${userId1} leagueId=
+expectError "Unknown user" getNumberOfWins id=xxx leagueId=${leagueId1}
+expectError "Unknown user" getNumberOfWins id="" leagueId=${leagueId1}
+expectError "Unknown user" getNumberOfWins id= leagueId=${leagueId1}
+
+# --------------------------------------------
+# command: getNumberOfLosses
+# syntax: getNumberOfLosses userId leagueId
+# --------------------------------------------
+expectError "Unknown league" getNumberOfLosses id=${userId1} leagueId=xxx
+expectError "Unknown league" getNumberOfLosses id=${userId1} leagueId=""
+expectError "Unknown league" getNumberOfLosses id=${userId1} leagueId=
+expectError "Unknown user" getNumberOfLosses id=xxx leagueId=${leagueId1}
+expectError "Unknown user" getNumberOfLosses id="" leagueId=${leagueId1}
+expectError "Unknown user" getNumberOfLosses id= leagueId=${leagueId1}
+
+# --------------------------------------------
+# command: getMatch (league)
+# syntax: getMatch leagueId index
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown league" getMatch leagueId=xxx index=1
+expectError "Unknown league" getMatch leagueId="" index=1
+expectError "Unknown league" getMatch leagueId= index=1
+expectError "Invalid index" getMatch leagueId=${leagueId1} index=0
+expectError "Invalid index" getMatch leagueId=${leagueId1} index=2
+
+# --------------------------------------------
+# command: getMatch (player)
+# syntax: getMatch userId leagueId index
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" getMatch userId=xxx leagueId=${leagueId1} index=1
+expectError "Unknown user" getMatch userId="" leagueId=${leagueId1} index=1
+expectError "Unknown user" getMatch userId= leagueId=${leagueId1} index=1
+expectError "Unknown league" getMatch userId=${userId1} leagueId=xxx index=1
+expectError "Unknown league" getMatch userId=${userId1} leagueId="" index=1
+expectError "Unknown league" getMatch userId=${userId1} leagueId= index=1
+expectError "Invalid index" getMatch userId=${userId1} leagueId=${leagueId1} index=0
+expectError "Invalid index" getMatch userId=${userId1} leagueId=${leagueId1} index=2
+
+# --------------------------------------------
+# command: getMatchByDate (league, by date)
+# syntax: getMatchByDate leagueId startDate endDate index
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown league" getMatchByDate leagueId=xxx startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown league" getMatchByDate leagueId="" startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown league" getMatchByDate leagueId= startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate leagueId=${leagueId1} startDate=2/13/2007 endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate leagueId=${leagueId1} startDate=xxx endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate leagueId=${leagueId1} startDate= endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate=2/13/2007 index=1
+expectError "Invalid date" getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate=xxx index=1
+expectError "Invalid date" getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate= index=1
+expectError "Invalid index" getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=0
+expectError "Invalid index" getMatchByDate leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=2
+
+# --------------------------------------------
+# command: getMatchByDate (player, by date)
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" getMatchByDate userId=xxx leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown user" getMatchByDate userId="" leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown user" getMatchByDate userId= leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown league" getMatchByDate userId=${userId1} leagueId=xxx startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown league" getMatchByDate userId=${userId1} leagueId="" startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Unknown league" getMatchByDate userId=${userId1} leagueId= startDate=2/12/2007 endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/13/2007 endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=xxx endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate= endDate=2/12/2007 index=1
+expectError "Invalid date" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=2/13/2007 index=1
+expectError "Invalid date" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=xxx index=1
+expectError "Invalid date" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate= index=1
+expectError "Invalid index" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=0
+expectError "Invalid index" getMatchByDate userId=${userId1} leagueId=${leagueId1} startDate=2/12/2007 endDate=2/12/2007 index=2
+
+# --------------------------------------------
+# command: getMatchWinner
+# syntax: getMatchWinner matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" getMatchWinner matchId=xxx
+expectError "Unknown match" getMatchWinner matchId=""
+expectError "Unknown match" getMatchWinner matchId=
+
+# --------------------------------------------
+# command: getMatchLoser
+# syntax: getMatchLoser matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" getMatchLoser matchId=xxx
+expectError "Unknown match" getMatchLoser matchId=""
+expectError "Unknown match" getMatchLoser matchId=
+
+# --------------------------------------------
+# command: getMatchLength
+# syntax: getMatchLength matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" getMatchLength matchId=xxx
+expectError "Unknown match" getMatchLength matchId=""
+expectError "Unknown match" getMatchLength matchId=
+
+# --------------------------------------------
+# command: getMatchScore
+# syntax: getMatchScore matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" getMatchScore matchId=xxx
+expectError "Unknown match" getMatchScore matchId=""
+expectError "Unknown match" getMatchScore matchId=
+
+# --------------------------------------------
+# command: getMatchLongestRunForWinner
+# syntax: getMatchLongestRunForWinner matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" getMatchLongestRunForWinner matchId=xxx
+expectError "Unknown match" getMatchLongestRunForWinner matchId=""
+expectError "Unknown match" getMatchLongestRunForWinner matchId=
+
+# --------------------------------------------
+# command: getMatchLongestRunForLoser
+# syntax: getMatchLongestRunForLoser matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" getMatchLongestRunForLoser matchId=xxx
+expectError "Unknown match" getMatchLongestRunForLoser matchId=""
+expectError "Unknown match" getMatchLongestRunForLoser matchId=
+
+# --------------------------------------------
+# command: updateMatchResult
+# syntax: updateMatchResult matchId date winner loser length score longestRunForWinner longestRunForLoser
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" updateMatchResult matchId=xxx date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" updateMatchResult matchId="" date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" updateMatchResult matchId= date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid date" updateMatchResult matchId=${matchId} date=1/13/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid date" updateMatchResult matchId=${matchId} date="" winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid date" updateMatchResult matchId=${matchId} date= winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=xxx loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner="" loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner= loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=xxx length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser="" length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown user" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser= length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+# length >= 1
+expectError "Invalid match length" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=0 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid match length" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=-1 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid match length" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=xxx score=87 longestRunForWinner=23 longestRunForLoser=30
+# 0 <= score < length
+expectError "Invalid score" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=-1 longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid score" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=xxx longestRunForWinner=23 longestRunForLoser=30
+expectError "Invalid score" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=150 longestRunForWinner=23 longestRunForLoser=30
+# 1 <= longestRunForWinner <= length
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=0 longestRunForLoser=30
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=-1 longestRunForLoser=30
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=xxx longestRunForLoser=30
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=151 longestRunForLoser=30
+# 0 <= longestRunForLoser <= score
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=-1
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=xxx
+expectError "Invalid run" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=88
+expectError "Users must be different" updateMatchResult matchId=${matchId} date=1/12/2007 winner=${userId1} loser=${userId1} length=150 score=87 longestRunForWinner=23 longestRunForLoser=87
+
+# --------------------------------------------
+# command: deleteMatch
+# syntax: deleteMatch matchId
+# --------------------------------------------
+removeAllMatches
+matchId=addMatchResult leagueId=${leagueId1} date=2/12/2007 winner=${userId1} loser=${userId2} length=150 score=87 longestRunForWinner=23 longestRunForLoser=30
+expectError "Unknown match" deleteMatch matchId=xxx
+expectError "Unknown match" deleteMatch matchId=""
+expectError "Unknown match" deleteMatch matchId=
+
+# --------------------------------------------
+# command: dateFormat
+# --------------------------------------------
+expectError "Unknown date format" dateFormat format=xxx
+expectError "Unknown date format" dateFormat format=""
+expectError "Unknown date format" dateFormat format=

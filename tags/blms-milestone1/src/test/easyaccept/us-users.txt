@@ -1,0 +1,153 @@
+##################################################################
+# PLEASE REPORT ANY ERRORS IN THE TESTS TO jacques@dsc.ufcg.edu.br
+##################################################################
+# [Users] User registry maintenance
+# System users may be created. All maintenance operations (CRUD - Create/Read/Update/Delete) must be provided.
+# user attributes during creation are:
+#
+#    * First name
+#    * Last name
+#    * Home phone
+#    * Work phone
+#    * Email
+#    * A picture may be uploaded and associated with the player
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+##################################################################
+# user creation
+##################################################################
+# users should not exist
+expectError "Could not find user Sauve" findUserByLastName lastName=Sauve
+expectError "Could not find user Twain" findUserByLastName lastName=Twain
+
+# make sure we can create a couple of users
+idUser1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+idUser2=createUser firstName=Mark lastName=Twain homePhone=123-222-3333 \
+	workPhone=123-444-5555 cellPhone=123-666-7777 email=mt@a.com picture=mark-twain.jpg
+expect Jacques getUserAttribute id=${idUser1} attribute=firstName
+expect Sauve getUserAttribute id=${idUser1} attribute=lastName
+expect 111-222-3333 getUserAttribute id=${idUser1} attribute=homePhone
+expect 111-444-5555 getUserAttribute id=${idUser1} attribute=workPhone
+expect 111-666-7777 getUserAttribute id=${idUser1} attribute=cellPhone
+expect js@a.com getUserAttribute id=${idUser1} attribute=email
+expect jacques-sauve.jpg getUserAttribute id=${idUser1} attribute=picture
+
+expect Mark getUserAttribute id=${idUser2} attribute=firstName
+expect Twain getUserAttribute id=${idUser2} attribute=lastName
+expect 123-222-3333 getUserAttribute id=${idUser2} attribute=homePhone
+expect 123-444-5555 getUserAttribute id=${idUser2} attribute=workPhone
+expect 123-666-7777 getUserAttribute id=${idUser2} attribute=cellPhone
+expect mt@a.com getUserAttribute id=${idUser2} attribute=email
+expect mark-twain.jpg getUserAttribute id=${idUser2} attribute=picture
+
+##################################################################
+# rules concerning user attributes
+##################################################################
+# Rule: firstName, lastName are required
+# Rule: picture not required
+expectError "Required data: first name" createUser firstName= lastName=ln homePhone=111-222-3333 \
+	workPhone= cellPhone= email=x picture=
+expectError "Required data: first name" createUser firstName="" lastName=ln homePhone=111-222-3333 \
+	workPhone= cellPhone= email=x picture=
+expectError "Required data: last name" createUser firstName=fn lastName= homePhone=111-222-3333 \
+	workPhone= cellPhone= email=x picture=
+expectError "Required data: last name" createUser firstName=fn lastName="" homePhone=111-222-3333 \
+	workPhone= cellPhone= email=x picture=
+expectError "Required data: first name, last name" createUser firstName= lastName= homePhone=111-222-3333 \
+	workPhone= cellPhone= email=x picture=
+expectError "Required data: first name, last name, email" createUser firstName= lastName= homePhone=111-222-3333 \
+	workPhone= cellPhone= email= picture=
+
+# Rule: must have at least one way to contact user (by phone or email)
+expectError "Need at least one phone" createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone= email=fl1@a.com picture=
+idUser3=createUser firstName=fn lastName=ln homePhone=111-222-3333 workPhone= cellPhone= email=fl2@a.com picture=
+idUser4=createUser firstName=fn lastName=ln homePhone= workPhone=111-222-3333 cellPhone= email=fl3@a.com picture=
+idUser5=createUser firstName=fn lastName=ln homePhone= workPhone= cellPhone=111-222-3333 email=f4@a.com picture=
+
+# Rule: No user data is unique except email
+expectError "User with this email exists" createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+idUser7=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js1@a.com picture=jacques-sauve.jpg
+expectDifferent ${idUser1} echo ${idUser7}
+
+##################################################################
+# Changing user attributes
+##################################################################
+# check errors
+expectError "Must provide an attribute to be changed" changeUserAttribute id=${idUser2} attribute= value=Jumping
+expectError "Must provide an attribute to be changed" changeUserAttribute id=${idUser2} attribute="" value=Jumping
+expectError "Unknown user attribute" changeUserAttribute id=${idUser2} attribute=xxx value=Jumping
+
+# normal change
+changeUserAttribute id=${idUser2} attribute=firstName value=Jumping
+changeUserAttribute id=${idUser2} attribute=lastName value=Frog
+changeUserAttribute id=${idUser2} attribute=homePhone value=1
+changeUserAttribute id=${idUser2} attribute=workPhone value=2
+changeUserAttribute id=${idUser2} attribute=cellPhone value=3
+changeUserAttribute id=${idUser2} attribute=email value=jf@a.com
+changeUserAttribute id=${idUser2} attribute=picture value=jumping-frog.jpg
+
+expect Jumping getUserAttribute id=${idUser2} attribute=firstName
+expect Frog getUserAttribute id=${idUser2} attribute=lastName
+expect 1 getUserAttribute id=${idUser2} attribute=homePhone
+expect 2 getUserAttribute id=${idUser2} attribute=workPhone
+expect 3 getUserAttribute id=${idUser2} attribute=cellPhone
+expect jf@a.com getUserAttribute id=${idUser2} attribute=email
+expect jumping-frog.jpg getUserAttribute id=${idUser2} attribute=picture
+
+# Check some rules again ...
+# Rule: firstName, lastName are required
+expectError "Required data: first name" changeUserAttribute id=${idUser2} attribute=firstName value=
+expectError "Required data: first name" changeUserAttribute id=${idUser2} attribute=firstName value=""
+expectError "Required data: last name" changeUserAttribute id=${idUser2} attribute=lastName value=
+expectError "Required data: last name" changeUserAttribute id=${idUser2} attribute=lastName value=""
+expectError "Required data: email" changeUserAttribute id=${idUser2} attribute=email value=""
+expectError "Required data: email" changeUserAttribute id=${idUser2} attribute=email value=""
+
+# Rule: picture not required
+changeUserAttribute id=${idUser2} attribute=picture value=
+changeUserAttribute id=${idUser2} attribute=picture value=""
+changeUserAttribute id=${idUser2} attribute=picture value=jumping-frog.jpg
+
+# Rule: must have at least one way to contact user by phone
+changeUserAttribute id=${idUser2} attribute=homePhone value=
+changeUserAttribute id=${idUser2} attribute=workPhone value=
+expectError "Need at least one phone" changeUserAttribute id=${idUser2} attribute=cellPhone value=
+
+# Rule: No user data is unique except email
+expectError "User with this email exists" changeUserAttribute id=${idUser2} attribute=email value=js@a.com
+changeUserAttribute id=${idUser1} attribute=email value=js@a.com
+
+##################################################################
+# User deletion
+##################################################################
+expect "[Sauve, Sauve]" findUserByLastName lastName=Sauve
+deleteUser id=${idUser7}
+expect "[Sauve]" findUserByLastName lastName=Sauve
+deleteUser id=${idUser1}
+expectError "Could not find user Sauve" findUserByLastName lastName=Sauve
+
+##################################################################
+# Finding users
+##################################################################
+# Twain is now "The Jumping Frog of Calaveras County"
+expectError "Could not find user Twain" findUserByLastName lastName=Twain
+expect [Frog] findUserByLastName lastName=Frog
+# case insensitive
+expect [Frog] findUserByLastName lastName=frog
+# can find user with regular expression
+expect [Frog] findUserByLastName lastName=f[a-z]+g
+expectError "Could not find user f[0-9]*g" findUserByLastName lastName=f[0-9]*g
