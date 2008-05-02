@@ -1,4 +1,7 @@
 Billiards League Management System (BLMS)
+by Rodrigo Rocha
+   Dalton Cézane
+   Diego Santos
 -----------------------------------------
 How to Install and Run
 
@@ -23,8 +26,12 @@ How to Install and Run
 
   cd ..
   cd blms-web
-  ant run-deploy
+  ant deploy
 
 
 5. Open http://YOUR_TOMCAT_SERVER/blms-web
+
+To undeploy BLMS-web, just run 
+
+  ant undeploy
 

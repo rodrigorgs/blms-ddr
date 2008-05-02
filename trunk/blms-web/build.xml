@@ -5,6 +5,9 @@
 <project name="blms4" default="default" basedir=".">
     <description>Builds, tests, and runs the project blms4.</description>
     <import file="nbproject/build-impl.xml"/>
+
+	<target name="deploy" depends="init,compile,compile-jsps,-do-compile-single-jsp,-pre-dist,-do-tmp-dist-with-manifest,-do-tmp-dist-without-manifest,-pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,-post-run-deploy"/>
+	<target name="undeploy" depends="run-undeploy"/>
     <!--
 
     There exist several targets which are by default empty and which can be 
