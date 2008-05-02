@@ -26,12 +26,10 @@ How to Install and Run
 
   cd ..
   cd blms-web
-  ant deploy
+  ant deploy -lib /opt/apache-tomcat-6.0.16/lib -Dtomcat.home=/opt/apache-tomcat-6.0.16 -Dtomcat.url="http://localhost:8080/" -Dtomcat.username=tomcat -Dtomcat.password=s3cret
 
+The parameters may be different.
 
-5. Open http://YOUR_TOMCAT_SERVER/blms-web
-
-To undeploy BLMS-web, just run 
-
-  ant undeploy
+5. Open http://localhost:8080/blms-web
+(Replace localhost:8080 by the URL of your Tomcat server)
 
