@@ -26,9 +26,9 @@ Go to the blms folder (from the core application). Run the command
 
 This command will create a file name blms.jar. Copy it to blms-web/jars.
 
-Run the command
+Run the command (adjust the parameters)
 
-  ant run-deploy
+  ant deploy -lib /opt/apache-tomcat-6.0.16/lib -Dtomcat.home=/opt/apache-tomcat-6.0.16 -Dtomcat.url="http://localhost:8080/" -Dtomcat.username=tomcat -Dtomcat.password=s3cret
 
 (Please ignore the message BUILD FAILED).
 The web application will be deployed at /blms-web
@@ -38,11 +38,4 @@ The web application will be deployed at /blms-web
 Open a web browse and enter the following address:
 
 http://localhost:8080/blms-web/
-
-== Uninstalling ==
-
-Run the command
-
-  ant run-undeploy
-
 
