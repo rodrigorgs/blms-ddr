@@ -30,9 +30,6 @@ Run the command (adjust the parameters)
 
   ant deploy -lib /opt/apache-tomcat-6.0.16/lib -Dtomcat.home=/opt/apache-tomcat-6.0.16 -Dtomcat.url="http://localhost:8080/" -Dtomcat.username=tomcat -Dtomcat.password=s3cret
 
-(Please ignore the message BUILD FAILED).
-The web application will be deployed at /blms-web
-
 == Running ==
 
 Open a web browse and enter the following address:
