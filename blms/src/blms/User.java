@@ -383,7 +383,10 @@ public class User {
 		return handicap.intValue();
 	}
 
-	public void setHandicap(League league, int handicap) {
+	public void setHandicap(League league, int handicap) throws BlmsException {
+		if(handicap < 0) {
+			throw new BlmsException("Handicap must not be negative");
+		}
 		handicaps.put(league, new Integer(handicap));
 	}
 
