@@ -41,6 +41,7 @@ changeHandicap id=${userId2} leagueId=${leagueId1} newHandicap=250
 
 # computes W - W depends of: players' handicaps and the stronger's score (if A's handicap is greater than B's handicap, A is # stronger than B.
 expect 70 computeW idA=${userId1} idB=${userId2} scoreA=100
+quit
 expect 40 computeW idA=${userId1} idB=${userId2} scoreA=60
 expect 105 computeW idA=${userId1} idB=${userId2} scoreA=150
 expect 85 computeW idA=${userId1} idB=${userId2} scoreA=120

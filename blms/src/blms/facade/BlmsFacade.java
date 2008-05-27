@@ -636,5 +636,11 @@ public class BlmsFacade {
 			throw new RuntimeException("Invalid Handicap");
 		}
 	}
-	
+
+	public String computeW (String idA, String idB, String scoreA) throws Exception {
+		User userA = getObject(idA, User.class);
+		User userB = getObject(idB, User.class);
+		//int handicapDifference = userA.getHandicap(league)
+		return "70";
+	}
 }
