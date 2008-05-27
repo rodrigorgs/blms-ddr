@@ -2,7 +2,9 @@ package blms;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.cheffo.jeplite.JEP;
 
@@ -20,7 +22,8 @@ public class User {
 	String firstName, lastName, homePhone, workPhone, cellPhone, email;
 	String picture;
 	Collection<Match> matches;
-
+	Map<League, Integer> handicaps;
+	
 	/**
 	 * Creates a user with the given parameters. At least one phone number
 	 * must be provided. The parameters firstName, lastName and email are
@@ -48,6 +51,7 @@ public class User {
 		this.cellPhone = cellPhone;
 		this.email = email;
 		this.picture = picture;
+		this.handicaps = new HashMap<League, Integer>();
 	}
 
 	/**
@@ -64,6 +68,37 @@ public class User {
 	 */
 	void addMatch(Match m) {
 		matches.add(m);
+		League league = m.getLeague();
+		String handicapExpression = league.getHandicapExpression();
+		double win = 0.0;
+		double loss = 0.0;
+		if(m.getWinner() == this) {
+					win += 1.0;
+		} else if(m.getLoser() == this) {
+			loss += 1.0;
+		} else {
+			throw new RuntimeException("Implementation error in User.addMatch()");
+		}
+		JEP jep = new JEP();
+		jep.addVariable("win", (double) win);
+		jep.addVariable("loss", (double) loss);
+		jep.parseExpression(handicapExpression);
+		
+		double handicapDifference;
+		try {
+			handicapDifference = jep.getValue();
+		} catch (Throwable e) {
+			throw new RuntimeException("Exception in Java Expression Parser.");
+		}
+		if (Double.isInfinite(handicapDifference))
+			throw new RuntimeException("Division by zero in standings expression");
+		int previousHandicap = handicaps.remove(league);
+		int newHandicap = (int)(previousHandicap + handicapDifference);
+		//Avoiding negative handicaps
+		if(newHandicap < 0) {
+			newHandicap = 0;
+		}
+		handicaps.put(league, new Integer(newHandicap));
 	}
 	
 	/**
@@ -342,4 +377,18 @@ public class User {
 			return list.toArray(new String[] {});
 		}
 	}
+
+	public int getHandicap(League league) {
+		Integer handicap = handicaps.get(league);
+		return handicap.intValue();
+	}
+
+	public void setHandicap(League league, int handicap) {
+		handicaps.put(league, new Integer(handicap));
+	}
+
+	public void removeHandicap(League league) {
+		this.handicaps.remove(league);
+	}
+
 }

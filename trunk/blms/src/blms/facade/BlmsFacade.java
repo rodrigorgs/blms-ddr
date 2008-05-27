@@ -115,6 +115,10 @@ public class BlmsFacade {
 		String x = "" + Match.UNDEFINED;
 		return addMatchResult(leagueId, date, winner, loser, x, x, x, x);
 	}
+	
+	public String addMatchResultToday (String leagueId, String winner, String loser) throws Throwable {
+		return addMatchResult(leagueId, todaysDate(), winner, loser);
+	}
 
 	public String addMatchResult(String leagueId, String date, String winner,
 			String loser, String length, String score,
@@ -513,6 +517,7 @@ public class BlmsFacade {
 		User user = (User) registry.getObject(idUser);
 		League league = (League) registry.getObject(idLeague);
 		registry.userJoinLeague(user, league, initialHandicap);
+		
 	}
 
 	// from us-join.txt:972,1036,1038,1040,1042
@@ -605,4 +610,23 @@ public class BlmsFacade {
 		changeLeagueAttribute(leagueID, "name", name);
 		changeLeagueAttribute(leagueID, "operator", operator);
 	}
+	
+	public void defineHandicapExpression (String leagueId, String expression) throws Exception {
+		League league = getObject(leagueId, League.class);
+		// try {
+		league.setHandicapExpression(expression);
+	}
+	
+	public String getPlayerHandicap (String id, String leagueId) throws Exception {
+		User user = getObject(id, User.class);
+		League league = getObject(leagueId, League.class);
+		return "" + (int) user.getHandicap(league);
+	}
+	
+	public void changeHandicap(String userId, String leagueId, String newHandicap) throws Exception {
+		User user = getObject(userId, User.class);
+		League league = getObject(leagueId, League.class);
+		user.setHandicap(league, Integer.parseInt(newHandicap));
+	}
+	
 }

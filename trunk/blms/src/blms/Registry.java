@@ -185,6 +185,7 @@ public class Registry {
 			if ((j.league).equals(league))
 				auxJoins.add(j);
 		}
+		league.operator.removeHandicap(league);
 		store.joins.removeAll(auxJoins);
 		updateDb();
 	}
@@ -209,6 +210,7 @@ public class Registry {
 		if (store.leagues.contains(league))
 			throw new BlmsException("This league already exists");
 		Join join = new Join(operator, league, 0);
+		operator.setHandicap(league, 0);
 		store.leagues.add(league);
 		store.joins.add(join);
 		updateDb();
@@ -291,6 +293,7 @@ public class Registry {
 		Join existentJoin = findJoin(user, league);
 		if (existentJoin == null) {
 			Join join = new Join(user, league, handicap);
+			user.setHandicap(league, handicap);
 			store.joins.add(join);
 			updateDb();
 		} else
@@ -320,6 +323,7 @@ public class Registry {
 		Join join = findJoin(user, league);
 		if (join != null) {
 			store.joins.remove(join);
+			user.removeHandicap(league);
 		} else
 			throw new BlmsException("User/league is null");
 		store.leagues.remove(league);

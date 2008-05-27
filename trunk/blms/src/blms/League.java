@@ -25,6 +25,7 @@ public class League implements Comparable<League> {
 	Date creationDate;
 	Vector<Match> matches;
 	String standingsExpression;
+	String handicapExpression;
 
 	/**
 	 * Creates a league with the given name and the given operator. The creation
@@ -42,6 +43,7 @@ public class League implements Comparable<League> {
 		setName(name);
 		setOperator(operator);
 		this.creationDate = new Date();
+		this.handicapExpression = "0";
 	}
 
 	/**
@@ -184,5 +186,35 @@ public class League implements Comparable<League> {
 	 */
 	public String getStandingsExpression() {
 		return standingsExpression;
+	}
+
+	public void setHandicapExpression(String expression) {
+		Pattern regex = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)");
+		Matcher m = regex.matcher(expression);
+		while (m.find()) {
+			String s = m.group();
+			if (!s.equals("win") && !s.equals("loss"))
+				throw new RuntimeException(
+						"Unknown variable in handicap expression");
+		}
+		JEP jep = new JEP();
+		jep.addVariable("win", 0.0);
+		jep.addVariable("loss", 0.0);
+		jep.parseExpression(expression);
+		try {
+			jep.getValue();
+		} catch (Throwable e) {
+			throw new RuntimeException("Syntax error in handicap expression");
+		}
+
+		handicapExpression = expression;
+	}
+
+	/**
+	 * 
+	 * @return the handicap expression
+	 */
+	public String getHandicapExpression() {
+		return handicapExpression;
 	}
 }
