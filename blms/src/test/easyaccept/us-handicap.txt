@@ -1,0 +1,135 @@
+##################################################################
+# Whenever a player is created, an initial handicap is stored.
+# A handicap changes as a function of 2 events:
+# 
+#     * A manual change (done by the league operator, but only when the [Security] US is working)
+#     * After every match, according to an expression
+# 
+# The change in handicap is calculated according to an expression that can be edited.
+# It is based on wins and losses and applies to every match.
+# Example: change in handicap = 3 * (win - loss))
+# where win is 1 if a player won a match and 0 otherwise and loss is 1 if a player lost a match and 0 otherwise.
+# A history of all handicap changes must be maintained (who entered the info, date, other relevant data)
+# A handicap page shows current handicap for all players.
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+# date format is country-dependent
+dateFormat format=dd/mm/yyyy
+
+##################################################################
+# setup
+##################################################################
+
+# user creation
+userId1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+userId2=createUser firstName=fn1 lastName=ln1 homePhone=111-222-3334 workPhone= cellPhone= email=fl1@a.com picture=
+userId3=createUser firstName=fn2 lastName=ln2 homePhone=111-222-3335 workPhone= cellPhone= email=fl2@a.com picture=
+
+# league creation
+leagueId1=createLeague name=LSCG operator=${userId1}
+
+# other users join league
+joinLeague id=${userId2} leagueId=${leagueId1} initialHandicap=200
+joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
+
+# define expression for handicap.
+defineHandicapExpression leagueId=${leagueId1} expression="3 * (win - loss)"
+
+
+# enter a match result
+expect 0 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 200 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+expect 200 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+matchId1=addMatchResultToday leagueId=${leagueId1} winner=${userId2} loser=${userId3}
+expect 203 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+expect 197 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+matchId2=addMatchResultToday leagueId=${leagueId1} winner=${userId2} loser=${userId3}
+expect 206 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+expect 194 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+matchId3=addMatchResultToday leagueId=${leagueId1} winner=${userId3} loser=${userId2}
+expect 203 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+expect 197 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+
+# handicap must not be negative
+
+matchId4=addMatchResultToday leagueId=${leagueId1} winner=${userId2} loser=${userId1}
+expect 0 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 206 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+matchId5=addMatchResultToday leagueId=${leagueId1} winner=${userId1} loser=${userId2}
+expect 3 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 203 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+matchId6=addMatchResultToday leagueId=${leagueId1} winner=${userId1} loser=${userId2}
+expect 6 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 200 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+
+# updates users' handicaps manually
+changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=300
+expect 300 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+matchId7=addMatchResultToday leagueId=${leagueId1} winner=${userId3} loser=${userId1}
+expect 297 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 200 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+
+# updates expression for handicaps. Previous handicaps are kept.
+defineHandicapExpression leagueId=${leagueId1} expression="5 * win - 2 * loss"
+expect 297 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 200 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+expect 200 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+matchId8=addMatchResultToday leagueId=${leagueId1} winner=${userId3} loser=${userId1}
+expect 295 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 205 getPlayerHandicap id=${userId3} leagueId=${leagueId1}
+matchId9=addMatchResultToday leagueId=${leagueId1} winner=${userId1} loser=${userId2}
+expect 300 getPlayerHandicap id=${userId1} leagueId=${leagueId1}
+expect 198 getPlayerHandicap id=${userId2} leagueId=${leagueId1}
+
+##############################################################
+# test error conditions
+##############################################################
+# --------------------------------------------
+# command: defineHandicapExpression
+# syntax: defineHandicapExpression leagueId expression
+# --------------------------------------------
+expectError "Syntax error in handicap expression" defineHandicapExpression leagueId=${leagueId1} expression="4*"
+expectError "Syntax error in handicap expression" defineHandicapExpression leagueId=${leagueId1} expression="*4"
+expectError "Syntax error in handicap expression" defineHandicapExpression leagueId=${leagueId1} expression="4*(2+win"
+expectError "Syntax error in handicap expression" defineHandicapExpression leagueId=${leagueId1} expression="4*2+win)"
+expectError "Syntax error in handicap expression" defineHandicapExpression leagueId=${leagueId1} expression="4*((2+loss"
+expectError "Unknown variable in handicap expression" defineHandicapExpression leagueId=${leagueId1} expression="xxx"
+
+# --------------------------------------------
+# command: getPlayerHandicap
+# syntax: getPlayerHandicap userId leagueId
+# --------------------------------------------
+expectError "Unknown league" getPlayerHandicap id=${userId1} leagueId=xxx
+expectError "Unknown league" getPlayerHandicap id=${userId1} leagueId=""
+expectError "Unknown league" getPlayerHandicap id=${userId1} leagueId=
+expectError "Unknown user" getPlayerHandicap id=xxx leagueId=${leagueId1}
+expectError "Unknown user" getPlayerHandicap id="" leagueId=${leagueId1}
+expectError "Unknown user" getPlayerHandicap id= leagueId=${leagueId1}
+
+# --------------------------------------------
+# command: changeHandicap
+# syntax: changeHandicap id leagueId newHandicap
+# --------------------------------------------
+expectError "Unknown league" changeHandicap id=${userId1} leagueId=xxx newHandicap=200
+expectError "Unknown league" changeHandicap id=${userId1} leagueId="" newHandicap=200
+expectError "Unknown league" changeHandicap id=${userId1} leagueId= newHandicap=200
+expectError "Unknown user" changeHandicap id=xxx leagueId=${leagueId1} newHandicap=200
+quit
+expectError "Unknown user" changeHandicap id="" leagueId=${leagueId1} newHandicap=200
+expectError "Unknown user" changeHandicap id= leagueId=${leagueId1} newHandicap=200
+expectError "Invalid Handicap" changeHandicap id= leagueId=${leagueId1} newHandicap=
+expectError "Invalid Handicap" changeHandicap id= leagueId=${leagueId1} newHandicap=""
+expectError "Invalid Handicap" changeHandicap id= leagueId=${leagueId1} newHandicap="xxx"
+expectError "Handicap must not be negative" changeHandicap id= leagueId=${leagueId1} newHandicap="-10"
