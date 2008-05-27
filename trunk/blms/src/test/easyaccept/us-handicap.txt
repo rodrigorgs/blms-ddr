@@ -126,10 +126,9 @@ expectError "Unknown league" changeHandicap id=${userId1} leagueId=xxx newHandic
 expectError "Unknown league" changeHandicap id=${userId1} leagueId="" newHandicap=200
 expectError "Unknown league" changeHandicap id=${userId1} leagueId= newHandicap=200
 expectError "Unknown user" changeHandicap id=xxx leagueId=${leagueId1} newHandicap=200
-quit
 expectError "Unknown user" changeHandicap id="" leagueId=${leagueId1} newHandicap=200
 expectError "Unknown user" changeHandicap id= leagueId=${leagueId1} newHandicap=200
-expectError "Invalid Handicap" changeHandicap id= leagueId=${leagueId1} newHandicap=
-expectError "Invalid Handicap" changeHandicap id= leagueId=${leagueId1} newHandicap=""
-expectError "Invalid Handicap" changeHandicap id= leagueId=${leagueId1} newHandicap="xxx"
-expectError "Handicap must not be negative" changeHandicap id= leagueId=${leagueId1} newHandicap="-10"
+expectError "Invalid Handicap" changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=
+expectError "Invalid Handicap" changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=""
+expectError "Invalid Handicap" changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap="xxx"
+expectError "Handicap must not be negative" changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap="-10"

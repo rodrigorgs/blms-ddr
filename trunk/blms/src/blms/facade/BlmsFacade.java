@@ -626,7 +626,15 @@ public class BlmsFacade {
 	public void changeHandicap(String userId, String leagueId, String newHandicap) throws Exception {
 		User user = getObject(userId, User.class);
 		League league = getObject(leagueId, League.class);
-		user.setHandicap(league, Integer.parseInt(newHandicap));
+		try {
+			int handicap = Integer.parseInt(newHandicap);
+			user.setHandicap(league, handicap);
+		} catch (BlmsException e) {
+			throw new RuntimeException(e.getMessage());
+		} 
+		catch (Throwable e) {
+			throw new RuntimeException("Invalid Handicap");
+		}
 	}
 	
 }
