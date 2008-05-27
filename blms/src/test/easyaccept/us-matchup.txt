@@ -1,0 +1,75 @@
+##################################################################
+# This user story applies specifically to straight pool.
+# If a player with handicap H1 plays a player with handicap H2 (with H1 >= H2), and if the stronger player must make S points # to win then the weaker player must make W points to win a match. A web page must allow players to input values for H1, H2 # and S to find the value of W. Alternatively, the player names can be given and their current handicap will be used. The # value of W is found from these tables: . 
+##################################################################
+
+##################################################################
+# initialize
+##################################################################
+
+# Make sure the tests run on a test database, not the real thing
+useDatabase databaseName=test
+
+# start fresh
+removeAllMatches
+removeAllLeagues
+removeAllUsers
+
+# date format is country-dependent
+dateFormat format=dd/mm/yyyy
+
+##################################################################
+# setup
+##################################################################
+
+# user creation
+userId1=createUser firstName=Jacques lastName=Sauve homePhone=111-222-3333 \
+	workPhone=111-444-5555 cellPhone=111-666-7777 email=js@a.com picture=jacques-sauve.jpg
+userId2=createUser firstName=fn1 lastName=ln1 homePhone=111-222-3334 workPhone= cellPhone= email=fl1@a.com picture=
+userId3=createUser firstName=fn2 lastName=ln2 homePhone=111-222-3335 workPhone= cellPhone= email=fl2@a.com picture=
+
+# league creation
+leagueId1=createLeague name=LSCG operator=${userId1}
+
+# other users join league
+joinLeague id=${userId2} leagueId=${leagueId1} initialHandicap=200
+joinLeague id=${userId3} leagueId=${leagueId1} initialHandicap=200
+
+# changes handicaps
+changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=300
+changeHandicap id=${userId2} leagueId=${leagueId1} newHandicap=250
+
+# computes W - W depends of: players' handicaps and the stronger's score (if A's handicap is greater than B's handicap, A is # stronger than B.
+expect 70 computeW idA=${userId1} idB=${userId2} scoreA=100
+expect 40 computeW idA=${userId1} idB=${userId2} scoreA=60
+expect 105 computeW idA=${userId1} idB=${userId2} scoreA=150
+expect 85 computeW idA=${userId1} idB=${userId2} scoreA=120
+
+# changes handicaps
+changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=150
+changeHandicap id=${userId3} leagueId=${leagueId1} newHandicap=300
+
+# computes W 
+expect 35 computeW idA=${userId3} idB=${userId1} scoreA=100
+expect 20 computeW idA=${userId3} idB=${userId1} scoreA=60
+expect 55 computeW idA=${userId3} idB=${userId1} scoreA=150
+expect 40 computeW idA=${userId3} idB=${userId1} scoreA=120
+expect 30 computeW idA=${userId3} idB=${userId1} scoreA=90
+expect 25 computeW idA=${userId3} idB=${userId1} scoreA=70
+
+
+##############################################################
+# test error conditions
+##############################################################
+# --------------------------------------------
+# command: computeW
+# syntax: computeW userId1 userId2 scoreUser1 (since user 1 has the greater handicap)
+# --------------------------------------------
+expectError "Unknown user" computeW idA=${userId4} idB=${userId1} scoreA=100
+expectError "Unknown user" computeW idA=${userId3} idB=${userId4} scoreA=100
+expectError "Invalid Score" computeW idA=${userId3} idB=${userId1} scoreA=-5
+expectError "Invalid Score - the score must be one of the following values 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150" computeW idA=${userId3} idB=${userId2} scoreA=300
+expectError "Required: Score" computeW idA=${userId3} idB=${userId1} scoreA=
+expectError "Required: user 1" computeW idA= idB=${userId1} scoreA=200
+expectError "Required: user 2" computeW idA=${userId3} idB= scoreA=150
+
