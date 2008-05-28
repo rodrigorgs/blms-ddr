@@ -13,6 +13,8 @@ import blms.Match;
 import blms.Registry;
 import blms.User;
 import blms.exceptions.BlmsException;
+import blms.matchup.CrownBMatchupTable;
+import blms.matchup.IMatchupTable;
 import blms.util.Util;
 
 /**
@@ -637,10 +639,21 @@ public class BlmsFacade {
 		}
 	}
 
-	public String computeW (String idA, String idB, String scoreA) throws Exception {
+	public int computeW (String idA, String idB, String scoreA, String leagueId) throws Exception {
+		if(scoreA == null || scoreA.equals("")) {
+			throw new RuntimeException("Required: Score");
+		}
+		if(idA == null || idA.equals("")) {
+			throw new RuntimeException("Required: user A");
+		}
+		if(idB == null || idB.equals("")) {
+			throw new RuntimeException("Required: user B");
+		}
 		User userA = getObject(idA, User.class);
 		User userB = getObject(idB, User.class);
-		//int handicapDifference = userA.getHandicap(league)
-		return "70";
+		League league = getObject(leagueId, League.class);
+		int handicapDifference = userA.getHandicap(league) - userB.getHandicap(league);
+		IMatchupTable matchupTable = CrownBMatchupTable.getInstance();
+		return matchupTable.getW(handicapDifference, Integer.parseInt(scoreA));
 	}
 }

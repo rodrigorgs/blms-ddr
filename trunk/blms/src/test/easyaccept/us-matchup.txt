@@ -40,23 +40,22 @@ changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=300
 changeHandicap id=${userId2} leagueId=${leagueId1} newHandicap=250
 
 # computes W - W depends of: players' handicaps and the stronger's score (if A's handicap is greater than B's handicap, A is # stronger than B.
-expect 70 computeW idA=${userId1} idB=${userId2} scoreA=100
-quit
-expect 40 computeW idA=${userId1} idB=${userId2} scoreA=60
-expect 105 computeW idA=${userId1} idB=${userId2} scoreA=150
-expect 85 computeW idA=${userId1} idB=${userId2} scoreA=120
+expect 70 computeW idA=${userId1} idB=${userId2} scoreA=100 leagueId=${leagueId1} 
+expect 40 computeW idA=${userId1} idB=${userId2} scoreA=60 leagueId=${leagueId1}
+expect 105 computeW idA=${userId1} idB=${userId2} scoreA=150 leagueId=${leagueId1}
+expect 85 computeW idA=${userId1} idB=${userId2} scoreA=120 leagueId=${leagueId1}
 
 # changes handicaps
 changeHandicap id=${userId1} leagueId=${leagueId1} newHandicap=150
 changeHandicap id=${userId3} leagueId=${leagueId1} newHandicap=300
 
 # computes W 
-expect 35 computeW idA=${userId3} idB=${userId1} scoreA=100
-expect 20 computeW idA=${userId3} idB=${userId1} scoreA=60
-expect 55 computeW idA=${userId3} idB=${userId1} scoreA=150
-expect 40 computeW idA=${userId3} idB=${userId1} scoreA=120
-expect 30 computeW idA=${userId3} idB=${userId1} scoreA=90
-expect 25 computeW idA=${userId3} idB=${userId1} scoreA=70
+expect 35 computeW idA=${userId3} idB=${userId1} scoreA=100 leagueId=${leagueId1}
+expect 20 computeW idA=${userId3} idB=${userId1} scoreA=60 leagueId=${leagueId1}
+expect 55 computeW idA=${userId3} idB=${userId1} scoreA=150 leagueId=${leagueId1}
+expect 40 computeW idA=${userId3} idB=${userId1} scoreA=120 leagueId=${leagueId1}
+expect 30 computeW idA=${userId3} idB=${userId1} scoreA=90 leagueId=${leagueId1}
+expect 25 computeW idA=${userId3} idB=${userId1} scoreA=70 leagueId=${leagueId1}
 
 
 ##############################################################
@@ -66,11 +65,13 @@ expect 25 computeW idA=${userId3} idB=${userId1} scoreA=70
 # command: computeW
 # syntax: computeW userId1 userId2 scoreUser1 (since user 1 has the greater handicap)
 # --------------------------------------------
-expectError "Unknown user" computeW idA=${userId4} idB=${userId1} scoreA=100
-expectError "Unknown user" computeW idA=${userId3} idB=${userId4} scoreA=100
-expectError "Invalid Score" computeW idA=${userId3} idB=${userId1} scoreA=-5
-expectError "Invalid Score - the score must be one of the following values 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150" computeW idA=${userId3} idB=${userId2} scoreA=300
-expectError "Required: Score" computeW idA=${userId3} idB=${userId1} scoreA=
-expectError "Required: user 1" computeW idA= idB=${userId1} scoreA=200
-expectError "Required: user 2" computeW idA=${userId3} idB= scoreA=150
+expectError "Unknown user" computeW idA="xxx" idB=${userId1} scoreA=100 leagueId=${leagueId1}
+expectError "Unknown user" computeW idA=${userId3} idB="xxx" scoreA=100 leagueId=${leagueId1}
+expectError "Invalid Score" computeW idA=${userId3} idB=${userId1} scoreA=-5 leagueId=${leagueId1}
+expectError "Invalid Score - the score must be one of the following values 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150" computeW idA=${userId3} idB=${userId2} scoreA=300 leagueId=${leagueId1}
+expectError "Required: Score" computeW idA=${userId3} idB=${userId1} scoreA= leagueId=${leagueId1}
+expectError "Required: user A" computeW idA= idB=${userId1} scoreA=200 leagueId=${leagueId1}
+expectError "Required: user A" computeW idA="" idB=${userId1} scoreA=200 leagueId=${leagueId1}
+expectError "Required: user B" computeW idA=${userId3} idB= scoreA=150 leagueId=${leagueId1}
+expectError "Required: user B" computeW idA=${userId3} idB="" scoreA=150 leagueId=${leagueId1}
 
