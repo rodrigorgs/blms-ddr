@@ -203,6 +203,25 @@ public class CrownBMatchupTable implements IMatchupTable {
 		table140.addRange(45,52,100);
 		table140.addRange(53,59,95);
 		table140.addRange(60,67,90);
+		table140.addRange(68,76,85);
+		table140.addRange(77,85,80);
+		table140.addRange(86,94,75);
+		table140.addRange(95,105,70);
+		table140.addRange(106,116,65);
+		table140.addRange(117,128,60);
+		table140.addRange(129,141,55);
+		table140.addRange(142,155,50);
+		table140.addRange(156,171,45);
+		table140.addRange(172,190,40);
+		table140.addRange(191,210,35);
+		table140.addRange(211,234,30);
+		table140.addRange(235,263,25);
+		table140.addRange(264,300,20);
+		table140.addRange(301,348,15);
+		table140.addRange(349,422,10);
+		subTables.add(table140);
+		
+		
 		
 	}
 
