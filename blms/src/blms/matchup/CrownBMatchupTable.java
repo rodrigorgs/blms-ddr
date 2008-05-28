@@ -221,7 +221,37 @@ public class CrownBMatchupTable implements IMatchupTable {
 		table140.addRange(349,422,10);
 		subTables.add(table140);
 		
-		
+		SubTable table150 = new SubTable(150);
+		table150.addRange(0,2,150);
+		table150.addRange(3,7,145);
+		table150.addRange(8,12,140);
+		table150.addRange(13,17,135);
+		table150.addRange(18,23,130);
+		table150.addRange(24,29,125);
+		table150.addRange(30,35,120);
+		table150.addRange(36,41,115);
+		table150.addRange(42,48,110);
+		table150.addRange(49,54,105);
+		table150.addRange(55,62,100);
+		table150.addRange(63,69,95);
+		table150.addRange(70,77,90);
+		table150.addRange(78,86,85);
+		table150.addRange(87,95,80);
+		table150.addRange(96,104,75);
+		table150.addRange(105,117,70);
+		table150.addRange(116,126,65);
+		table150.addRange(127,138,60);
+		table150.addRange(139,151,55);
+		table150.addRange(152,165,50);
+		table150.addRange(166,181,45);
+		table150.addRange(182,200,40);
+		table150.addRange(201,220,35);
+		table150.addRange(221,244,30);
+		table150.addRange(245,273,25);
+		table150.addRange(274,309,20);
+		table150.addRange(310,358,15);
+		table150.addRange(359,432,10);
+		subTables.add(table150);
 		
 	}
 
@@ -231,18 +261,23 @@ public class CrownBMatchupTable implements IMatchupTable {
 
 	@Override
 	public int getW(int handicapDifference, int winnerScore) {
+		
+		if(winnerScore <= 0) {
+			throw new RuntimeException("Invalid Score");
+		}
 		for (SubTable subtable : subTables) {
 			if(subtable.winnerScore == winnerScore) {
 				for(Range range : subtable.ranges) {
 					if(handicapDifference >= range.minValue && handicapDifference <= range.maxValue) {
 						return range.w;
 					}
-					break;
+					
 				}
-				break;
+				
 			}
 		}
-		return 0;
+		
+		throw new RuntimeException("Invalid Score - the score must be one of the following values 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150");
 	}
 
 }
