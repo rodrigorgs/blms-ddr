@@ -564,4 +564,8 @@ public class Registry {
 
 		updateDb();
 	}
+	
+	public BlmsDataStore getStore() {
+		return this.store;
+	}
 }

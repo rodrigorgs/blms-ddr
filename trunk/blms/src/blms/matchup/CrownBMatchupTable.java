@@ -3,7 +3,7 @@ package blms.matchup;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CrownBMatchupTable implements IMatchupTable {
+public class CrownBMatchupTable {
 
 	public static final CrownBMatchupTable instance = new CrownBMatchupTable();
 	List<SubTable> subTables;
@@ -259,7 +259,6 @@ public class CrownBMatchupTable implements IMatchupTable {
 		return instance;
 	}
 
-	@Override
 	public int getW(int handicapDifference, int winnerScore) {
 		
 		if(winnerScore <= 0) {
