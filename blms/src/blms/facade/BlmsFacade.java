@@ -653,7 +653,7 @@ public class BlmsFacade {
 		User userB = getObject(idB, User.class);
 		League league = getObject(leagueId, League.class);
 		int handicapDifference = userA.getHandicap(league) - userB.getHandicap(league);
-		IMatchupTable matchupTable = CrownBMatchupTable.getInstance();
+		CrownBMatchupTable matchupTable = CrownBMatchupTable.getInstance();
 		return matchupTable.getW(handicapDifference, Integer.parseInt(scoreA));
 	}
 }
