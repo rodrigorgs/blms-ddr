@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import blms.Join;
 import blms.League;
@@ -656,4 +657,11 @@ public class BlmsFacade {
 		CrownBMatchupTable matchupTable = CrownBMatchupTable.getInstance();
 		return matchupTable.getW(handicapDifference, Integer.parseInt(scoreA));
 	}
+	
+	public String showHandicapHistory(String userId, String leagueId) throws Exception {
+		User user = getObject(userId, User.class);
+		League league = getObject(leagueId, League.class);
+		return user.handicapHistoryString(league);
+	}
+	
 }
