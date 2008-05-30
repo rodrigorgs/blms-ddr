@@ -37,11 +37,16 @@ try {
                 else
                     break;
             }
+            
+            String result = "";
 
             if (!params.isEmpty()) {
                 try {
                     facade.useDatabase(BlmsConfig.DBNAME);
-                    
+                    if(methodName.equals("showHandicapHistory")) {
+                        result = (String)(m.invoke(facade, params.toArray()));
+                        session.setAttribute("result", result);
+                    }
                     m.invoke(facade, params.toArray());
                 } catch (InvocationTargetException e) {
                     request.setAttribute("exception", e.getCause());
@@ -52,7 +57,11 @@ try {
                 } finally {
                     facade.closeDatabase();
                 }
-                pageContext.forward("ok.jsp?operation=" + title);
+                if(methodName.equals("showHandicapHistory")) {
+                    pageContext.forward("handicap.jsp");
+                } else {
+                    pageContext.forward("ok.jsp?operation=" + title);
+                }
             }
         }
     }
