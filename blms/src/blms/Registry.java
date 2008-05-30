@@ -462,6 +462,10 @@ public class Registry {
 
 		updateDb();
 	}
+	
+	public void saveAll() {
+		this.updateDb();
+	}
 
 	/**
 	 * Adds a result of a match.

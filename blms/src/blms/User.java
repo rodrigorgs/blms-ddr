@@ -27,7 +27,6 @@ public class User {
 	Collection<Match> matches;
 	Map<League, Integer> handicaps;
 	Map<League, List<String>> handicapHistory;
-	SimpleDateFormat dateFormat;
 	
 	/**
 	 * Creates a user with the given parameters. At least one phone number
@@ -58,7 +57,6 @@ public class User {
 		this.picture = picture;
 		this.handicaps = new HashMap<League, Integer>();
 		this.handicapHistory = new HashMap<League, List<String>>();
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	}
 
 	/**
@@ -113,8 +111,8 @@ public class User {
 		} else {
 			messageResult = "lose";
 		}
-		historyForLeague.add("Handicap changed to " + newHandicap + " at " + 
-				todaysDate() + "due to " + messageResult + ".");
+		historyForLeague.add("Handicap changed to " + this.getHandicap(league) + " at " + 
+				todaysDate() + " due to " + messageResult + ".");
 	}
 	
 	/**
@@ -405,7 +403,7 @@ public class User {
 		}
 		handicaps.put(league, new Integer(handicap));
 		List<String> historyForLeague = this.getHandicapHistory(league);
-		historyForLeague.add("Handicap changed to " + handicap + " at " + todaysDate() + " manually.");
+		historyForLeague.add("Handicap changed to " + this.getHandicap(league) + " at " + todaysDate() + " manually.");
 	}
 
 	public void removeHandicap(League league) {
@@ -420,16 +418,19 @@ public class User {
 	}
 	
 	private String todaysDate() {
-		return dateFormat.format(new Date());
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		String date = format.format(new java.util.Date());
+		return date;
 	}
 	
 	public String handicapHistoryString(League league) {
-		String result = "User name = " + this.firstName + " " + this.lastName + "\n"
-			+ "League name  = " + league.getName() + "\n" 
-			+ "Current handicap = " + getHandicap(league) + "\n\n"
-			+ "History: \n\n";
+		String result = "User name = " + this.firstName + " " + this.lastName + ";"
+			+ "League name  = " + league.getName() + ";"
+			+ "League expression = " + league.getHandicapExpression() + ";"
+			+ "Current handicap = " + getHandicap(league) + ";;"
+			+ "History: ;;";
 		for(String message : getHandicapHistory(league)) {
-			result += message + "\n";
+			result += message + ";";
 		}
 		return result;
 	}
