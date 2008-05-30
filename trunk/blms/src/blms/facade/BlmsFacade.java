@@ -618,6 +618,7 @@ public class BlmsFacade {
 		League league = getObject(leagueId, League.class);
 		// try {
 		league.setHandicapExpression(expression);
+		this.registry.saveAll();
 	}
 	
 	public String getPlayerHandicap (String id, String leagueId) throws Exception {
@@ -632,6 +633,7 @@ public class BlmsFacade {
 		try {
 			int handicap = Integer.parseInt(newHandicap);
 			user.setHandicap(league, handicap);
+			this.registry.saveAll();
 		} catch (BlmsException e) {
 			throw new RuntimeException(e.getMessage());
 		} 
@@ -661,6 +663,7 @@ public class BlmsFacade {
 	public String showHandicapHistory(String userId, String leagueId) throws Exception {
 		User user = getObject(userId, User.class);
 		League league = getObject(leagueId, League.class);
+		this.registry.saveAll();
 		return user.handicapHistoryString(league);
 	}
 	
