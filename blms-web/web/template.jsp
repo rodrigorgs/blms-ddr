@@ -24,7 +24,7 @@
         <ul>        
         <li><a href="do.jsp?method=createLeague&title=Create League&fields=League name,User operator ID">Create League</a></li>
         <li><a href="do.jsp?method=deleteLeague&title=Delete League&fields=League ID">Delete League</a></li>
-        <li><a href="do.jsp?method=updateLeague&title=Update League&fields=League ID">Update League</a></li>
+        <li><a href="do.jsp?method=updateLeague&title=Update League&fields=League ID,Attribute Name='operator',New value">Update League</a></li>
         <li><a href="view.jsp?what=League&title=View Leagues">View Leagues</a></li>
         </ul>
 
@@ -36,12 +36,21 @@
         
         <li>Matches</li>
         <ul>
-        <li><a href="do.jsp?method=addMatchResult&title=Add Match Result&fields=League ID,Date,Winner user ID,Loser user ID,Length,Score,Longest run for winner,Longest run for loser">Add Match Result</a></li> 
+        <li><a href="do.jsp?method=addMatchResultToday&title=Add Match Result&fields=League ID,Winner user ID,Loser user ID">Add Match Result</a></li> 
         <li><a href="do.jsp?method=deleteMatch&title=Delete Match Result&fields=Match ID">Delete Match Result</a></li> 
         <li><a href="do.jsp?method=updateMatchResult&title=Update Match Result&fields=Match ID,Date,Winner user ID,Loser user ID,Length,Score,Longest run for winner,Longest run for loser">Update Match Result</a></li> 
         <li><a href="view.jsp?what=Match&title=View Matches">View Matches</a></li>
         </ul>
+        
+        <li>Handicaps</li>
+        <ul>
+            <li><a href="do.jsp?method=defineHandicapExpression&title=Update Handicap Expression (use variables 'win' and 'loss')&fields=League ID,Handicap expression">Update handicap expression</a></li>
+            <li><a href="do.jsp?method=changeHandicap&title=Update User Handicap&fields=User ID, League ID,New handicap">Update user handicap</a></li>
+            <li><a href="do.jsp?method=showHandicapHistory&title=Show Handicap History&fields=User ID, League ID">Show Handicap History</a></li>
         </ul>
+        </ul>
+        
+        
             
         </td><td align="left" valign="top" width="*">            
             <t:getAsString name="body" ignore="true"/>
