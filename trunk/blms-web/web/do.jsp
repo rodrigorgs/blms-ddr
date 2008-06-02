@@ -43,7 +43,9 @@ try {
             if (!params.isEmpty()) {
                 try {
                     facade.useDatabase(BlmsConfig.DBNAME);
-                    if(methodName.equals("showHandicapHistory")) {
+                    if(methodName.equals("showHandicapHistory")
+                            || methodName.equals("computeHypoteticalW")
+                            || methodName.equals("computeW")) {
                         result = (String)(m.invoke(facade, params.toArray()));
                         session.setAttribute("result", result);
                     }
@@ -60,7 +62,12 @@ try {
                 if(methodName.equals("showHandicapHistory")) {
                     pageContext.forward("handicap.jsp");
                 } else {
+                    if(methodName.equals("computeHypoteticalW")
+                            || methodName.equals("computeW")) {
+                        pageContext.forward("matchup.jsp");
+                    } else {
                     pageContext.forward("ok.jsp?operation=" + title);
+                    }
                 }
             }
         }
