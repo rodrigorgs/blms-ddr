@@ -642,7 +642,7 @@ public class BlmsFacade {
 		}
 	}
 
-	public int computeW (String idA, String idB, String scoreA, String leagueId) throws Exception {
+	public String computeW (String idA, String idB, String scoreA, String leagueId) throws Exception {
 		if(scoreA == null || scoreA.equals("")) {
 			throw new RuntimeException("Required: Score");
 		}
@@ -657,7 +657,13 @@ public class BlmsFacade {
 		League league = getObject(leagueId, League.class);
 		int handicapDifference = userA.getHandicap(league) - userB.getHandicap(league);
 		CrownBMatchupTable matchupTable = CrownBMatchupTable.getInstance();
-		return matchupTable.getW(handicapDifference, Integer.parseInt(scoreA));
+		return "" + matchupTable.getW(handicapDifference, Integer.parseInt(scoreA));
+	}
+	
+	public String computeHypoteticalW(String h1, String h2, String s) { 
+		int handicapDifference = Integer.parseInt(h1) - Integer.parseInt(h2);
+		CrownBMatchupTable matchupTable = CrownBMatchupTable.getInstance();
+		return "" + matchupTable.getW(handicapDifference, Integer.parseInt(s));
 	}
 	
 	public String showHandicapHistory(String userId, String leagueId) throws Exception {
