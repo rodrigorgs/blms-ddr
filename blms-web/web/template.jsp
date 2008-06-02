@@ -48,6 +48,12 @@
             <li><a href="do.jsp?method=changeHandicap&title=Update User Handicap&fields=User ID, League ID,New handicap">Update user handicap</a></li>
             <li><a href="do.jsp?method=showHandicapHistory&title=Show Handicap History&fields=User ID, League ID">Show Handicap History</a></li>
         </ul>
+        
+        <li>Matchups</li>
+        <ul>
+            <li><a href="do.jsp?method=computeHypoteticalW&title=Calculate Hypotetical Matchup&fields=H1,H2,S">Calculate hypotetical matchup</a></li>
+            <li><a href="do.jsp?method=computeW&title=Calculate Hypotetical Matchup&fields=User ID1,User ID2,Score 1,League ID">Calculate actual matchup</a></li>
+        </ul>
         </ul>
         
         
